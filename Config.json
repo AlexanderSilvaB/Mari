@@ -1,0 +1,22 @@
+{
+    "Modules" :
+    {
+        "Vision" : 
+        {
+            "Enabled" : true,
+            "Ball" : 
+            {
+                "Size" : [0.1, 0.1],
+                "Method" : "Cascade"
+            }
+        },
+        "Motion" : 
+        {
+            "Enabled" : true
+        },
+        "Perception" : 
+        {
+            "Enabled" : true
+        }
+    }
+}
