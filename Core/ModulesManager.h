@@ -7,8 +7,8 @@
 class ModulesManager
 {
     private:
-        vector<Module*> modules;
-        bool isRunning;
+        static vector<Module*> modules;
+        static void SignalHandler(int);
     public:
         ModulesManager();
         virtual ~ModulesManager();
