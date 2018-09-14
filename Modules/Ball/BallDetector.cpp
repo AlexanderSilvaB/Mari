@@ -49,6 +49,7 @@ BallDetector::BallDetector(SpellBook *spellBook) : Module(spellBook, TICK_TIME)
     method = CASCADE;
 }
 
+#ifdef USE_UNSW
 float BallDetector::CalculateDesiredPitch(XYZ_Coord &neckRelativeTarget)
 {
     float xSq = neckRelativeTarget.x * neckRelativeTarget.x;
@@ -70,6 +71,7 @@ float BallDetector::CalculateDesiredYaw(XYZ_Coord &neckRelativeTarget)
 {
     return atan2(neckRelativeTarget.y, neckRelativeTarget.x);
 }
+#endif
 
 void BallDetector::Tick(float ellapsedTime)
 {
@@ -119,6 +121,7 @@ void BallDetector::Tick(float ellapsedTime)
         spellBook->visionSpell.TimeSinceBallSeen += ellapsedTime;
         spellBook->visionSpell.HeadRelative = true;
         ballLostCount++;
+        #ifdef USE_UNSW
         if(ballLostCount > 3)
         {
             targetPitch = CalculateDesiredPitch(neckRelative);
@@ -132,62 +135,53 @@ void BallDetector::Tick(float ellapsedTime)
             spellBook->visionSpell.BallDistance = 0.0f;
             spellBook->visionSpell.HeadSpeed = speed;
         }
+        #endif
     }
     else
     {
         cv::Point pt(ball.x, ball.y);
         cv::circle(frame, pt, ball.radius, cv::Scalar(0, 0, 255), CV_FILLED);
-        /*        
-
+        #ifdef USE_UNSW
+        Blackboard *blackboard = InitManager::GetBlackboard();
+        conv_rr_.pose = readFrom(motion, pose);
+        conv_rr_.updateAngles(readFrom(kinematics, sensorsLagged));
+        RRCoord ballPosRR = conv_rr_.convertToRR(ball.x, ball.y + TOP_IMAGE_ROWS, true);
+        targetYaw = ballPosRR.heading();
+        float factor = abs(targetYaw) / 1.06290551;
+        speed = 0.75 * factor;
+        ballLostCount = 0;
+        neckRelative = conv_rr_.pose.robotRelativeToNeckCoord(ballPosRR, BALL_RADIUS);
+        targetPitch = CalculateDesiredPitch(neckRelative);
+        distance = ballPosRR.distance() / 1000.0f;
+        #else
+        #ifdef USE_QIBUILD    
         // Azimuth
         x_ = 1.0f - pt.x * w_;
         yc = sqrt(R*R - x_*x_);
         alpha = atan2(yc, x_);
         if(x_ == 0)
-            angles[0] = 0;
+            targetYaw = 0;
         else if(x_ < 0)
-            angles[0] = -(alpha - PI_2);
+            targetYaw = -(alpha - PI_2);
         else 
-            angles[0] = -(-PI_2 + alpha);
+            targetYaw = -(-PI_2 + alpha);
 
 
         // Elevation
         y_ = pt.y * h_ - 1.0f;
-        angles[1] = y_*Deg2Rad(24.06f);
-
-        */
-
-       
-        /*
-        cout << "Found: " << pt << " [ " << ball.radius << " ] | [" << Rad2Deg(angles[0]) << "º, " << Rad2Deg(angles[1]) << "º]" << endl;
-        spellBook->visionSpell.BallDetected = true;
-        spellBook->visionSpell.BallAzimuth = angles[0];
-        spellBook->visionSpell.BallElevation = angles[1];
-        spellBook->visionSpell.BallDistance = 0;
-        //spellBook->visionSpell.BallDistance = 1.0f;
-        spellBook->visionSpell.TimeSinceBallSeen = 0.0f;
-        */
-
-        Blackboard *blackboard = InitManager::GetBlackboard();
-        conv_rr_.pose = readFrom(motion, pose);
-        conv_rr_.updateAngles(readFrom(kinematics, sensorsLagged));
-        RRCoord ballPosRR = conv_rr_.convertToRR(ball.x, ball.y + TOP_IMAGE_ROWS, true);
-        //cout << ballPosRR.distance() << ", " << ballPosRR.heading() << ", " << ballPosRR.orientation() << endl;
-        //float CONSTANT_X = 320.0 / 1.06290551;
-        //float xDiff = -(ball.x - 640 / 2.0f) / CONSTANT_X;
-        targetYaw = ballPosRR.heading();
-        float factor = abs(targetYaw) / 1.06290551;
-        float speed = 0.75 * factor;
-        ballLostCount = 0;
-        //targetPitch = ( ball.y * h_ - 1.0f)*IMAGE_VFOV*0.5f;
-        neckRelative = conv_rr_.pose.robotRelativeToNeckCoord(ballPosRR, BALL_RADIUS);
-        targetPitch = CalculateDesiredPitch(neckRelative);
+        //targetPitch = y_*Deg2Rad(24.06f);       
+        targetPitch = 0;
+        distance = 0.2f;
+        speed = 0.2f;
+        cout << "Found: " << pt << " [ " << ball.radius << " ] | [" << Rad2Deg(targetYaw) << "º, " << Rad2Deg(targetPitch) << "º]" << endl;
+        #endif
+        #endif
 
         spellBook->visionSpell.BallDetected = true;
         spellBook->visionSpell.HeadRelative = true;
         spellBook->visionSpell.BallAzimuth = targetYaw;
         spellBook->visionSpell.BallElevation = targetPitch;
-        spellBook->visionSpell.BallDistance = ballPosRR.distance() / 1000.0f;
+        spellBook->visionSpell.BallDistance = distance;
         spellBook->visionSpell.TimeSinceBallSeen = 0.0f;
         spellBook->visionSpell.HeadSpeed = speed;
     }

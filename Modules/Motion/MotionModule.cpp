@@ -60,7 +60,7 @@ void MotionModule::OnStart()
     #ifdef USE_QIBUILD
     posture->GoToPosture("StandInit", 1.0f);
     motion->Move(0.01f, 0.0f, 0.0f);
-    Timer::Wait(200);
+    usleep(200*1000);
     motion->Move(0.0f, 0.0f, 0.0f);
     #endif
     #endif
@@ -104,8 +104,10 @@ void MotionModule::Tick(float ellapsedTime)
             SensorValues sensors = motion->GetSensors();
             //cout << sensors.joints.angles[Joints::HeadYaw] << endl;
             //cout << sensors.joints.angles[Joints::HeadPitch] << endl;
-            headAngles[0] = sensors.joints.angles[Joints::HeadYaw];
-            headAngles[1] = sensors.joints.angles[Joints::HeadPitch];
+            //headAngles[0] = sensors.joints.angles[Joints::HeadYaw];
+            headAngles[0] = 0;
+            //headAngles[1] = sensors.joints.angles[Joints::HeadPitch];
+            headAngles[1] = 0;
             #else
             #ifdef USE_QIBUILD
             headAngles[0] = motion->GetAngle("HeadYaw", true);
@@ -116,10 +118,11 @@ void MotionModule::Tick(float ellapsedTime)
             spellBook->motionSpell.HeadAzimuth = headAngles[0];
             headSpeed = spellBook->visionSpell.HeadSpeed;
             
-            //nextHeadAngles[0] = headAngles[0] + spellBook->visionSpell.BallAzimuth;
-            nextHeadAngles[0] = spellBook->visionSpell.BallAzimuth;
+            nextHeadAngles[0] = headAngles[0] + spellBook->visionSpell.BallAzimuth;
+            //nextHeadAngles[0] = spellBook->visionSpell.BallAzimuth;
             //nextHeadAngles[1] = headAngles[1] + spellBook->visionSpell.BallElevation + Deg2Rad(13.75f);
-            nextHeadAngles[1] = spellBook->visionSpell.BallElevation;
+            nextHeadAngles[1] = headAngles[1] + spellBook->visionSpell.BallElevation;
+            //nextHeadAngles[1] = spellBook->visionSpell.BallElevation;
         }
         else
         {

@@ -35,12 +35,14 @@ class BallDetector : public Module
 
         #if USE_UNSW
         CameraToRR conv_rr_;
+        XYZ_Coord neckRelative;
         #endif
         float closeInPitch, farPitch, ballYaw, ballPitch;
         bool ballCloseIn;
         float ballCloseInDistance, targetYaw, targetPitch;
         int ballLostCount;
-        XYZ_Coord neckRelative;
+        float distance;
+        float speed;
 
         cv::CascadeClassifier cascade;
         cv::Mat img;
@@ -53,8 +55,10 @@ class BallDetector : public Module
         bool CascadeMethod();
         bool GeometricMethod();
         bool NeuralMethod();
+        #if USE_UNSW
         float CalculateDesiredPitch(XYZ_Coord &neckRelativeTarget);
         float CalculateDesiredYaw(XYZ_Coord &neckRelativeTarget);
+        #endif
     public:
         BallDetector(SpellBook *spellBook);
         void Tick(float ellapsedTime);
