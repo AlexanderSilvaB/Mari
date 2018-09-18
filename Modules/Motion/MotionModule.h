@@ -46,6 +46,8 @@ class MotionModule : public Module
         bool kickRight, _kickRight;
         bool limpLeft, _limpLeft;
         bool limpRight, _limpRight;
+
+        void ScaleWalk2014(float *forward, float *left, float *turn);
     public:
         MotionModule(SpellBook *spellBook);
         ~MotionModule();

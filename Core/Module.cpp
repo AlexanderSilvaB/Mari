@@ -67,10 +67,17 @@ void Module::Start()
 void Module::Stop()
 {
     is_running = false;
+    Join();
+}
+
+void Module::Join()
+{
+    cout << "Join" << endl;
     int rc;
     pthread_join(thread, NULL);
     OnStop();
 }
+
 void *Module::Run(void *arg)
 {
     Module *module = (Module *)arg;

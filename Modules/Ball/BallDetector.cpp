@@ -173,9 +173,10 @@ void BallDetector::Tick(float ellapsedTime)
         targetPitch = 0;
         distance = 0.2f;
         speed = 0.2f;
+        #endif
+        #endif
+
         cout << "Found: " << pt << " [ " << ball.radius << " ] | [" << Rad2Deg(targetYaw) << "º, " << Rad2Deg(targetPitch) << "º]" << endl;
-        #endif
-        #endif
 
         spellBook->visionSpell.BallDetected = true;
         spellBook->visionSpell.HeadRelative = true;

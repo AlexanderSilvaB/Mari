@@ -24,8 +24,8 @@ int main(int argc,char *argv[])
         manager.Attach(new PerceptionModule(&spellBook));
     if(spellBook.modulesSpell.LoadMotion)
     {
-        manager.Attach(new MotionModule(&spellBook));
         manager.Attach(new RemoteModule(&spellBook));
+        manager.Attach(new MotionModule(&spellBook));
     }
     
     manager.Run();

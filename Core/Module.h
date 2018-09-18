@@ -16,6 +16,7 @@ class Module
     virtual void Tick(float ellapsedTime);
     void Start();
     void Stop();
+    void Join();
     virtual void OnStop();
     virtual void OnStart();
 

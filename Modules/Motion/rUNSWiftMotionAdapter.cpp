@@ -166,6 +166,10 @@ void rUNSWiftMotionAdapter::Tick(ActionCommand::All &request)
         sensors.sensors[Sensors::InertialSensor_AngleY] = -RAD2DEG(sensors.sensors[Sensors::InertialSensor_AngleY]);
         sensors.sensors[Sensors::InertialSensor_GyrX] = -sensors.sensors[Sensors::InertialSensor_GyrX];
         sensors.sensors[Sensors::InertialSensor_GyrY] = -sensors.sensors[Sensors::InertialSensor_GyrY];
+        cout << sensors.sensors[Sensors::InertialSensor_AngleX] << endl;
+        cout << sensors.sensors[Sensors::InertialSensor_AngleY] << endl;
+        cout << sensors.sensors[Sensors::InertialSensor_GyrX] << endl;
+        cout << sensors.sensors[Sensors::InertialSensor_GyrY] << endl;
     }
     else
     {

@@ -29,7 +29,7 @@ MotionModule::MotionModule(SpellBook *spellBook) : Module(spellBook, 0)
     headAngles[0] = headAngles[1] = 0;
     nextHeadAngles[0] = nextHeadAngles[1] = 0;
 
-    minDistanceToBall = 0.10f;
+    minDistanceToBall = 0.20f;
 
     vx = vy = vth = 0;
     headSpeed = 0;
@@ -115,7 +115,6 @@ void MotionModule::Tick(float ellapsedTime)
             #endif
             #endif
 
-            spellBook->motionSpell.HeadAzimuth = headAngles[0];
             headSpeed = spellBook->visionSpell.HeadSpeed;
             
             nextHeadAngles[0] = headAngles[0] + spellBook->visionSpell.BallAzimuth;
@@ -123,6 +122,8 @@ void MotionModule::Tick(float ellapsedTime)
             //nextHeadAngles[1] = headAngles[1] + spellBook->visionSpell.BallElevation + Deg2Rad(13.75f);
             nextHeadAngles[1] = headAngles[1] + spellBook->visionSpell.BallElevation;
             //nextHeadAngles[1] = spellBook->visionSpell.BallElevation;
+
+            spellBook->motionSpell.HeadAzimuth = spellBook->visionSpell.BallAzimuth;
         }
         else
         {
@@ -153,8 +154,9 @@ void MotionModule::Tick(float ellapsedTime)
                     vx = min(spellBook->visionSpell.BallDistance, 0.1f);
                 vy = 0.0f;
                 if(abs(spellBook->motionSpell.HeadAzimuth) > Deg2Rad(10.0f))
-                    //vth = spellBook->motionSpell.HeadAzimuth
-                    vth = spellBook->motionSpell.HeadAzimuth * 0.3f;
+                {
+                    vth = spellBook->motionSpell.HeadAzimuth * 0.6f;
+                }
                 else
                     vth = 0.0f;
             }
@@ -164,8 +166,9 @@ void MotionModule::Tick(float ellapsedTime)
                 vx = 0.0f;
                 vy = 0.0f;
                 if(abs(spellBook->motionSpell.HeadAzimuth) > Deg2Rad(10.0f))
-                    //vth = spellBook->motionSpell.HeadAzimuth * 0.5f;
-                    vth = spellBook->motionSpell.HeadAzimuth * 0.3f;
+                {
+                    vth = spellBook->motionSpell.HeadAzimuth * 0.6f;
+                }
                 else
                     vth = 0.0f;
             }
@@ -214,8 +217,14 @@ void MotionModule::Tick(float ellapsedTime)
     {
         request.head = ActionCommand::Head(nextHeadAngles[0], nextHeadAngles[1], !headRelative, headSpeed, 0.2f);
         //if(vx != 0 || vy != 0 || vth != 0)
-            request.body = ActionCommand::Body(ActionCommand::Body::WALK, vx*1000.0f, vy*1000.0f, vth);
+        {
+            vx *= 1000.0f;
+            vy *= 1000.0f;
+            ScaleWalk2014(&vx, &vy, &vth);
+            cout << vx << ", " << vy << ", " << Rad2Deg(vth) << endl;
+            request.body = ActionCommand::Body(ActionCommand::Body::WALK, vx, vy, vth);
             request.body.bend = 30.0f;
+        }
         //else
         //    request.body = ActionCommand::Body();       
         if(limpLeft != _limpLeft)
@@ -249,4 +258,17 @@ void MotionModule::Tick(float ellapsedTime)
     }
     #endif
     #endif
+}
+
+void MotionModule::ScaleWalk2014(float *forward, float *left, float *turn)
+{
+    float f = *forward;
+    float l = *left;
+    float t = *turn;
+    float sum = abs(f/300.0f) + abs(l/200.0f) + abs(t/1.5f);
+    if(sum <= 1)
+        return;
+    *forward = round(f/sum);
+    *left = round(l/sum);
+    *turn = round(t/sum);
 }
