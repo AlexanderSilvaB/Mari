@@ -3,7 +3,7 @@
     {
         "Vision" : 
         {
-            "Enabled" : false,
+            "Enabled" : true,
             "Ball" : 
             {
                 "Size" : [0.1, 0.1],
