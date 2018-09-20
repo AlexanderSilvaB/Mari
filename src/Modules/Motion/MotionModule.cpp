@@ -35,14 +35,12 @@ MotionModule::MotionModule(SpellBook *spellBook) : Module(spellBook, 0)
     headSpeed = 0;
     _stiff = false;
     _stand = false;
-    _kickLeft = _kickRight = false;
-    _limpLeft = _limpRight = false;
-
 
     stiff = true;
     stand = true;
     kickLeft = kickRight = false;
     limpLeft = limpRight = false;
+    getupFront = getupBack = false;
 }
 
 MotionModule::~MotionModule()
@@ -212,6 +210,16 @@ void MotionModule::Tick(float ellapsedTime)
         request.body = ActionCommand::Body(ActionCommand::Body::KICK);
         request.body.foot = ActionCommand::Body::RIGHT;
     }
+    else if(getupFront)
+    {
+        request.body = ActionCommand::Body(ActionCommand::Body::GETUP_FRONT);
+        request.body.foot = ActionCommand::Body::RIGHT;
+    }
+    else if(getupBack)
+    {
+        request.body = ActionCommand::Body(ActionCommand::Body::GETUP_BACK);
+        request.body.foot = ActionCommand::Body::RIGHT;
+    }
     else
     {
         request.head = ActionCommand::Head(nextHeadAngles[0], nextHeadAngles[1], !headRelative, headSpeed, 0.2f);
@@ -226,16 +234,8 @@ void MotionModule::Tick(float ellapsedTime)
         }
         //else
         //    request.body = ActionCommand::Body();       
-        if(limpLeft != _limpLeft)
-        {
-            request.body.leftArmLimp = limpLeft;
-            _limpLeft = limpLeft;
-        }
-        if(limpRight != _limpRight)
-        {
-            request.body.leftArmLimp = limpRight;
-            _limpRight = limpRight;
-        }
+        request.body.leftArmLimp = limpLeft;
+        request.body.leftArmLimp = limpRight;
     }
     motion->Tick(request);
     #else

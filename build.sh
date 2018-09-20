@@ -1,6 +1,8 @@
 #!/bin/bash
 
 cd src
-#qibuild configure -c robo
+if [ ! -d "buils-robo" ]; then
+    qibuild configure -c robo
+fi
 qibuild make -c robo
 cd ..

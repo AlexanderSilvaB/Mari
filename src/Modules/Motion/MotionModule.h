@@ -42,10 +42,11 @@ class MotionModule : public Module
         float vx, vy, vth;
         bool stiff, _stiff;
         bool stand, _stand;
-        bool kickLeft, _kickLeft;
-        bool kickRight, _kickRight;
-        bool limpLeft, _limpLeft;
-        bool limpRight, _limpRight;
+        bool kickLeft;
+        bool kickRight;
+        bool limpLeft;
+        bool limpRight;
+        bool getupFront, getupBack;
 
         void ScaleWalk2014(float *forward, float *left, float *turn);
     public:
