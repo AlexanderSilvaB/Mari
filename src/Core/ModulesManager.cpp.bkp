@@ -1,0 +1,159 @@
+#include "ModulesManager.h"
+#include <algorithm>
+#include <signal.h>
+#include <pthread.h>
+#include <setjmp.h>
+#include <sys/time.h>
+#include <string>
+#include "utils/ConcurrentMap.hpp"
+
+using namespace std;
+
+#define ALL_SIGNALS -1  // for indicating that we should register
+                        // all signal handlers
+
+bool system_running = false;
+
+ConcurrentMap<pthread_t, jmp_buf*> jumpPoints;
+
+void registerSignalHandlers(int signal);
+
+void overtimeAlert(int) 
+{
+   cout << " thread has frozen" << endl;
+   signal(SIGALRM, overtimeAlert);
+   struct itimerval itval5;
+   itval5.it_value.tv_sec = 5;
+   itval5.it_value.tv_usec = 0;
+   itval5.it_interval.tv_sec = 0;
+   itval5.it_interval.tv_usec = 0;
+   setitimer(ITIMER_REAL, &itval5, NULL);
+}
+
+/**
+ * The signal handler. Handles the signal and flag that the thread has died
+ * and allow the watcher thread to restart it.
+ * @param sigNumber The POSIX signal identifier
+ * @param info Signal info struct for the signal
+ * @see registerSignalHandler
+ */
+void handleSignals(int sigNumber, siginfo_t* info, void*) 
+{
+   // End the rUNSWift module [CTRL-C]. Call all destructors
+   if (sigNumber == SIGINT) {
+      cerr << endl;
+      cerr << "###########################" << endl;
+      cerr << "##    SIGINT RECEIVED    ##" << endl;
+      cerr << "##  ATTEMPTING SHUTDOWN  ##" << endl;
+      cerr << "###########################" << endl;
+      system_running = false;
+   } 
+   else if (sigNumber == SIGTERM) 
+   {
+      cerr << endl;
+      cerr << "###########################" << endl;
+      cerr << "##   SIGTERM RECEIVED    ##" << endl;
+      cerr << "##  ATTEMPTING SHUTDOWN  ##" << endl;
+      cerr << "###########################" << endl;
+      system_running = false;
+   } 
+   else 
+   {
+      // re-register the signal handler
+	  cout << "crash detected" << endl;
+      registerSignalHandlers(sigNumber);
+      pthread_t thread = pthread_self();
+
+      cerr << "Thread with id " << thread <<
+      " received signal " << sigNumber << " and is restarting" << endl;
+      /*
+      llog(ERROR) << string(Thread::name) << " with id "
+                  << thread << " received signal "
+                  << sigNumber << " and is restarting" << endl;
+        */
+      longjmp(*jumpPoints[thread], 1);
+   }
+   return;
+}
+
+
+/**
+ * @param signal default param is ALL_SIGNALS which is -1
+ */
+void registerSignalHandlers(int signal) 
+{
+   // setup the sigaction
+   struct sigaction act;
+   act.sa_sigaction = handleSignals;
+   sigemptyset(&act.sa_mask);
+   act.sa_flags = SA_SIGINFO | SA_RESETHAND;
+
+   // register the signal handlers
+   if (signal == SIGINT || signal == ALL_SIGNALS)
+      sigaction(SIGINT, &act, NULL);   // CTRL-C termination
+   if (signal == SIGTERM || signal == ALL_SIGNALS)
+      sigaction(SIGTERM, &act, NULL);   // kill -15 termination
+   if (signal == SIGSEGV || signal == ALL_SIGNALS)
+      sigaction(SIGSEGV, &act, NULL);  // seg fault
+   if (signal == SIGFPE || signal == ALL_SIGNALS)
+      sigaction(SIGFPE, &act, NULL);   // floating point exception
+   if (signal == SIGSTKFLT || signal == ALL_SIGNALS)
+      sigaction(SIGSTKFLT, &act, NULL);   // stack faults
+   if (signal == SIGHUP || signal == ALL_SIGNALS)
+      sigaction(SIGHUP, &act, NULL);   // lost controlling terminal
+}
+
+ModulesManager::ModulesManager()
+{
+    registerSignalHandlers(ALL_SIGNALS);   
+}
+
+ModulesManager::~ModulesManager()
+{
+    Cancel();
+}
+
+void ModulesManager::Attach(Module *module)
+{
+    modules.push_back(module);
+    if(system_running)
+        module->Start();
+}
+
+void ModulesManager::Dettach(Module *module)
+{
+    vector<Module*>::iterator it = find(modules.begin(), modules.end(), module);
+    if(it != modules.end())
+    {
+        modules.erase(it);
+        if(system_running)
+            module->Stop();
+    }
+}
+
+void ModulesManager::Run()
+{
+    if(system_running)
+        return;
+    for(int i = 0; i < modules.size(); i++)
+    {
+        modules[i]->Start();
+    }
+    system_running = true;
+    while(system_running)
+    {
+        cout << "Thread manager running" << endl;
+        usleep(100000);  
+    }
+}
+
+void ModulesManager::Cancel()
+{
+    if(!system_running)
+        return;
+    system_running = false;
+    for(int i = 0; i < modules.size(); i++)
+    {
+        modules[i]->Stop();
+    }
+}
