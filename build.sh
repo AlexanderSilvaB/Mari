@@ -1,8 +1,8 @@
 #!/bin/bash
 
 cd src
-if [ ! -d "buils-robo" ]; then
-    qibuild configure -c robo
+if [ ! -d "build-$1" ]; then
+    qibuild configure -c $1
 fi
-qibuild make -c robo
+qibuild make -c $1
 cd ..

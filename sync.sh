@@ -1,6 +1,6 @@
 #!/bin/bash
 
-robot="nao01.local"
+robot=$1
 
 echo "Sync keys"
 mkdir -p keys

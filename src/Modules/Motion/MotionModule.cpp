@@ -188,6 +188,9 @@ void MotionModule::Tick(float ellapsedTime)
         }
     }  
 
+    vx = 0.3f;
+    vy = 0.2f;
+
     #ifdef USE_UNSW
     ActionCommand::All request;
     if(stiff != _stiff)
