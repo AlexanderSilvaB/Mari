@@ -34,10 +34,10 @@ class MotionModule : public Module
         #endif
         #endif
 
-        float headAngles[2];
+        float headYaw;
+        float headPitch;
         float headSpeed;
         bool headRelative;
-        float nextHeadAngles[2];
         float minDistanceToBall;
         float vx, vy, vth;
         bool stiff, _stiff;

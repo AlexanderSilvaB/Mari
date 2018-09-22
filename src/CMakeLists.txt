@@ -63,4 +63,4 @@ add_subdirectory("Core/External")
 
 qi_create_bin(rinobot ${src} ${CORE_SRC} ${CORE_DRIVERS_SRC} ${CORE_UTILS_SRC} ${MODULES_SRC})
 qi_use_lib(rinobot RinoLib unsw )
-target_link_libraries(rinobot pthread ${OpenCV_LIBS})
+target_link_libraries(rinobot pthread ${OpenCV_LIBS} TcpUdpSocket)

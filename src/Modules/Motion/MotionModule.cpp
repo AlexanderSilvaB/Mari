@@ -25,9 +25,7 @@ MotionModule::MotionModule(SpellBook *spellBook) : Module(spellBook, 0)
     #endif
     #endif
 
-    spellBook->motionSpell.HeadAzimuth = 0;
-    headAngles[0] = headAngles[1] = 0;
-    nextHeadAngles[0] = nextHeadAngles[1] = 0;
+    headYaw = headPitch = 0;
 
     minDistanceToBall = 0.20f;
 
@@ -36,8 +34,8 @@ MotionModule::MotionModule(SpellBook *spellBook) : Module(spellBook, 0)
     _stiff = false;
     _stand = false;
 
-    stiff = true;
-    stand = true;
+    stiff = false;
+    stand = false;
     kickLeft = kickRight = false;
     limpLeft = limpRight = false;
     getupFront = getupBack = false;
@@ -79,117 +77,22 @@ void MotionModule::OnStop()
 
 void MotionModule::Tick(float ellapsedTime)
 {
-    
-    if(spellBook->motionSpell.RemoteMotion)
-    {
-        vx = spellBook->motionSpell.RemoteVx;
-        vy = spellBook->motionSpell.RemoteVy;
-        vth = spellBook->motionSpell.RemoteVth;
-        nextHeadAngles[0] = spellBook->motionSpell.RemoteHeadYaw;
-        nextHeadAngles[1] = spellBook->motionSpell.RemoteHeadPitch;
-        kickLeft = spellBook->motionSpell.RemoteKickLeft;
-        kickRight = spellBook->motionSpell.RemoteKickRight;
-        limpLeft = spellBook->motionSpell.RemoteLimpLeft;
-        limpRight = spellBook->motionSpell.RemoteLimpRight;
-        stand = spellBook->motionSpell.RemoteStand;
-        stiff = spellBook->motionSpell.RemoteStiff;
-    }
-    else
-    {
-        // Head
-        if(spellBook->visionSpell.BallDetected)
-        {
-            #ifdef USE_UNSW
-            SensorValues sensors = motion->GetSensors();
-            //cout << sensors.joints.angles[Joints::HeadYaw] << endl;
-            //cout << sensors.joints.angles[Joints::HeadPitch] << endl;
-            //headAngles[0] = sensors.joints.angles[Joints::HeadYaw];
-            headAngles[0] = 0;
-            //headAngles[1] = sensors.joints.angles[Joints::HeadPitch];
-            headAngles[1] = 0;
-            #else
-            #ifdef USE_QIBUILD
-            headAngles[0] = motion->GetAngle("HeadYaw", true);
-            headAngles[1] = motion->GetAngle("HeadPitch", true);
-            #endif
-            #endif
+    vx = spellBook->motionSpell.Vx;
+    vy = spellBook->motionSpell.Vy;
+    vth = spellBook->motionSpell.Vth;
+    headYaw = spellBook->motionSpell.HeadYaw;
+    headPitch = spellBook->motionSpell.HeadPitch;
+    headSpeed = spellBook->motionSpell.HeadSpeed;
+    headRelative = spellBook->motionSpell.HeadRelative;
+    kickLeft = spellBook->motionSpell.KickLeft;
+    kickRight = spellBook->motionSpell.KickRight;
+    limpLeft = spellBook->motionSpell.LimpLeft;
+    limpRight = spellBook->motionSpell.LimpRight;
+    stand = spellBook->motionSpell.Stand;
+    stiff = spellBook->motionSpell.Stiff;
+    getupFront = spellBook->motionSpell.GetupFront;
+    getupBack = spellBook->motionSpell.GetupBack;
 
-            headSpeed = spellBook->visionSpell.HeadSpeed;
-            
-            nextHeadAngles[0] = headAngles[0] + spellBook->visionSpell.BallAzimuth;
-            //nextHeadAngles[0] = spellBook->visionSpell.BallAzimuth;
-            //nextHeadAngles[1] = headAngles[1] + spellBook->visionSpell.BallElevation + Deg2Rad(13.75f);
-            nextHeadAngles[1] = headAngles[1] + spellBook->visionSpell.BallElevation;
-            //nextHeadAngles[1] = spellBook->visionSpell.BallElevation;
-
-            spellBook->motionSpell.HeadAzimuth = spellBook->visionSpell.BallAzimuth;
-        }
-        else
-        {
-            if(spellBook->visionSpell.TimeSinceBallSeen > 0.3f)
-            {
-                nextHeadAngles[0] = 0.0f;
-                nextHeadAngles[1] = 0.0f;
-
-                spellBook->motionSpell.HeadAzimuth = 0;
-            }
-            else
-            {
-                nextHeadAngles[0] = spellBook->visionSpell.BallAzimuth;
-                nextHeadAngles[1] = spellBook->visionSpell.BallElevation;
-            }
-        }
-        headRelative = spellBook->visionSpell.HeadRelative;
-
-        // Walk
-        if(spellBook->visionSpell.BallDetected)
-        {
-            if(spellBook->visionSpell.BallDistance > minDistanceToBall)
-            {
-                cout << "Walk: " << Rad2Deg(spellBook->visionSpell.BallAzimuth) << ", " << spellBook->visionSpell.BallDistance << endl;
-                if(spellBook->visionSpell.BallDistance > minDistanceToBall*1.3f)
-                    vx = 0.3f;
-                else
-                    vx = 0.3f;//min(spellBook->visionSpell.BallDistance, 0.1f);
-                vy = 0.0f;
-                if(abs(spellBook->motionSpell.HeadAzimuth) > Deg2Rad(10.0f))
-                {
-                    vth = spellBook->motionSpell.HeadAzimuth * 0.6f;
-                }
-                else
-                    vth = 0.0f;
-            }
-            else
-            {
-                cout << "Turn: " << Rad2Deg(spellBook->visionSpell.BallAzimuth) << ", " << spellBook->visionSpell.BallDistance << endl;
-                vx = 0.0f;
-                vy = 0.0f;
-                if(abs(spellBook->motionSpell.HeadAzimuth) > Deg2Rad(10.0f))
-                {
-                    vth = spellBook->motionSpell.HeadAzimuth * 0.6f;
-                }
-                else
-                    vth = 0.0f;
-            }
-        }
-        else
-        {
-            cout << "Search: " << spellBook->visionSpell.TimeSinceBallSeen << endl;
-            if(spellBook->visionSpell.TimeSinceBallSeen > 0.3f)
-            {
-                vx = 0.3f;
-                vy = 0.0f;
-                vth = 0.0f;
-            }
-            if(spellBook->visionSpell.TimeSinceBallSeen > 1.5f)
-            {
-                vth = Deg2Rad(10.0f);
-            }
-        }
-    }  
-
-    vx = 0.3f;
-    vy = 0.2f;
 
     #ifdef USE_UNSW
     ActionCommand::All request;
@@ -225,7 +128,7 @@ void MotionModule::Tick(float ellapsedTime)
     }
     else
     {
-        request.head = ActionCommand::Head(nextHeadAngles[0], nextHeadAngles[1], !headRelative, headSpeed, 0.2f);
+        request.head = ActionCommand::Head(headYaw, headPitch, !headRelative, headSpeed, 0.2f);
         //if(vx != 0 || vy != 0 || vth != 0)
         {
             vx *= 1000.0f;
@@ -253,8 +156,8 @@ void MotionModule::Tick(float ellapsedTime)
     }
     else
     {
-        anglesList[0] = nextHeadAngles[0];
-        anglesList[1] = nextHeadAngles[1];
+        anglesList[0] = headYaw;
+        anglesList[1] = headPitch;
         motion->AnglesInterpolation(namesList, anglesList, 0.1f);
         motion->Move(vx, vy, vth, moveConfig);
     }

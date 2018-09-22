@@ -4,6 +4,7 @@
 
 PerceptionModule::PerceptionModule(SpellBook *spellBook) : Module(spellBook, 30)
 {
+    vision = new Vision(spellBook);
     #ifdef USE_UNSW
     InitManager::GetBlackboard()->thread.configCallbacks["perception"];
     perception = new rUNSWiftPerceptionAdapter();
@@ -12,6 +13,7 @@ PerceptionModule::PerceptionModule(SpellBook *spellBook) : Module(spellBook, 30)
 
 PerceptionModule::~PerceptionModule()
 {
+    delete vision;
     #ifdef USE_UNSW
     delete perception;
     #endif
@@ -33,6 +35,7 @@ void PerceptionModule::OnStop()
 
 void PerceptionModule::Tick(float ellapsedTime)
 {
+    vision->Tick(ellapsedTime);
     #ifdef USE_UNSW
     perception->Tick();
     #endif

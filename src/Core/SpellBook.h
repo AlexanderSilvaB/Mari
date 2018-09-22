@@ -16,7 +16,8 @@ class Spell
 class ModulesSpell : public Spell
 {
     public:
-        bool LoadVision;
+        bool LoadStrategy;
+        bool LoadRemote;
         bool LoadMotion;
         bool LoadPerception;
 
@@ -25,9 +26,12 @@ class ModulesSpell : public Spell
         void Save(Storage &storage);
 };
 
-class VisionSpell : public Spell
+class BallSpell : public Spell
 {
     public:
+        std::string method;
+        float ballWidth, ballHeight;
+
         bool BallDetected;
         float BallAzimuth;
         float BallElevation;
@@ -36,25 +40,49 @@ class VisionSpell : public Spell
         bool HeadRelative;
         float TimeSinceBallSeen;
 
-        VisionSpell();
+        BallSpell();
         void Load(Storage &storage);
         void Save(Storage &storage);
 
 };
 
+class PerceptionSpell : public Spell
+{
+    public:
+        bool EnableBallDetector;
+
+        BallSpell ballSpell;
+
+        PerceptionSpell();
+        void Load(Storage &storage);
+        void Save(Storage &storage);
+};
+
 class MotionSpell : public Spell
 {
     public:
-        float HeadAzimuth;
-
-        bool RemoteMotion;
-        bool RemoteStand, RemoteStiff;
-        float RemoteVx, RemoteVy, RemoteVth;
-        float RemoteHeadYaw, RemoteHeadPitch;
-        bool RemoteKickLeft, RemoteKickRight;
-        bool RemoteLimpLeft, RemoteLimpRight;
+        bool Remote;
+        bool Stand, Stiff;
+        float Vx, Vy, Vth;
+        float HeadYaw, HeadPitch;
+        float HeadSpeed;
+        bool HeadRelative;
+        bool KickLeft, KickRight;
+        bool LimpLeft, LimpRight;
+        bool GetupFront, GetupBack;
 
         MotionSpell();
+        void Load(Storage &storage);
+        void Save(Storage &storage);
+};
+
+class RemoteSpell : public Spell
+{
+    public:
+        bool EnableJoystick;
+        bool EnableNetwork;
+
+        RemoteSpell();
         void Load(Storage &storage);
         void Save(Storage &storage);
 };
@@ -62,9 +90,10 @@ class MotionSpell : public Spell
 class SpellBook
 {
     public:
-        VisionSpell visionSpell;
+        PerceptionSpell perceptionSpell;
         MotionSpell motionSpell;
         ModulesSpell modulesSpell;
+        RemoteSpell remoteSpell;
 
         SpellBook();
         void Load(std::string fileName);

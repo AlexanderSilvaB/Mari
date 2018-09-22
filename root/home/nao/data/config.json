@@ -1,22 +1,38 @@
 {
     "Modules" :
     {
-        "Vision" : 
-        {
-            "Enabled" : true,
-            "Ball" : 
-            {
-                "Size" : [0.1, 0.1],
-                "Method" : "Cascade"
-            }
-        },
         "Motion" : 
         {
             "Enabled" : true
         },
         "Perception" : 
         {
+            "Enabled" : true,
+            "BallDetector" : 
+            {
+                "Enabled" : false,
+                "Ball" : 
+                {
+                    "Size" : [0.1, 0.1],
+                    "Method" : "Cascade"
+                }
+            }
+        },
+        "Strategy" : 
+        {
             "Enabled" : true
+        },
+        "Remote" : 
+        {
+            "Enabled" : true,
+            "Joystick" : 
+            {
+                "Enabled" : true
+            },
+            "Network" : 
+            {
+                "Enabled" : true
+            }
         }
     }
 }

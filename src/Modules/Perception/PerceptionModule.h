@@ -10,6 +10,8 @@
 #include "rUNSWiftPerceptionAdapter.h"
 #endif
 
+#include "Vision.h"
+
 using namespace std;
 
 class PerceptionModule : public Module
@@ -18,6 +20,8 @@ class PerceptionModule : public Module
         #ifdef USE_UNSW
         rUNSWiftPerceptionAdapter *perception;
         #endif
+
+        Vision *vision;
     public:
         PerceptionModule(SpellBook *spellBook);
         ~PerceptionModule();
