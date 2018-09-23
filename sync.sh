@@ -15,6 +15,8 @@ root=false
 services=false
 home=true
 restart=false
+build=false
+configure=false
 
 for i in "$@" ; do
     if [[ $i == "-sudo" ]] ; then
@@ -29,8 +31,20 @@ for i in "$@" ; do
         home=false
     elif [[ $i == "-restart" ]] ; then
         restart=true
+    elif [[ $i == "-build" ]] ; then
+        build=true
+    elif [[ $i == "-configure" ]] ; then
+        configure=true
     fi
 done
+
+if [ $build == true ]; then
+    if [ $configure == true ]; then
+        ./build.sh $2 -configure
+    else
+        ./build.sh $2
+    fi
+fi
 
 if [ $ssh == true ]; then
     echo "Sync keys"
