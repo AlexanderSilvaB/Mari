@@ -39,6 +39,7 @@ MotionModule::MotionModule(SpellBook *spellBook) : Module(spellBook, 0)
     kickLeft = kickRight = false;
     limpLeft = limpRight = false;
     getupFront = getupBack = false;
+    walk = false;
 }
 
 MotionModule::~MotionModule()
@@ -92,6 +93,7 @@ void MotionModule::Tick(float ellapsedTime)
     stiff = spellBook->motionSpell.Stiff;
     getupFront = spellBook->motionSpell.GetupFront;
     getupBack = spellBook->motionSpell.GetupBack;
+    walk = spellBook->motionSpell.Walk;
 
 
     #ifdef USE_UNSW
@@ -126,7 +128,7 @@ void MotionModule::Tick(float ellapsedTime)
         request.body = ActionCommand::Body(ActionCommand::Body::GETUP_BACK);
         request.body.foot = ActionCommand::Body::RIGHT;
     }
-    else
+    else if(walk)
     {
         request.head = ActionCommand::Head(headYaw, headPitch, !headRelative, headSpeed, 0.2f);
         //if(vx != 0 || vy != 0 || vth != 0)

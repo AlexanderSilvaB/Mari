@@ -24,7 +24,7 @@
         },
         "Remote" : 
         {
-            "Enabled" : true,
+            "Enabled" : false,
             "Joystick" : 
             {
                 "Enabled" : true

@@ -47,6 +47,7 @@ class MotionModule : public Module
         bool limpLeft;
         bool limpRight;
         bool getupFront, getupBack;
+        bool walk;
 
         void ScaleWalk2014(float *forward, float *left, float *turn);
     public:

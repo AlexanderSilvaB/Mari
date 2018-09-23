@@ -9,9 +9,9 @@ if [ ! -f ~/.ssh/id_rsa ]; then
 fi
 
 SSH_CMD="ssh -o ControlMaster=auto -o ControlPath=/tmp/control_%l_%h_%p_%r"
+cat ~/.ssh/id_rsa.pub | $SSH_CMD -l nao $robot "mkdir -p .ssh; sh -c 'cat >> .ssh/authorized_keys'; chmod 700 ~/.ssh; chmod 600 ~/.ssh/authorized_keys ; chmod g-w,o-w /home/nao"
 
-cat ~/.ssh/id_rsa.pub | $SSH_CMD -l nao $robot "mkdir -p .ssh; sh -c 'cat >> .ssh/authorized_keys'; chmod 700 .ssh; chmod 600 .ssh/authorized_keys "
-
+echo "Disable sudo"
 $SSH_CMD -t -l nao $robot "su -c 'tee /etc/sudoers <<< \"nao     ALL=(ALL) NOPASSWD:ALL\" && chmod 0440 /etc/sudoers && chown root:root /etc/sudoers'"
 
 echo "Placing files"
@@ -26,9 +26,10 @@ rsync -aurvP root/home/nao/ nao@$robot:~/
 echo "Turning off services we do not use"
 # Add back in then delete because delete throws error if not installed
 #  * Networking connection manager replaced with runswiftwireless above
-$SSH_CMD nao@$robot "sudo rc-update add connman boot"
-$SSH_CMD nao@$robot "sudo rc-update del connman boot"
-$SSH_CMD nao@$robot "sudo rc-update add qimessaging-json default"
-$SSH_CMD nao@$robot "sudo rc-update del qimessaging-json default"
+#$SSH_CMD nao@$robot "sudo rc-update add connman boot"
+#$SSH_CMD nao@$robot "sudo rc-update del connman boot"
+#$SSH_CMD nao@$robot "sudo rc-update add qimessaging-json default"
+#$SSH_CMD nao@$robot "sudo rc-update del qimessaging-json default"
 
-$SSH_CMD nao@$robot "nao restart"
+echo "Restart Naoqi"
+$SSH_CMD nao@$robot "sudo /etc/init.d/naoqi restart"

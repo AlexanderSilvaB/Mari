@@ -17,15 +17,15 @@ int main(int argc,char *argv[])
     ModulesManager manager;
     SpellBook spellBook;
     spellBook.Load("/home/nao/data/config.json");
-
+        
     if(spellBook.modulesSpell.LoadPerception)
         manager.Attach(new PerceptionModule(&spellBook));
+    if(spellBook.modulesSpell.LoadMotion)
+        manager.Attach(new MotionModule(&spellBook));
     if(spellBook.modulesSpell.LoadStrategy)
         manager.Attach(new StrategyModule(&spellBook));
     if(spellBook.modulesSpell.LoadRemote)
         manager.Attach(new RemoteModule(&spellBook));
-    if(spellBook.modulesSpell.LoadMotion)
-        manager.Attach(new MotionModule(&spellBook));
     
     manager.Run();
 

@@ -6,12 +6,14 @@
 #include <string>
 #include <map>
 
+#include "GameController/GameController.h"
+
 using namespace std;
 
 class StrategyModule : public Module
 {
     private:
-        
+        GameController *gameController;
     public:
         StrategyModule(SpellBook *spellBook);
         ~StrategyModule();

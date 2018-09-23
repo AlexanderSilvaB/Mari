@@ -32,14 +32,13 @@ Vision::~Vision()
 void Vision::Tick(float ellapsedTime)
 {
     #ifdef USE_V4L2
-    cout << "USE_V4L2" << endl;
     const uint8_t *yuvData = capture->getFrameBottom();
     frame.ReadFromYUV422(yuvData);
-    memcpy(img.data, frame.GetDataBGR(), 320*240*3);
+    img.data = frame.GetDataBGR();
     //cv::Mat rawYuv(240, 320, CV_8UC2, yuvData);
     //img = imdecode(rawYuv, CV_LOAD_IMAGE_COLOR);
     //cv::cvtColor(rawYuv, img, CV_YUV2BGR_YVYU);
-    imwrite("img.jpg", img);
+    //imwrite("img.jpg", img);
     #else
     #ifdef USE_QIBUILD
     img = capture->Get();

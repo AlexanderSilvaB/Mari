@@ -1,4 +1,5 @@
 #include "SpellBook.h"
+#include <iostream>
 
 using namespace std;
 
@@ -9,11 +10,19 @@ SpellBook::SpellBook()
 
 void SpellBook::Load(string fileName)
 {
+    cout << __LINE__ << endl;
     Storage storage(fileName);
+    cout << __LINE__ << endl;
     modulesSpell.Load(storage);
+    cout << __LINE__ << endl;
     motionSpell.Load(storage);
+    cout << __LINE__ << endl;
     perceptionSpell.Load(storage);
+    cout << __LINE__ << endl;
     remoteSpell.Load(storage);
+    cout << __LINE__ << endl;
+    strategySpell.Load(storage);
+    cout << __LINE__ << endl;
 }
 
 void SpellBook::Save(string fileName)
@@ -23,6 +32,7 @@ void SpellBook::Save(string fileName)
     motionSpell.Save(storage);
     perceptionSpell.Save(storage);
     remoteSpell.Save(storage);
+    strategySpell.Save(storage);
 
     storage.Save();
 }
@@ -127,6 +137,7 @@ MotionSpell::MotionSpell()
     KickLeft = KickRight = false;
     LimpLeft = LimpRight = false;
     GetupBack = GetupFront = false;
+    Walk = false;
 }
 
 void MotionSpell::Load(Storage &storage)
@@ -155,4 +166,19 @@ void RemoteSpell::Save(Storage &storage)
 {
     storage["Modules"]["Remote"]["Joystick"]["Enabled"] = EnableJoystick;
     storage["Modules"]["Remote"]["Network"]["Enabled"] = EnableNetwork;
+}
+
+StrategySpell::StrategySpell()
+{
+    Penalized = true;
+}
+
+void StrategySpell::Load(Storage &storage)
+{
+    
+}
+
+void StrategySpell::Save(Storage &storage)
+{
+    
 }

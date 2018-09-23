@@ -70,6 +70,7 @@ class MotionSpell : public Spell
         bool KickLeft, KickRight;
         bool LimpLeft, LimpRight;
         bool GetupFront, GetupBack;
+        bool Walk;
 
         MotionSpell();
         void Load(Storage &storage);
@@ -87,6 +88,16 @@ class RemoteSpell : public Spell
         void Save(Storage &storage);
 };
 
+class StrategySpell : public Spell
+{
+    public:
+        bool Penalized;
+
+        StrategySpell();
+        void Load(Storage &storage);
+        void Save(Storage &storage);
+};
+
 class SpellBook
 {
     public:
@@ -94,6 +105,7 @@ class SpellBook
         MotionSpell motionSpell;
         ModulesSpell modulesSpell;
         RemoteSpell remoteSpell;
+        StrategySpell strategySpell;
 
         SpellBook();
         void Load(std::string fileName);

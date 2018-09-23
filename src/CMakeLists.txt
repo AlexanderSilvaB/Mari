@@ -4,7 +4,7 @@ project(CodeRelease)
 add_definitions( " -DVERSION_MAJOR=1 ")
 add_definitions( " -DVERSION_MINOR=0 ")
 
-option(USE_QIBUILD "module is compiled using qibuild (ON or OFF)" ON)
+option(USE_QIBUILD "module is compiled using qibuild (ON or OFF)" OFF)
 option(USE_UNSW "module is compiled using unsw (ON or OFF)" ON)
 option(USE_V4L2 "module is compiled using v4l2 camera driver (ON or OFF)" ON)
 
