@@ -93,13 +93,9 @@ void *Module::Run(void *arg)
         module->Tick(t);
         timer.Restart();
         ms = timerWait.Millis();
-        if(module->ms > 0)
-        {
-            wt = module->ms - ms;
-            if(wt < 0)
-                wt = 0;
-            usleep(wt*1000);
-        }
+        
+        wt = max(module->ms - ms, 10);
+        usleep(wt*1000);
     }
     pthread_exit(NULL);
 }
