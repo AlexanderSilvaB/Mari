@@ -36,6 +36,26 @@ for i in "$@" ; do
     elif [[ $i == "-configure" ]] ; then
         configure=true
     fi
+    elif [[ $i == "-initial" ]] ; then
+        configure=true
+        build=true
+        sudo=true
+        ssh=true
+        root=true
+        services=true
+        home=true
+        restart=true
+        configure=true
+    elif [[ $i == "-all" ]] ; then
+        build=true
+        sudo=true
+        ssh=true
+        root=true
+        services=true
+        home=true
+        restart=true
+        configure=true
+    fi
 done
 
 if [ $build == true ]; then
