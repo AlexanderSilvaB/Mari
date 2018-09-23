@@ -70,7 +70,9 @@ class MotionSpell : public Spell
         bool KickLeft, KickRight;
         bool LimpLeft, LimpRight;
         bool GetupFront, GetupBack;
+        bool TipOver, Dead;
         bool Walk;
+        bool Crouch;
 
         MotionSpell();
         void Load(Storage &storage);
@@ -92,6 +94,8 @@ class StrategySpell : public Spell
 {
     public:
         bool Penalized;
+        bool FallenFront, FallenBack;
+        bool Die, TurnOver;
 
         StrategySpell();
         void Load(Storage &storage);

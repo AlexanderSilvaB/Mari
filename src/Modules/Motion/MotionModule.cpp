@@ -39,7 +39,9 @@ MotionModule::MotionModule(SpellBook *spellBook) : Module(spellBook, 0)
     kickLeft = kickRight = false;
     limpLeft = limpRight = false;
     getupFront = getupBack = false;
+    tipOver = dead = false;
     walk = false;
+    crouch = false;
 }
 
 MotionModule::~MotionModule()
@@ -93,7 +95,10 @@ void MotionModule::Tick(float ellapsedTime)
     stiff = spellBook->motionSpell.Stiff;
     getupFront = spellBook->motionSpell.GetupFront;
     getupBack = spellBook->motionSpell.GetupBack;
+    tipOver = spellBook->motionSpell.TipOver;
+    dead = spellBook->motionSpell.Dead;
     walk = spellBook->motionSpell.Walk;
+    crouch = spellBook->motionSpell.Crouch;
 
 
     #ifdef USE_UNSW
@@ -108,6 +113,26 @@ void MotionModule::Tick(float ellapsedTime)
         request.body = ActionCommand::Body(stand ? ActionCommand::Body::STAND : ActionCommand::Body::INITIAL);
         _stand = stand;
     }
+    else if(dead)
+    {
+        request.body = ActionCommand::Body(ActionCommand::Body::DEAD);
+    }
+    else if(tipOver)
+    {
+        request.body = ActionCommand::Body(ActionCommand::Body::TIP_OVER);
+    }
+    else if(getupFront)
+    {
+        request.body = ActionCommand::Body(ActionCommand::Body::GETUP_FRONT);
+    }
+    else if(getupBack)
+    {
+        request.body = ActionCommand::Body(ActionCommand::Body::GETUP_BACK);
+    }
+    else if(crouch)
+    {
+        request.body = ActionCommand::Body(ActionCommand::Body::WALK, 0, 0, 0, 0.4f, 1.0f);
+    }
     else if(kickLeft)
     {
         request.body = ActionCommand::Body(ActionCommand::Body::KICK);
@@ -116,16 +141,6 @@ void MotionModule::Tick(float ellapsedTime)
     else if(kickRight)
     {
         request.body = ActionCommand::Body(ActionCommand::Body::KICK);
-        request.body.foot = ActionCommand::Body::RIGHT;
-    }
-    else if(getupFront)
-    {
-        request.body = ActionCommand::Body(ActionCommand::Body::GETUP_FRONT);
-        request.body.foot = ActionCommand::Body::RIGHT;
-    }
-    else if(getupBack)
-    {
-        request.body = ActionCommand::Body(ActionCommand::Body::GETUP_BACK);
         request.body.foot = ActionCommand::Body::RIGHT;
     }
     else if(walk)

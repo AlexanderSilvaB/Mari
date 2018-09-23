@@ -137,7 +137,9 @@ MotionSpell::MotionSpell()
     KickLeft = KickRight = false;
     LimpLeft = LimpRight = false;
     GetupBack = GetupFront = false;
+    TipOver = Dead = false;
     Walk = false;
+    Crouch = false;
 }
 
 void MotionSpell::Load(Storage &storage)
@@ -171,6 +173,10 @@ void RemoteSpell::Save(Storage &storage)
 StrategySpell::StrategySpell()
 {
     Penalized = true;
+    FallenBack = false;
+    FallenFront = false;
+    Die = false;
+    TurnOver = false;
 }
 
 void StrategySpell::Load(Storage &storage)
