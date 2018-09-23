@@ -1,4 +1,5 @@
 #include "SafetyMonitor.h"
+#include "Core/Utils/Math.h"
 
 SafetyMonitor::SafetyMonitor(SpellBook *spellBook)
 {
