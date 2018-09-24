@@ -1,6 +1,7 @@
 #ifndef RINOBOT_MODULE_H
 #define RINOBOT_MODULE_H
 #include <pthread.h>
+#include <string>
 #include <unistd.h>
 #include "SpellBook.h"
 
@@ -9,10 +10,11 @@ using namespace std;
 class Module
 {
   public:
-    Module(SpellBook*, int);
+    Module(SpellBook*, std::string, int);
     void SetHighPriority(bool highPriority);
     bool IsRunning();
     bool IsHighPriority();
+    std::string Name();
     virtual ~Module();
     virtual void Tick(float ellapsedTime);
     void Start();
@@ -30,6 +32,7 @@ class Module
     int ms;
     bool is_running;
     bool highPriority;
+    std::string name;
 };
 
 #endif

@@ -3,7 +3,7 @@
 #include "Core/InitManager.h"
 
 StrategyModule::StrategyModule(SpellBook *spellBook)
-    : Module(spellBook, 20)
+    : Module(spellBook, "Strategy", 20)
 {
     touch = NULL;
     gameController = new GameController(spellBook);   

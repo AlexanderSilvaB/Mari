@@ -1,6 +1,6 @@
 #include "RemoteModule.h"
 
-RemoteModule::RemoteModule(SpellBook *spellBook) : Module(spellBook, 100)
+RemoteModule::RemoteModule(SpellBook *spellBook) : Module(spellBook, "Remote", 100)
 {
     spellBook->motion.Remote = false;
     joystick = new Joystick("/dev/hidraw0");

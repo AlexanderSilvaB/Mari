@@ -2,7 +2,7 @@
 #include "rUNSWiftPerceptionAdapter.h"
 #include "Core/InitManager.h"
 
-PerceptionModule::PerceptionModule(SpellBook *spellBook) : Module(spellBook, 30)
+PerceptionModule::PerceptionModule(SpellBook *spellBook) : Module(spellBook, "Perception", 30)
 {
     //vision = new Vision(spellBook);
     vision = NULL;

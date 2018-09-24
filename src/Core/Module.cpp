@@ -1,11 +1,15 @@
 #include "Module.h"
 #include "Utils/SimpleTimer.h"
 #include "Utils/Math.h"
+#include <iostream>
 
-Module::Module(SpellBook *spellBook, int ms)
+using namespace std;
+
+Module::Module(SpellBook *spellBook, std::string name, int ms)
 {   
     is_running = false;
     highPriority = false;
+    this->name = name;
     this->ms = ms;
     this->spellBook = spellBook;
 }
@@ -29,6 +33,11 @@ bool Module::IsHighPriority()
     return highPriority;
 }
 
+string Module::Name()
+{
+    return name;
+}
+
 void Module::Tick(float ellapsedTime)
 {
     
@@ -46,6 +55,7 @@ void Module::OnStart()
 
 void Module::Start()
 {
+    cout << "Starting " << name << endl;
     is_running = true;
     OnStart();
     int rc;
@@ -67,12 +77,15 @@ void Module::Start()
         pthread_attr_destroy(&attr);
         pthread_getschedparam(thread, &policy, &param);
     }
+    cout << name << " started" << endl;
 }
 
 void Module::Stop()
 {
+    cout << "Stopping " << name << endl;
     is_running = false;
     Join();
+    cout << name << " stopped" << endl;
 }
 
 void Module::Join()
