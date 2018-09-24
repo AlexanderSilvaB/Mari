@@ -35,7 +35,6 @@ for i in "$@" ; do
         build=true
     elif [[ $i == "-configure" ]] ; then
         configure=true
-    fi
     elif [[ $i == "-initial" ]] ; then
         configure=true
         build=true
