@@ -14,6 +14,11 @@ Module::~Module()
 {
 }
 
+void Module::SetHighPriority(bool highPriority)
+{
+    this->highPriority = highPriority;
+}
+
 bool Module::IsRunning()
 {
     return is_running;

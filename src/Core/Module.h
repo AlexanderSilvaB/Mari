@@ -10,6 +10,7 @@ class Module
 {
   public:
     Module(SpellBook*, int);
+    void SetHighPriority(bool highPriority);
     bool IsRunning();
     bool IsHighPriority();
     virtual ~Module();
@@ -22,13 +23,13 @@ class Module
 
   protected:
     SpellBook *spellBook;
-    bool highPriority;
 
   private:
     static void *Run(void *arg);
     pthread_t thread;
     int ms;
     bool is_running;
+    bool highPriority;
 };
 
 #endif

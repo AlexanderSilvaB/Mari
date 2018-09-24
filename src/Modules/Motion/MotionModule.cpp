@@ -8,7 +8,7 @@ using namespace std;
 
 MotionModule::MotionModule(SpellBook *spellBook) : Module(spellBook, 0)
 {
-    this->highPriority = true;
+    SetHighPriority(true);
     #ifdef USE_UNSW
     InitManager::GetBlackboard()->thread.configCallbacks["motion"];
     motion = new rUNSWiftMotionAdapter();
