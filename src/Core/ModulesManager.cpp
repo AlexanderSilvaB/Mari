@@ -50,8 +50,8 @@ void ModulesManager::Run()
     {
         modules[i]->Start();
     }
-    modules[modules.size()-1]->Join();
     system_running = true;
+    //modules[modules.size()-1]->Join();
     while(system_running)
     {
         if(system_cancel)

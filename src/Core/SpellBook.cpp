@@ -10,29 +10,22 @@ SpellBook::SpellBook()
 
 void SpellBook::Load(string fileName)
 {
-    cout << __LINE__ << endl;
     Storage storage(fileName);
-    cout << __LINE__ << endl;
-    modulesSpell.Load(storage);
-    cout << __LINE__ << endl;
-    motionSpell.Load(storage);
-    cout << __LINE__ << endl;
-    perceptionSpell.Load(storage);
-    cout << __LINE__ << endl;
-    remoteSpell.Load(storage);
-    cout << __LINE__ << endl;
-    strategySpell.Load(storage);
-    cout << __LINE__ << endl;
+    modules.Load(storage);
+    motion.Load(storage);
+    perception.Load(storage);
+    remote.Load(storage);
+    strategy.Load(storage);
 }
 
 void SpellBook::Save(string fileName)
 {
     Storage storage(fileName);
-    modulesSpell.Save(storage);
-    motionSpell.Save(storage);
-    perceptionSpell.Save(storage);
-    remoteSpell.Save(storage);
-    strategySpell.Save(storage);
+    modules.Save(storage);
+    motion.Save(storage);
+    perception.Save(storage);
+    remote.Save(storage);
+    strategy.Save(storage);
 
     storage.Save();
 }

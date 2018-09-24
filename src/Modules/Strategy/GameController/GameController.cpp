@@ -17,7 +17,7 @@ void GameController::Tick(float ellapsedTime, SensorValues &sensor)
     if(sensor.sensors[Sensors::ChestBoard_Button] > 0 && timeSincePress > 1.0f)
     {
         cout << "ChestBoard_Button" << endl;
-        spellBook->strategySpell.Penalized = !spellBook->strategySpell.Penalized;
+        spellBook->strategy.Penalized = !spellBook->strategy.Penalized;
         timeSincePress = 0;
     }
 }

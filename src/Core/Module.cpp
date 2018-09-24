@@ -72,7 +72,6 @@ void Module::Stop()
 
 void Module::Join()
 {
-    cout << "Join" << endl;
     int rc;
     pthread_join(thread, NULL);
     OnStop();

@@ -16,26 +16,26 @@ void SafetyMonitor::Tick(float ellapsedTime, SensorValues &sensor)
 	float ang[2] = {Rad2Deg(sensor.sensors[Sensors::InertialSensor_AngleX]),
 	               Rad2Deg(sensor.sensors[Sensors::InertialSensor_AngleY])};
 
-	spellBook->strategySpell.FallenBack = false;
-    spellBook->strategySpell.FallenFront = false;
-    spellBook->strategySpell.TurnOver = false;
-    spellBook->strategySpell.Die = false;
+	spellBook->strategy.FallenBack = false;
+    spellBook->strategy.FallenFront = false;
+    spellBook->strategy.TurnOver = false;
+    spellBook->strategy.Die = false;
 
 	if(ang[1] < -FALLEN_ANG) 
     {
-        spellBook->strategySpell.FallenBack = true;
+        spellBook->strategy.FallenBack = true;
 	}
     else if(ang[1] > FALLEN_ANG) 
     {
-        spellBook->strategySpell.FallenFront = true;
+        spellBook->strategy.FallenFront = true;
 	} 
     else if (ang[0] > FALLEN_ANG || ang[0] < -FALLEN_ANG) 
     {
-        spellBook->strategySpell.TurnOver = true;
+        spellBook->strategy.TurnOver = true;
 	} 
     else if (ABS(ang[0]) > FALLING_ANG || ABS(ang[1]) > FALLING_ANG) 
     {
-        spellBook->strategySpell.Die = true;
+        spellBook->strategy.Die = true;
 	}
 }
 

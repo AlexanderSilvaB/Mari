@@ -105,11 +105,11 @@ class StrategySpell : public Spell
 class SpellBook
 {
     public:
-        PerceptionSpell perceptionSpell;
-        MotionSpell motionSpell;
-        ModulesSpell modulesSpell;
-        RemoteSpell remoteSpell;
-        StrategySpell strategySpell;
+        PerceptionSpell perception;
+        MotionSpell motion;
+        ModulesSpell modules;
+        RemoteSpell remote;
+        StrategySpell strategy;
 
         SpellBook();
         void Load(std::string fileName);

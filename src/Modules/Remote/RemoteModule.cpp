@@ -2,7 +2,7 @@
 
 RemoteModule::RemoteModule(SpellBook *spellBook) : Module(spellBook, 100)
 {
-    spellBook->motionSpell.Remote = false;
+    spellBook->motion.Remote = false;
     joystick = new Joystick("/dev/hidraw0");
     usingJoystick = false;
 }

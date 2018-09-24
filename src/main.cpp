@@ -18,13 +18,13 @@ int main(int argc,char *argv[])
     SpellBook spellBook;
     spellBook.Load("/home/nao/data/config.json");
         
-    if(spellBook.modulesSpell.LoadPerception)
+    if(spellBook.modules.LoadPerception)
         manager.Attach(new PerceptionModule(&spellBook));
-    if(spellBook.modulesSpell.LoadMotion)
+    if(spellBook.modules.LoadMotion)
         manager.Attach(new MotionModule(&spellBook));
-    if(spellBook.modulesSpell.LoadStrategy)
+    if(spellBook.modules.LoadStrategy)
         manager.Attach(new StrategyModule(&spellBook));
-    if(spellBook.modulesSpell.LoadRemote)
+    if(spellBook.modules.LoadRemote)
         manager.Attach(new RemoteModule(&spellBook));
     
     manager.Run();

@@ -5,7 +5,7 @@ using namespace cv;
 Vision::Vision(SpellBook *spellBook)
 {
     this->spellbook = spellbook;
-    if(spellBook->perceptionSpell.EnableBallDetector)
+    if(spellBook->perception.EnableBallDetector)
         ballDetector = new BallDetector(spellBook);
     else
         ballDetector = NULL;

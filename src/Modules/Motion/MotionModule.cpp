@@ -80,25 +80,25 @@ void MotionModule::OnStop()
 
 void MotionModule::Tick(float ellapsedTime)
 {
-    vx = spellBook->motionSpell.Vx;
-    vy = spellBook->motionSpell.Vy;
-    vth = spellBook->motionSpell.Vth;
-    headYaw = spellBook->motionSpell.HeadYaw;
-    headPitch = spellBook->motionSpell.HeadPitch;
-    headSpeed = spellBook->motionSpell.HeadSpeed;
-    headRelative = spellBook->motionSpell.HeadRelative;
-    kickLeft = spellBook->motionSpell.KickLeft;
-    kickRight = spellBook->motionSpell.KickRight;
-    limpLeft = spellBook->motionSpell.LimpLeft;
-    limpRight = spellBook->motionSpell.LimpRight;
-    stand = spellBook->motionSpell.Stand;
-    stiff = spellBook->motionSpell.Stiff;
-    getupFront = spellBook->motionSpell.GetupFront;
-    getupBack = spellBook->motionSpell.GetupBack;
-    tipOver = spellBook->motionSpell.TipOver;
-    dead = spellBook->motionSpell.Dead;
-    walk = spellBook->motionSpell.Walk;
-    crouch = spellBook->motionSpell.Crouch;
+    vx = spellBook->motion.Vx;
+    vy = spellBook->motion.Vy;
+    vth = spellBook->motion.Vth;
+    headYaw = spellBook->motion.HeadYaw;
+    headPitch = spellBook->motion.HeadPitch;
+    headSpeed = spellBook->motion.HeadSpeed;
+    headRelative = spellBook->motion.HeadRelative;
+    kickLeft = spellBook->motion.KickLeft;
+    kickRight = spellBook->motion.KickRight;
+    limpLeft = spellBook->motion.LimpLeft;
+    limpRight = spellBook->motion.LimpRight;
+    stand = spellBook->motion.Stand;
+    stiff = spellBook->motion.Stiff;
+    getupFront = spellBook->motion.GetupFront;
+    getupBack = spellBook->motion.GetupBack;
+    tipOver = spellBook->motion.TipOver;
+    dead = spellBook->motion.Dead;
+    walk = spellBook->motion.Walk;
+    crouch = spellBook->motion.Crouch;
 
 
     #ifdef USE_UNSW

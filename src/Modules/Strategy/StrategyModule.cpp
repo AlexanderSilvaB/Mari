@@ -41,30 +41,30 @@ void StrategyModule::Tick(float ellapsedTime)
     safetyMonitor->Tick(ellapsedTime, sensor);
     gameController->Tick(ellapsedTime, sensor);
 
-    spellBook->motionSpell.Dead = spellBook->strategySpell.Die;
-    if(spellBook->strategySpell.Die)
+    spellBook->motion.Dead = spellBook->strategy.Die;
+    if(spellBook->strategy.Die)
         return;
-    spellBook->motionSpell.TipOver = spellBook->strategySpell.TurnOver;
-    if(spellBook->strategySpell.TurnOver)
+    spellBook->motion.TipOver = spellBook->strategy.TurnOver;
+    if(spellBook->strategy.TurnOver)
         return;
-    spellBook->motionSpell.GetupBack = spellBook->strategySpell.FallenBack;
-    if(spellBook->strategySpell.FallenBack)
+    spellBook->motion.GetupBack = spellBook->strategy.FallenBack;
+    if(spellBook->strategy.FallenBack)
         return;
-    spellBook->motionSpell.GetupFront = spellBook->strategySpell.FallenFront;
-    if(spellBook->strategySpell.FallenFront)
+    spellBook->motion.GetupFront = spellBook->strategy.FallenFront;
+    if(spellBook->strategy.FallenFront)
         return;
 
-    if(spellBook->strategySpell.Penalized)
+    if(spellBook->strategy.Penalized)
     {
-        spellBook->motionSpell.Stiff = true;
-        spellBook->motionSpell.Stand = false;
-        spellBook->motionSpell.Walk = false;
+        spellBook->motion.Stiff = true;
+        spellBook->motion.Stand = false;
+        spellBook->motion.Walk = false;
     }
     else
     {
-        spellBook->motionSpell.Stiff = true;
-        spellBook->motionSpell.Stand = true;
-        spellBook->motionSpell.Walk = true;
-        spellBook->motionSpell.Vx = 0.1f;
+        spellBook->motion.Stiff = true;
+        spellBook->motion.Stand = true;
+        spellBook->motion.Walk = true;
+        spellBook->motion.Vx = 0.3f;
     }
 }
