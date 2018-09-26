@@ -41,6 +41,22 @@ void StrategyModule::Tick(float ellapsedTime)
     safetyMonitor->Tick(ellapsedTime, sensor);
     gameController->Tick(ellapsedTime, sensor);
 
+    if(!spellBook->strategy.Started)
+    {
+        spellBook->motion.Stiff = false;
+        spellBook->motion.Stand = false;
+        spellBook->motion.Walk = false;
+        return;
+    }
+
+    if(spellBook->strategy.Penalized)
+    {
+        spellBook->motion.Stiff = true;
+        spellBook->motion.Stand = false;
+        spellBook->motion.Walk = false;
+        return;
+    }
+
     spellBook->motion.Dead = spellBook->strategy.Die;
     if(spellBook->strategy.Die)
         return;
@@ -54,17 +70,8 @@ void StrategyModule::Tick(float ellapsedTime)
     if(spellBook->strategy.FallenFront)
         return;
 
-    if(spellBook->strategy.Penalized)
-    {
-        spellBook->motion.Stiff = true;
-        spellBook->motion.Stand = false;
-        spellBook->motion.Walk = false;
-    }
-    else
-    {
-        spellBook->motion.Stiff = true;
-        spellBook->motion.Stand = true;
-        spellBook->motion.Walk = true;
-        spellBook->motion.Vx = 0.3f;
-    }
+    spellBook->motion.Stiff = true;
+    spellBook->motion.Stand = true;
+    spellBook->motion.Walk = true;
+    spellBook->motion.Vx = 0.3f;
 }

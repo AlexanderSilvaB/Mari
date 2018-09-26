@@ -9,6 +9,7 @@ class Spell
     public:
         Spell();
         virtual ~Spell();
+        virtual void CopyTo(Spell *spell);
         virtual void Load(Storage &storage);
         virtual void Save(Storage &storage);
 };
@@ -22,6 +23,7 @@ class ModulesSpell : public Spell
         bool LoadPerception;
 
         ModulesSpell();
+        void CopyTo(Spell *spell);
         void Load(Storage &storage);
         void Save(Storage &storage);
 };
@@ -41,6 +43,7 @@ class BallSpell : public Spell
         float TimeSinceBallSeen;
 
         BallSpell();
+        void CopyTo(Spell *spell);
         void Load(Storage &storage);
         void Save(Storage &storage);
 
@@ -54,6 +57,7 @@ class PerceptionSpell : public Spell
         BallSpell ballSpell;
 
         PerceptionSpell();
+        void CopyTo(Spell *spell);
         void Load(Storage &storage);
         void Save(Storage &storage);
 };
@@ -75,6 +79,7 @@ class MotionSpell : public Spell
         bool Crouch;
 
         MotionSpell();
+        void CopyTo(Spell *spell);
         void Load(Storage &storage);
         void Save(Storage &storage);
 };
@@ -86,6 +91,7 @@ class RemoteSpell : public Spell
         bool EnableNetwork;
 
         RemoteSpell();
+        void CopyTo(Spell *spell);
         void Load(Storage &storage);
         void Save(Storage &storage);
 };
@@ -93,11 +99,13 @@ class RemoteSpell : public Spell
 class StrategySpell : public Spell
 {
     public:
+        bool Started;
         bool Penalized;
         bool FallenFront, FallenBack;
         bool Die, TurnOver;
 
         StrategySpell();
+        void CopyTo(Spell *spell);
         void Load(Storage &storage);
         void Save(Storage &storage);
 };

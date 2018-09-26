@@ -1,16 +1,19 @@
 #include "Module.h"
-#include "Utils/SimpleTimer.h"
+#include "utils/Timer.hpp"
 #include "Utils/Math.h"
 #include <iostream>
 
 using namespace std;
+
+#define MAX(v1, v2) (v1 > v2 ? v1 : v2)
+#define MIN(v1, v2) (v1 < v2 ? v1 : v2)
 
 Module::Module(SpellBook *spellBook, std::string name, int ms)
 {   
     is_running = false;
     highPriority = false;
     this->name = name;
-    this->ms = ms;
+    this->us = ms*1000;
     this->spellBook = spellBook;
 }
 
@@ -98,21 +101,22 @@ void Module::Join()
 void *Module::Run(void *arg)
 {
     Module *module = (Module *)arg;
-    SimpleTimer timer, timerWait;
+    Timer timer, timerWait;
     float t;
-    int ms = 0, wt = 0;
+    int us = 0, wt = 0;
     while (module->is_running)
     {
-        t = timer.Seconds();
+        t = timer.elapsed_us() * 0.000001f;
         if(t < 0.0f)
             t = -t;
-        timerWait.Restart();
+        timerWait.restart();
         module->Tick(t);
-        timer.Restart();
-        ms = timerWait.Millis();
+        timer.restart();
+        us = timerWait.elapsed_us();
         
-        wt = max(module->ms - ms, 10);
-        usleep(wt*1000);
+        wt = min(max(module->us - us, 50), 5000000);
+        //cout << module->Name() << " -> " << module->us << " - " << us << " = " << wt << endl;
+        usleep(wt);
     }
     pthread_exit(NULL);
 }

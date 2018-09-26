@@ -8,9 +8,12 @@ using namespace std;
 
 class GameController
 {
+    public:
+        enum GameStates { INITIAL, PENALIZED, PLAYING };
     private:
         float timeSincePress;
         SpellBook *spellBook;
+        GameStates gameState;
     public:
         GameController(SpellBook *spellBook);
         void OnStart();

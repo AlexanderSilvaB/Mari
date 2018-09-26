@@ -6,7 +6,7 @@
 
 using namespace std;
 
-MotionModule::MotionModule(SpellBook *spellBook) : Module(spellBook, "Motion", 0)
+MotionModule::MotionModule(SpellBook *spellBook) : Module(spellBook, "Motion", 10)
 {
     SetHighPriority(true);
     #ifdef USE_UNSW

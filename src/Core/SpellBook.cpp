@@ -42,6 +42,11 @@ Spell::~Spell()
 
 }
 
+void Spell::CopyTo(Spell *spell)
+{
+
+}
+
 void Spell::Load(Storage &storage)
 {
 
@@ -59,6 +64,11 @@ ModulesSpell::ModulesSpell()
     LoadMotion = true;
     LoadPerception = true;
     LoadRemote = true;
+}
+
+void ModulesSpell::CopyTo(Spell *spell)
+{
+
 }
 
 void ModulesSpell::Load(Storage &storage)
@@ -88,6 +98,11 @@ BallSpell::BallSpell()
     BallElevation = 0;
 }
 
+void BallSpell::CopyTo(Spell *spell)
+{
+
+}
+
 void BallSpell::Load(Storage &storage)
 {
     method = (string)storage["Modules"]["Perception"]["BallDetector"]["Ball"]["Method"].Default("CASCADE");
@@ -105,6 +120,11 @@ void BallSpell::Save(Storage &storage)
 PerceptionSpell::PerceptionSpell()
 {
     EnableBallDetector = true;
+}
+
+void PerceptionSpell::CopyTo(Spell *spell)
+{
+
 }
 
 void PerceptionSpell::Load(Storage &storage)
@@ -135,6 +155,11 @@ MotionSpell::MotionSpell()
     Crouch = false;
 }
 
+void MotionSpell::CopyTo(Spell *spell)
+{
+
+}
+
 void MotionSpell::Load(Storage &storage)
 {
     
@@ -151,6 +176,11 @@ RemoteSpell::RemoteSpell()
     EnableNetwork = true;
 }
 
+void RemoteSpell::CopyTo(Spell *spell)
+{
+
+}
+
 void RemoteSpell::Load(Storage &storage)
 {
     EnableJoystick = storage["Modules"]["Remote"]["Joystick"]["Enabled"].Default(true);
@@ -165,11 +195,17 @@ void RemoteSpell::Save(Storage &storage)
 
 StrategySpell::StrategySpell()
 {
-    Penalized = true;
+    Started = false;
+    Penalized = false;
     FallenBack = false;
     FallenFront = false;
     Die = false;
     TurnOver = false;
+}
+
+void StrategySpell::CopyTo(Spell *spell)
+{
+
 }
 
 void StrategySpell::Load(Storage &storage)

@@ -10,7 +10,7 @@ SimpleTimer::SimpleTimer()
 
 void SimpleTimer::Restart()
 {
-    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+    clock_gettime(CLOCK_REALTIME, &start);
 }
 
 /* return elapsed time in seconds */
@@ -26,7 +26,7 @@ uint32_t SimpleTimer::Millis()
 
 uint32_t SimpleTimer::Micros() 
 {
-    clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+    clock_gettime(CLOCK_REALTIME, &end);
     float value = ((end.tv_sec - start.tv_sec) * 1000000.0f + (end.tv_nsec - start.tv_nsec) / 1000.0f);
     return value;
 }

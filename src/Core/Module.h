@@ -1,5 +1,6 @@
 #ifndef RINOBOT_MODULE_H
 #define RINOBOT_MODULE_H
+#include <stdint.h>
 #include <pthread.h>
 #include <string>
 #include <unistd.h>
@@ -29,7 +30,7 @@ class Module
   private:
     static void *Run(void *arg);
     pthread_t thread;
-    int ms;
+    int us;
     bool is_running;
     bool highPriority;
     std::string name;
