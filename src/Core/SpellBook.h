@@ -21,6 +21,7 @@ class ModulesSpell : public Spell
         bool LoadRemote;
         bool LoadMotion;
         bool LoadPerception;
+        bool LoadBehaviour;
 
         ModulesSpell();
         void CopyTo(Spell *spell);
@@ -54,7 +55,7 @@ class PerceptionSpell : public Spell
     public:
         bool EnableBallDetector;
 
-        BallSpell ballSpell;
+        BallSpell ball;
 
         PerceptionSpell();
         void CopyTo(Spell *spell);
@@ -110,6 +111,20 @@ class StrategySpell : public Spell
         void Save(Storage &storage);
 };
 
+class BehaviourSpell : public Spell
+{
+    public:
+        bool Started;
+        bool Penalized;
+        bool Fallen;
+        bool Die;
+
+        BehaviourSpell();
+        void CopyTo(Spell *spell);
+        void Load(Storage &storage);
+        void Save(Storage &storage);
+};
+
 class SpellBook
 {
     public:
@@ -118,6 +133,7 @@ class SpellBook
         ModulesSpell modules;
         RemoteSpell remote;
         StrategySpell strategy;
+        BehaviourSpell behaviour;
 
         SpellBook();
         void Load(std::string fileName);

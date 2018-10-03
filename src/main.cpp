@@ -7,6 +7,7 @@
 #include "Modules/Strategy/StrategyModule.h"
 #include "Modules/Remote/RemoteModule.h"
 #include "Modules/Perception/PerceptionModule.h"
+#include "Modules/Behaviour/BehaviourModule.h"
 
 using namespace std;
 
@@ -26,6 +27,7 @@ int main(int argc,char *argv[])
         manager.Attach(new StrategyModule(&spellBook));
     if(spellBook.modules.LoadRemote)
         manager.Attach(new RemoteModule(&spellBook));
+    manager.Attach(new BehaviourModule(&spellBook));
     
     manager.Run();
 

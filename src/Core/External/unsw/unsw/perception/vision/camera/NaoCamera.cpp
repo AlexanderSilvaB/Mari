@@ -89,7 +89,7 @@ bool NaoCamera::setControl(const uint32_t controlId,
          ioctl(fd, VIDIOC_S_CTRL, &control);
          ioctl (fd, VIDIOC_G_CTRL, &current);
          count++;
-         if(count > 10)
+         if(count > 100)
             break;
          //cout << "setting id " << control.id << "to " << controlValue << std::endl;
       }

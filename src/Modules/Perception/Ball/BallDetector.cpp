@@ -96,9 +96,9 @@ void BallDetector::Tick(float ellapsedTime, cv::Mat &img)
     if(!detected)
     {
         cout << "Not found" << endl;
-        spellBook->perception.ballSpell.BallDetected = false;
-        spellBook->perception.ballSpell.TimeSinceBallSeen += ellapsedTime;
-        spellBook->perception.ballSpell.HeadRelative = true;
+        spellBook->perception.ball.BallDetected = false;
+        spellBook->perception.ball.TimeSinceBallSeen += ellapsedTime;
+        spellBook->perception.ball.HeadRelative = true;
         ballLostCount++;
         #ifdef USE_UNSW
         if(ballLostCount > 3)
@@ -108,11 +108,11 @@ void BallDetector::Tick(float ellapsedTime, cv::Mat &img)
             targetYaw = ballYaw;
             float speed = 0.25f;
 
-            spellBook->perception.ballSpell.HeadRelative = false;
-            spellBook->perception.ballSpell.BallAzimuth = 0;
-            spellBook->perception.ballSpell.BallElevation = 0;
-            spellBook->perception.ballSpell.BallDistance = 0.0f;
-            spellBook->perception.ballSpell.HeadSpeed = speed;
+            spellBook->perception.ball.HeadRelative = false;
+            spellBook->perception.ball.BallAzimuth = 0;
+            spellBook->perception.ball.BallElevation = 0;
+            spellBook->perception.ball.BallDistance = 0.0f;
+            spellBook->perception.ball.HeadSpeed = speed;
         }
         #endif
     }
@@ -157,13 +157,13 @@ void BallDetector::Tick(float ellapsedTime, cv::Mat &img)
 
         cout << "Found: " << pt << " [ " << ball.radius << " ] | [" << Rad2Deg(targetYaw) << "º, " << Rad2Deg(targetPitch) << "º]" << endl;
 
-        spellBook->perception.ballSpell.BallDetected = true;
-        spellBook->perception.ballSpell.HeadRelative = true;
-        spellBook->perception.ballSpell.BallAzimuth = targetYaw;
-        spellBook->perception.ballSpell.BallElevation = targetPitch;
-        spellBook->perception.ballSpell.BallDistance = distance;
-        spellBook->perception.ballSpell.TimeSinceBallSeen = 0.0f;
-        spellBook->perception.ballSpell.HeadSpeed = speed;
+        spellBook->perception.ball.BallDetected = true;
+        spellBook->perception.ball.HeadRelative = true;
+        spellBook->perception.ball.BallAzimuth = targetYaw;
+        spellBook->perception.ball.BallElevation = targetPitch;
+        spellBook->perception.ball.BallDistance = distance;
+        spellBook->perception.ball.TimeSinceBallSeen = 0.0f;
+        spellBook->perception.ball.HeadSpeed = speed;
     }
 
     #ifdef USE_V4L2

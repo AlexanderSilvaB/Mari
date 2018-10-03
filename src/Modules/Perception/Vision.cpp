@@ -37,8 +37,7 @@ void Vision::Tick(float ellapsedTime)
     img.data = frame.GetDataBGR();
     //cv::Mat rawYuv(240, 320, CV_8UC2, yuvData);
     //img = imdecode(rawYuv, CV_LOAD_IMAGE_COLOR);
-    //cv::cvtColor(rawYuv, img, CV_YUV2BGR_YVYU);
-    //imwrite("img.jpg", img);
+    //cv::cvtColor(rawYuv, img, CV_YUV2BGR_Y422);
     #else
     #ifdef USE_QIBUILD
     img = capture->Get();

@@ -405,11 +405,11 @@ po::options_description store_and_notify(vector<string> argv,
       ifs.close();
    }
 
-   ifs.open("/home/nao/data/runswift.cfg");
+   ifs.open("/home/nao/data/rinobot.cfg");
    store(parse_config_file(ifs, config_file_options), vm);
    ifs.close();
 
-   ifs.open("runswift.cfg");
+   ifs.open("rinobot.cfg");
    store(parse_config_file(ifs, config_file_options), vm);
    ifs.close();
 

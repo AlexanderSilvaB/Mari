@@ -16,6 +16,7 @@ void SpellBook::Load(string fileName)
     perception.Load(storage);
     remote.Load(storage);
     strategy.Load(storage);
+    behaviour.Load(storage);
 }
 
 void SpellBook::Save(string fileName)
@@ -26,6 +27,7 @@ void SpellBook::Save(string fileName)
     perception.Save(storage);
     remote.Save(storage);
     strategy.Save(storage);
+    behaviour.Save(storage);
 
     storage.Save();
 }
@@ -64,6 +66,7 @@ ModulesSpell::ModulesSpell()
     LoadMotion = true;
     LoadPerception = true;
     LoadRemote = true;
+    LoadBehaviour = true;
 }
 
 void ModulesSpell::CopyTo(Spell *spell)
@@ -77,6 +80,7 @@ void ModulesSpell::Load(Storage &storage)
     LoadMotion = storage["Modules"]["Motion"]["Enabled"].Default(true);
     LoadPerception = storage["Modules"]["Perception"]["Enabled"].Default(true);
     LoadRemote = storage["Modules"]["Remote"]["Enabled"].Default(true);
+    LoadBehaviour = storage["Modules"]["Behaviour"]["Enabled"].Default(true);
 }
 
 void ModulesSpell::Save(Storage &storage)
@@ -85,6 +89,7 @@ void ModulesSpell::Save(Storage &storage)
     storage["Modules"]["Motion"]["Enabled"] = LoadMotion;
     storage["Modules"]["Perception"]["Enabled"] = LoadPerception;
     storage["Modules"]["Remote"]["Enabled"] = LoadRemote;
+    storage["Modules"]["Behaviour"]["Enabled"] = LoadBehaviour;
 }
 
 BallSpell::BallSpell()
@@ -130,13 +135,13 @@ void PerceptionSpell::CopyTo(Spell *spell)
 void PerceptionSpell::Load(Storage &storage)
 {
     EnableBallDetector = storage["Modules"]["Perception"]["BallDetector"]["Enabled"].Default(true);
-    ballSpell.Load(storage);
+    ball.Load(storage);
 }
 
 void PerceptionSpell::Save(Storage &storage)
 {
     storage["Modules"]["Perception"]["BallDetector"]["Enabled"] = EnableBallDetector;
-    ballSpell.Save(storage);
+    ball.Save(storage);
 }
 
 MotionSpell::MotionSpell()
@@ -214,6 +219,29 @@ void StrategySpell::Load(Storage &storage)
 }
 
 void StrategySpell::Save(Storage &storage)
+{
+    
+}
+
+BehaviourSpell::BehaviourSpell()
+{
+    Started = false;
+    Penalized = false;
+    Fallen = false;
+    Die = false;
+}
+
+void BehaviourSpell::CopyTo(Spell *spell)
+{
+
+}
+
+void BehaviourSpell::Load(Storage &storage)
+{
+    
+}
+
+void BehaviourSpell::Save(Storage &storage)
 {
     
 }

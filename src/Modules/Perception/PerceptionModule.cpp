@@ -4,8 +4,7 @@
 
 PerceptionModule::PerceptionModule(SpellBook *spellBook) : Module(spellBook, "Perception", 30)
 {
-    //vision = new Vision(spellBook);
-    vision = NULL;
+    vision = new Vision(spellBook);
     #ifdef USE_UNSW
     InitManager::GetBlackboard()->thread.configCallbacks["perception"];
     perception = new rUNSWiftPerceptionAdapter();

@@ -132,7 +132,7 @@ void CameraFrame::ReadFromYUV422(const uint8_t *yuvData)
 {
 	uint32_t width  = GetWidth();
 	uint32_t height = GetHeight();
-	uint32_t bpl    = 320;//m_fmt_pix.fmt.pix.bytesperline;
+	uint32_t bpl    = 640;//m_fmt_pix.fmt.pix.bytesperline;
 	uint8_t *dst_data = GetDataBGR();
 
 	for (size_t y = 0; y < height; y += 1)
