@@ -1,7 +1,6 @@
 #include <iostream>
 #include <unistd.h>
 #include "Core/InitManager.h"
-#include "unsw/perception/vision/camera/CombinedCamera.hpp"
 #include "Core/ModulesManager.h"
 #include "Modules/Motion/MotionModule.h"
 #include "Modules/Strategy/StrategyModule.h"

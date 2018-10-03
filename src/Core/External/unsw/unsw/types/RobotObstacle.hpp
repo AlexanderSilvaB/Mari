@@ -13,7 +13,7 @@
 
 struct RobotObstacle {
     RRCoord rr;
-    UNSW::RobotInfo::Type type;
+    RobotInfo::Type type;
     AbsCoord rrc;
     AbsCoord pos;
     //Used to determine if a heading would overlap the obstacle

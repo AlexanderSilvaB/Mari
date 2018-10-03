@@ -1,4 +1,3 @@
-
 template <typename T>
 boost::numeric::ublas::matrix<T> translateMatrix(T x, T y, T z) {
    boost::numeric::ublas::matrix<T> r(4, 4);

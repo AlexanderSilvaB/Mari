@@ -1,69 +1,33 @@
-/*
-Copyright 2010 The University of New South Wales (UNSW).
-
-This file is part of the 2010 team rUNSWift RoboCup entry. You may
-redistribute it and/or modify it under the terms of the GNU General
-Public License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version as
-modified below. As the original licensors, we add the following
-conditions to that license:
-
-In paragraph 2.b), the phrase "distribute or publish" should be
-interpreted to include entry into a competition, and hence the source
-of any derived work entered into a competition must be made available
-to all parties involved in that competition under the terms of this
-license.
-
-In addition, if the authors of a derived work publish any conference
-proceedings, journal articles or other academic papers describing that
-derived work, then appropriate academic citations to the original work
-must be included in that publication.
-
-This rUNSWift source is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-General Public License for more details.
-
-You should have received a copy of the GNU General Public License along
-with this source code; if not, write to the Free Software Foundation,
-Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-*/
-
-#include "perception/PerceptionThread.hpp"
-
 #include <pthread.h>
 #include <ctime>
 #include <utility>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
-#include "perception/dumper/PerceptionDumper.hpp"
-//#include "perception/behaviour/SafetySkill.hpp"
+#include "perception/PerceptionThread.hpp"
+#include "perception/behaviour/SafetySkill.hpp"
 #include "soccer.hpp"
 #include "blackboard/Blackboard.hpp"
 #include "utils/Logger.hpp"
 #include "thread/Thread.hpp"
 #include "boost/lexical_cast.hpp"
 #include <boost/bind.hpp>
-#include <boost/thread/thread.hpp>
+
+#include "utils/systemCalls.hpp"
 
 using namespace std;
 using namespace boost;
 
 PerceptionThread::PerceptionThread(Blackboard *bb)
    : Adapter(bb), 
-     kinematicsAdapter(bb),
-#ifndef SIMULATION
+     kinematicsAdapter(bb)
      //visionAdapter(bb),
-#endif
      //localisationAdapter(bb),
-     //behaviourAdapter(bb),
-     bb_(bb)
+     //behaviourAdapter(bb)
 {
    dumper = NULL;
 
    releaseLock(serialization);
-   /*
    //uint8_t const* currentFrame = readFrom(vision, currentFrame);
    uint8_t const* topFrame = readFrom(vision, topFrame);
    uint8_t const* botFrame = readFrom(vision, botFrame);
@@ -76,11 +40,10 @@ PerceptionThread::PerceptionThread(Blackboard *bb)
       ret = fwrite(topFrame, 640 * 480 * 2, 1, errorFrameFile);
       ret = fwrite(botFrame, 640 * 480 * 2, 1, errorFrameFile);
       fclose(errorFrameFile);
-      file = "/usr/bin/tail -n 200 /var/volatile/runswift/*-/Perception > "
+      file = "/usr/bin/tail -n 200 /var/volatile/runswift/*/Perception > "
              + file + ".log";
-      ret = std::system(file.c_str());
+      ret = systemCalls::_system(file.c_str());
    }
-   */
 
 
    readOptions(bb->config);
@@ -95,149 +58,93 @@ PerceptionThread::~PerceptionThread() {
 }
 
 void PerceptionThread::tick() {
-   llog_open(VERBOSE) << "Perception Thread" << endl;
-
-   Timer timer_thread;
-   Timer timer_tick;
-
-   /*
-    * Kinematics Tick
-    */
-   llog_open(VERBOSE) << "Kinematics Tick" << endl;
-   timer_tick.restart();
+   llog(DEBUG1) << "Perception.. ticking away" << endl;
+   Timer t1;
+   Timer t;
    kinematicsAdapter.tick();
-
-   uint32_t kinematics_time = timer_tick.elapsed_us();
-   if (kinematics_time > TICK_MAX_TIME_KINEMATICS) {
-      llog_close(VERBOSE) << "Kinematics Tick: OK " << kinematics_time << " us" << endl;
-   } else {
-      llog_close(ERROR) << "Kinematics Tick: TOO LONG " << kinematics_time << " us" << endl;
+   uint32_t kinematics = t.elapsed_us();
+   llog(VERBOSE) << "kinematics tick took " << kinematics << endl;
+   if (t.elapsed_us() > 30000) {
+      llog(ERROR) << "Kinematics took " << t.elapsed_us() << " us" << std::endl;
    }
 
-   /*
-    * Vision Tick
-    */ 
-/*
-   llog_open(VERBOSE) << "Vision Tick" << endl;
-   timer_tick.restart();
-#ifndef SIMULATION
-   visionAdapter.tick();
-#endif
-
-   uint32_t vision_time = timer_tick.elapsed_us();
-   if (vision_time > TICK_MAX_TIME_VISION) {
-      llog_close(VERBOSE) << "Vision Tick: OK " << vision_time << endl;
-   } else {
-      llog_close(ERROR) << "Vision Tick: TOO LONG " << vision_time << endl;
+    /*
+   t.restart();
+   if (blackboard->config["debug.vision"].as<bool>()) {
+      visionAdapter.tick();
    }
-*/
-   /*
-    * Localisation Tick
-    */
-/*
-   llog_open(VERBOSE) << "Localisation Tick" << endl;
-   timer_tick.restart();
-   localisationAdapter.tick();
-
-   uint32_t localisation_time = timer_tick.elapsed_us();
-   if (localisation_time > TICK_MAX_TIME_LOCALISATION) {
-      llog_close(VERBOSE) << "Localisation Tick: OK " << localisation_time << endl;
-   } else {
-      llog_close(ERROR) << "Localisation Tick: TOO LONG " << localisation_time << endl;
-   }
-*/
-   /*
-    * Behaviour Tick
-    */
-   /*
-   llog_open(VERBOSE) << "Behaviour Tick" << endl;
-   timer_tick.restart();
-   pthread_yield();
-  
-   if (time(NULL) - readFrom(remoteControl, time_received) < 60) {
-     // we have fresh remote control data, use it 
-     int writeBuf = (readFrom(behaviour, readBuf) + 1) % 2;
-     writeTo(behaviour, request[writeBuf], readFrom(remoteControl, request));
-     writeTo(behaviour, readBuf, writeBuf);
-   } else {
-      behaviourAdapter.tick();
-   }
-
-   uint32_t behaviour_time = timer_tick.elapsed_us();
-   if (behaviour_time > TICK_MAX_TIME_BEHAVIOUR) {
-      llog_close(VERBOSE) << "Behaviour Tick (and perception yield): OK " << behaviour_time << endl;
-   } else {
-      llog_close(ERROR) << "Behaviour Tick (and perception yield): TOO LONG " << behaviour_time << endl;
+   uint32_t vision = t.elapsed_us();
+   llog(VERBOSE) << "vision tick took " << vision << endl;
+   if (t.elapsed_us() > 30000) {
+      llog(ERROR) << "Vision took " << t.elapsed_us() << " us" << std::endl;
    }
    */
 
-#ifdef SIMULATION
-   // Introduce delay to componsate for vision processing
-   // (so behaviours runs at the correct speed)
-   boost::this_thread::sleep(boost::posix_time::milliseconds(32));
-#endif
-
-   /*
-    * Finishing Perception
-    */
-   uint32_t perception_time = timer_thread.elapsed_us();
-   if (perception_time > THREAD_MAX_TIME) {
-      llog_close(VERBOSE) << "Perception Thread: OK " << perception_time << endl;
-   } else {
-      llog_close(ERROR) << "Perception Thread: TOO LONG " << perception_time << endl;
+    /*
+   t.restart();
+   localisationAdapter.tick();
+   uint32_t localisation = t.elapsed_us();
+   llog(VERBOSE) << "localisation tick took " << localisation << endl;
+   if (t.elapsed_us() > 30000) {
+      llog(ERROR) << "Localisation took " << t.elapsed_us() << " us" << std::endl;
    }
+   */
 
-   writeTo(perception, kinematics, kinematics_time);
-   //writeTo(perception, vision, vision_time);
-   //writeTo(perception, localisation, localisation_time);
-   //writeTo(perception, behaviour, behaviour_time);
-   writeTo(perception, total, perception_time);
+   t.restart();
+   pthread_yield();
+  /*
+   if (time(NULL) - readFrom(remoteControl, time_received) < 60) {
+      //we have fresh remote control data, use it 
+	  int writeBuf = (readFrom(behaviour, readBuf) + 1) % 2;
+	  //writeTo(behaviour, request[writeBuf], safetySkill.wrapRequest(readFrom(remoteControl, request), readFrom(motion, sensors)));
+	  writeTo(behaviour, request[writeBuf], readFrom(remoteControl, request));
+	  writeTo(behaviour, readBuf, writeBuf);
+   } else if (blackboard->config["debug.behaviour"].as<bool>()) {
+      //run behaviour 
+      //behaviourAdapter.tick();
+   }
+*/
+   uint32_t behaviour = t.elapsed_us();
+   llog(VERBOSE) << "behaviour tick took " << behaviour << endl;
+   if (t.elapsed_us() > 30000) {
+      llog(ERROR) << "Behaviour and perception yield took " << t.elapsed_us() << " us" << std::endl;
+   }   
+   uint32_t total = t1.elapsed_us();
+   llog(VERBOSE) << "perception took " << total << endl;
+
+   writeTo(perception, kinematics, kinematics);
+   //writeTo(perception, vision, vision);
+   //writeTo(perception, localisation, localisation);
+   writeTo(perception, behaviour, behaviour);
+   writeTo(perception, total, total);
 
    if (dumper) {
       if (dump_timer.elapsed_us() > dump_rate) {
          dump_timer.restart();
          try {
-            dumper->dump(bb_);
+            dumper->dump(blackboard);
          } catch(const std::exception &e) {
             attemptingShutdown = true;
-            cout << "Error: " << e.what() << endl;
          }
       }
    }
-
 }
 
 void PerceptionThread::readOptions(const boost::program_options::variables_map& config) {
-#ifndef SIMULATION
    const string &e = config["vision.camera_controls"].as<string>();
    vector<string> vs;
    split(vs, e, is_any_of(",;"));
    for (vector<string>::const_iterator ci = vs.begin(); ci != vs.end(); ++ci) {
       vector<string> nv;
       split(nv, *ci, is_any_of(":"));
-      if (nv.size() != 3)
-         llog(ERROR) << "controls should be cam:control_id:value" << endl;
-      else{
-	// TODO: Fix camera selection
-	/*
-         Camera *currCamera;
-         if(strtol(nv[0].c_str(),NULL,10) == 0){
-            currCamera = visionAdapter.combined_camera_->getCameraBot();
-         }else{
-            currCamera = visionAdapter.combined_camera_->getCameraTop();
-         }
-         if(strtoul(nv[1].c_str(), NULL, 10) == 0)
-            currCamera->setControl(22,1);
-         if(strtoul(nv[1].c_str(), NULL, 10) == 17)
-            currCamera->setControl(22,0);
-         if(strtoul(nv[1].c_str(), NULL, 10) == 19)
-            currCamera->setControl(22,0);
-         currCamera->setControl(strtoul(nv[1].c_str(), NULL, 10),
-                                strtol (nv[2].c_str(), NULL, 10));
-*/
-      }
+      if (nv.size() != 2)
+         llog(ERROR) << "controls should be control_id:value" << endl;
+      else;
+         /* TODO
+         visionAdapter.V.camera->setControl(strtoul(nv[0].c_str(), NULL, 0),
+                                            strtol (nv[1].c_str(), NULL, 0));
+                                            */
    }
-#endif
 
    const string &dumpPath = config["debug.dump"].as<string>();
    dump_rate = config["vision.dumprate"].as<int>() * 1000;
@@ -251,7 +158,7 @@ void PerceptionThread::readOptions(const boost::program_options::variables_map& 
       }
    }
 
-   //OffNaoMask_t dumpMask = config["debug.mask"].as<int>();
-   //bb_->write(&(bb_->mask), dumpMask);
+   OffNaoMask_t dumpMask = config["debug.mask"].as<int>();
+   blackboard->write(&(blackboard->mask), dumpMask);
 }
 

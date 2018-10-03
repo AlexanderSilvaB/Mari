@@ -1,5 +1,4 @@
-#ifndef POST_INFO_HPP
-#define POST_INFO_HPP
+#pragma once
 
 #include "types/Point.hpp"
 #include "types/RRCoord.hpp"
@@ -7,7 +6,8 @@
 
 #include <iostream>
 
-struct PostInfo {
+struct PostInfo
+{
 
    enum Type
    {
@@ -98,5 +98,3 @@ inline std::istream& operator>>(std::istream& is, PostInfo& postInfo) {
    
    return is;
 }
-
-#endif

@@ -5,7 +5,7 @@
 
 #include "Core/SpellBook.h"
 #if USE_UNSW
-#include "perception/vision/camera/CameraToRR.hpp"
+#include "perception/vision/CameraToRR.hpp"
 #endif
 
 using namespace std;

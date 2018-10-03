@@ -5,9 +5,8 @@
 #include <vector>
 #include <math.h>
 #include <limits>
-#include <iostream>
 
-#include "perception/vision/VisionDefinitions.hpp"
+#include "perception/vision/VisionConstants.hpp"
 
 
 //-------------------------------------------------------
@@ -63,7 +62,3 @@ struct Ipoint {
 
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Ipoint& Ip) {
-  os << "Coordinates: [" << Ip.x << "," << Ip.y << "] Scale: " << Ip.scale << " laplacian: " << Ip.laplacian << " isRobot: " << Ip.isRobot << std::endl;
-  return os;
-}

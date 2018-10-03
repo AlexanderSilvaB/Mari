@@ -3,7 +3,7 @@
 #include "Core/InitManager.h"
 
 #if USE_UNSW
-#include "perception/vision/camera/CameraToRR.hpp"
+#include "perception/vision/CameraToRR.hpp"
 #endif
 
 #define R 2.0f

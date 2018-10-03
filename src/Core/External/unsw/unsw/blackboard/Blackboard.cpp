@@ -1,34 +1,3 @@
-/*
-Copyright 2010 The University of New South Wales (UNSW).
-
-This file is part of the 2010 team rUNSWift RoboCup entry. You may
-redistribute it and/or modify it under the terms of the GNU General
-Public License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version as
-modified below. As the original licensors, we add the following
-conditions to that license:
-
-In paragraph 2.b), the phrase "distribute or publish" should be
-interpreted to include entry into a competition, and hence the source
-of any derived work entered into a competition must be made available
-to all parties involved in that competition under the terms of this
-license.
-
-In addition, if the authors of a derived work publish any conference
-proceedings, journal articles or other academic papers describing that
-derived work, then appropriate academic citations to the original work
-must be included in that publication.
-
-This rUNSWift source is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-General Public License for more details.
-
-You should have received a copy of the GNU General Public License along
-with this source code; if not, write to the Free Software Foundation,
-Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-*/
-
 #include "blackboard/Blackboard.hpp"
 #include "thread/Thread.hpp"
 #include <boost/assign/list_of.hpp>
@@ -49,15 +18,14 @@ Blackboard::Blackboard(){
       store_and_notify(argv, vm, NULL);
       config = boost::program_options::variables_map(vm);
 
-      //mask = INITIAL_MASK;
+      mask = INITIAL_MASK;
       readOptions(vm);
       thread.configCallbacks["Blackboard"] = bind(&Blackboard::readOptions, this, _1);
       llog(INFO) << "Initialising the blackboard" << endl;
 }
 
 Blackboard::Blackboard(const program_options::variables_map &vm)
-   : config(vm)//, mask(INITIAL_MASK) 
-   {
+   : config(vm), mask(INITIAL_MASK) {
       readOptions(vm);
       thread.configCallbacks["Blackboard"] = bind(&Blackboard::readOptions, this, _1);
       thread.configCallbacks["Logger"] = &Logger::readOptions;
@@ -71,14 +39,12 @@ Blackboard::~Blackboard() {
 }
 
 void Blackboard::readOptions(const program_options::variables_map& config) {
-   //behaviour.readOptions(config);
-   //gameController.readOptions(config);
-   //receiver.readOptions(config);
+   behaviour.readOptions(config);
+   gameController.readOptions(config);
+   receiver.readOptions(config);
    kinematics.readOptions(config);
-   //localisation.readOptions(config);
 }
 
-/*
 BehaviourBlackboard::BehaviourBlackboard() {
    llog(INFO) << "Initialising blackboard: behaviour" << endl;
    readBuf = 0;
@@ -86,26 +52,22 @@ BehaviourBlackboard::BehaviourBlackboard() {
 
 void BehaviourBlackboard::readOptions(const program_options::variables_map& config) {
    skill = config["behaviour.skill"].as<string>();
-   remoteStiffen = config["behaviour.remote_stiffen"].as<bool>();
-   useGetups = config["behaviour.use_getups"].as<bool>();
-
    string a = config["default.body"].as<string>();
    if (a == "NONE") request[readBuf].actions.body.actionType = ActionCommand::Body::NONE;
    if (a == "STAND") request[readBuf].actions.body.actionType = ActionCommand::Body::STAND;
    if (a == "WALK") request[readBuf].actions.body.actionType = ActionCommand::Body::WALK;
    if (a == "DRIBBLE") request[readBuf].actions.body.actionType = ActionCommand::Body::DRIBBLE;
-   if (a == "TURN_DRIBBLE") request[readBuf].actions.body.actionType = ActionCommand::Body::TURN_DRIBBLE;
    if (a == "INITIAL") request[readBuf].actions.body.actionType = ActionCommand::Body::INITIAL;
    if (a == "KICK") request[readBuf].actions.body.actionType = ActionCommand::Body::KICK;
    if (a == "GETUP_FRONT")
       request[readBuf].actions.body.actionType = ActionCommand::Body::GETUP_FRONT;
    if (a == "GETUP_BACK")
       request[readBuf].actions.body.actionType = ActionCommand::Body::GETUP_BACK;
-   if (a == "TIP_OVER")
-      request[readBuf].actions.body.actionType = ActionCommand::Body::TIP_OVER;
    if (a == "DEAD") request[readBuf].actions.body.actionType = ActionCommand::Body::DEAD;
    if (a == "REF_PICKUP")
       request[readBuf].actions.body.actionType = ActionCommand::Body::REF_PICKUP;
+   if (a == "THROW_IN")
+      request[readBuf].actions.body.actionType = ActionCommand::Body::THROW_IN;
    if (a == "GOALIE_SIT")
       request[readBuf].actions.body.actionType = ActionCommand::Body::GOALIE_SIT;
    if (a == "GOALIE_DIVE_LEFT")
@@ -116,6 +78,8 @@ void BehaviourBlackboard::readOptions(const program_options::variables_map& conf
       request[readBuf].actions.body.actionType = ActionCommand::Body::GOALIE_CENTRE;
    if (a == "GOALIE_UNCENTRE")
       request[readBuf].actions.body.actionType = ActionCommand::Body::GOALIE_UNCENTRE;
+   if (a == "GOALIE_STAND")
+      request[readBuf].actions.body.actionType = ActionCommand::Body::GOALIE_STAND;
    if (a == "GOALIE_INITIAL")
       request[readBuf].actions.body.actionType = ActionCommand::Body::GOALIE_INITIAL;
    if (a == "GOALIE_AFTERSIT_INITIAL")
@@ -134,28 +98,10 @@ void BehaviourBlackboard::readOptions(const program_options::variables_map& conf
       request[readBuf].actions.body.foot = ActionCommand::Body::RIGHT;
    }
 }
-*/
-
-/*
-void LocalisationBlackboard::readOptions(const program_options::variables_map& config) {
-   if (config["debug.set_initial_pose"].as<bool>()) {
-      setInitialPose = true;
-      robotPos.vec[0] = config["debug.initial_x"].as<int>();
-      robotPos.vec[1] = config["debug.initial_y"].as<int>();
-      robotPos.vec[2] = M_PI * config["debug.initial_theta"].as<int>() / 180.0;
-   }
-   else {
-      setInitialPose = false;
-   }
-
-   setFallen = config["debug.set_fallen"].as<bool>();
-   getupLost = config["debug.getup_lost"].as<bool>();
-}
 
 LocalisationBlackboard::LocalisationBlackboard() {
    llog(INFO) << "Initialising blackboard: localisation" << endl;
    robotObstacles.reserve(MAX_ROBOT_OBSTACLES);
-   allrobotPos.reserve(MAX_GAUSSIANS);
    ballLostCount = numeric_limits<uint32_t>::max();
    ballPosRR = RRCoord();
    ballPosRRC = AbsCoord();
@@ -165,11 +111,11 @@ LocalisationBlackboard::LocalisationBlackboard() {
    ballPos = AbsCoord();
    teamBall = TeamBallInfo();
    sharedLocalisationBundle = SharedLocalisationUpdateBundle();
-
+   
    // This flag is here so that localisation can know when a shared localisation bundle has
    // been sent so it can reset it.
    havePendingOutgoingSharedBundle = false;
-
+   
    // one flag per teammate, include ourselves for simplicity.
    havePendingIncomingSharedBundle = std::vector<bool>(5, false);
 }
@@ -178,15 +124,18 @@ VisionBlackboard::VisionBlackboard()
 {
    llog(INFO) << "Initialising blackboard: vision" << endl;
    landmarks.reserve(MAX_LANDMARKS);
-   feet_boxes.reserve(MAX_FEET);
+   feet.reserve(MAX_FEET);
    balls.reserve(MAX_BALLS);
    posts.reserve(MAX_POSTS);
    robots.reserve(MAX_ROBOTS);
-   fieldBoundaries.reserve(MAX_FIELD_BOUNDARIES);
+   fieldEdges.reserve(MAX_FIELD_EDGES);
    fieldFeatures.reserve(MAX_FIELD_FEATURES);
-   regions.reserve(ESTIMATED_REGIONS);
+   vOdometry = Odometry();
+   dualOdometry = Odometry();
    missedFrames = 0;
    dxdy = std::make_pair(0,0);
+   caughtLeft = false;
+   caughtRight = false;
    goalArea = PostInfo::pNone;
    awayGoalProb = 0.5f;
    homeMapSize = 0;
@@ -198,16 +147,13 @@ VisionBlackboard::VisionBlackboard()
    botFrame = NULL;
 
    numFieldLinePoints = 0;
-
-   lastSecond = LastSecondInfo();
 }
-*/
 
 PerceptionBlackboard::PerceptionBlackboard() {
    kinematics = 0;
-    //localisation = 0;
-   //vision = 0;
-   //behaviour = 0;
+   localisation = 0;
+   vision = 0;
+   behaviour = 0;
    total = 33;
 }
 
@@ -226,12 +172,10 @@ MotionBlackboard::MotionBlackboard() {
    sonarWindow.push_back(right);
 }
 
-/*
 RemoteControlBlackboard::RemoteControlBlackboard() {
-   llog(INFO) << "Initialising blackboard: remote control" << endl;
-   time_received = 0;
+	llog(INFO) << "Initialising blackboard: remote control" << endl;
+	time_received = 0;
 }
-*/
 
 KinematicsBlackboard::KinematicsBlackboard() {
    llog(INFO) << "Initialising blackboard: kinematics" << endl;
@@ -265,10 +209,10 @@ void KinematicsBlackboard::readOptions(const program_options::variables_map& con
    }
 }
 
-/*
 GameControllerBlackboard::GameControllerBlackboard() {
    llog(INFO) << "Initialising blackboard: gameController" << endl;
    connected = false;
+   game_type = MATCH;
    memset(&our_team, 0, sizeof our_team);
    memset(&data, 0, sizeof data);
 }
@@ -276,6 +220,11 @@ GameControllerBlackboard::GameControllerBlackboard() {
 void GameControllerBlackboard::readOptions(const program_options::variables_map& config) {
    connect = config["gamecontroller.connect"].as<bool>();
    player_number = config["player.number"].as<int>();
+   string a = config["game.type"].as<string>();
+   if (a == "MATCH") game_type = MATCH;
+   if (a == "DRIBBLE") game_type = DRIBBLE;
+   if (a == "OPEN") game_type = OPEN;
+   if (a == "PASSING") game_type = PASSING;
    our_team.teamNumber = config["player.team"].as<int>();
    our_team.teamColour = (int)(config["gamecontroller.ourcolour"].
                                as<string>() == "red");
@@ -293,8 +242,6 @@ void GameControllerBlackboard::readOptions(const program_options::variables_map&
       their_team.players[i].penalty = PENALTY_NONE;
       their_team.players[i].secsTillUnpenalised = 0;
    }
-
-   // Config allows testing states without running the Java GameController
    map<string, int> gcStateMap;
    gcStateMap["INITIAL"] = STATE_INITIAL;
    gcStateMap["READY"] = STATE_READY;
@@ -312,8 +259,6 @@ void GameControllerBlackboard::readOptions(const program_options::variables_map&
    map<string, int> gcSecStateMap;
    gcSecStateMap["NORMAL"] = STATE2_NORMAL;
    gcSecStateMap["PENALTYSHOOT"] = STATE2_PENALTYSHOOT;
-   gcSecStateMap["OVERTIME"] = STATE2_OVERTIME;
-   gcSecStateMap["TIMEOUT"] = STATE2_TIMEOUT;
    data.secondaryState = gcSecStateMap[
       config["gamecontroller.secondarystate"].as<string>()];
    data.secsRemaining = config["gamecontroller.secsremaining"].as<int>();
@@ -333,7 +278,6 @@ ReceiverBlackboard::ReceiverBlackboard() {
 void ReceiverBlackboard::readOptions(const program_options::variables_map& config) {
    team = config["player.team"].as<int>();
 }
-*/
 
 ThreadBlackboard::ThreadBlackboard() {
    llog(INFO) << "Initialising blackboard: thread" << endl;

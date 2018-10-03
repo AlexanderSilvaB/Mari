@@ -3,7 +3,7 @@
 
 #include <boost/program_options.hpp>
 #include "thread/ThreadManager.hpp"
-#include "perception/vision/camera/NaoCamera.hpp"
+#include "perception/vision/NaoCamera.hpp"
 #include "utils/speech.hpp"
 
 class InitManager

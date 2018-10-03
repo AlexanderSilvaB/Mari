@@ -1,7 +1,7 @@
 #include "RobotInfo.hpp"
 
 
-const char *const UNSW::RobotInfo::TypeName[] =
+const char *const RobotInfo::TypeName[] =
 {
    "rUnknown",
    "rBlue",

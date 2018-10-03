@@ -20,7 +20,7 @@ StrategyModule::~StrategyModule()
 void StrategyModule::OnStart()
 {
     boost::program_options::variables_map config = InitManager::GetBlackboard()->config;
-    touch = (Touch *)new AgentTouch(config["player.team"].as<int>(), config["player.number"].as<int>());
+    touch = (Touch *)new AgentTouch();
     touch->readOptions(config); 
     
     gameController->OnStart();

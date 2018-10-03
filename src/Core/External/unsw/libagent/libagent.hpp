@@ -1,29 +1,3 @@
-/*
-Copyright 2010 The University of New South Wales (UNSW).
-This file is part of the 2010 team rUNSWift RoboCup entry. You may
-redistribute it and/or modify it under the terms of the GNU General
-Public License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version as
-modified below. As the original licensors, we add the following
-conditions to that license:
-In paragraph 2.b), the phrase "distribute or publish" should be
-interpreted to include entry into a competition, and hence the source
-of any derived work entered into a competition must be made available
-to all parties involved in that competition under the terms of this
-license.
-In addition, if the authors of a derived work publish any conference
-proceedings, journal articles or other academic papers describing that
-derived work, then appropriate academic citations to the original work
-must be included in that publication.
-This rUNSWift source is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-General Public License for more details.
-You should have received a copy of the GNU General Public License along
-with this source code; if not, write to the Free Software Foundation,
-Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-*/
-
 #pragma once
 
 #include <semaphore.h>
@@ -31,15 +5,17 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #include <string>
 #include <vector>
 #include <stack>
-#include <boost/shared_ptr.hpp>
 #include "alcommon/albroker.h"
 #include "alcommon/alproxy.h"
 #include "alproxies/alloggerproxy.h"
 #include "alproxies/almemoryproxy.h"
-#include "alproxies/alsonarproxy.h"
+#include "alproxies/almotionproxy.h"
 #include "alproxies/altexttospeechproxy.h"
 #include "alcommon/almodule.h"
+//#include "alcore/alptr.h"
+//#include "altools/tools.h"
 #include "alvalue/alvalue.h"
+//#include "altools/alxplatform.h"
 #include "alproxies/dcmproxy.h"
 #include "libagent/AgentData.hpp"
 #include "utils/angles.hpp"
@@ -141,14 +117,14 @@ class Agent : public AL::ALModule {
       void postCallback();
       void doLEDs(ActionCommand::LED& leds);
       void doButtons(bool chest, bool left, bool right);
-      void doBattery(float charge, float current, int status);
       void doHeadTouch(float headTouchFront,
                        float headTouchRear,
                        float headTouchMiddle);
+      void doBattery(float charge, float current, int status);
       void doTemps();
+      void doStiffen(ActionCommand::Stiffen stf);
       void doNetworking();
       void doAvahi();
-      void doStiffen(ActionCommand::Stiffen stf);
 
    private:
       AL::ALLoggerProxy* log;
@@ -168,15 +144,14 @@ class Agent : public AL::ALModule {
       std::vector<float*> sensor_pointers;
       std::vector<float*> joint_pointers;
       std::vector<float*> temperature_pointers;
-      std::vector<float*> current_pointers;
       std::vector<float*> sonar_pointers;
       int* battery_status_pointer;
 
-      /*Sonar*/
-      AL::ALSonarProxy*	 sonar;
-
       std::vector<std::string> leg_names;
       std::vector<float> stand_angles;
+
+      /* ALMotion */
+      AL::ALMotionProxy* motion;
 
       /* ALTextToSpeech */
       AL::ALTextToSpeechProxy* speech;

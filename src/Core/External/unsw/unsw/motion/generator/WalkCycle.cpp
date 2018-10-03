@@ -33,6 +33,19 @@ WalkCycle::WalkCycle(float useForwardL, float useForwardR, float useLeft,
 void WalkCycle::generateWalk(float &forwardL, float &forwardR,
                              float &leftL, float &leftR,
                              float &turnLR, float &liftL, float &liftR) {
+//      float movePercent = 0.5;
+//      if(leftSwing){
+//         forwardR = moveSin(s_x*(1-movePercent), -s_x_*movePercent, getPhase(t, T));
+//         forwardL = moveSin(-s_x*movePercent, s_x_*(1-movePercent), getPhase(t, T));
+//         leftR = moveSin(s_y*(1-movePercent), -s_y_*movePercent, getPhase(t, T));
+//         leftL = moveSin(-s_y*movePercent, s_y_*(1-movePercent), getPhase(t, T));
+//      } else {
+//         forwardL = moveSin(s_x*(1-movePercent), -s_x_*movePercent, getPhase(t, T));
+//         forwardR = moveSin(-s_x*movePercent, s_x_*(1-movePercent), getPhase(t, T));
+//         leftL = moveSin(s_y*(1-movePercent), -s_y_*movePercent, getPhase(t, T));
+//         leftR = moveSin(-s_y*movePercent, s_y_*(1-movePercent), getPhase(t, T));
+//      }
+//      turnLR = moveSin(s_r, s_r_, getPhase(t, T));
 
    float phaseLeftT = t;
    float phaseTurnT = t;
@@ -147,6 +160,8 @@ void WalkCycle::generateWalk(float &forwardL, float &forwardR,
          leftR     += useLeft * 1.0;
       }
    }
+   // leftL *= useLeft > 0 ? 1 : - 1;
+   // leftR *= useLeft > 0 ? 1 : - 1;
 }
 
 void WalkCycle::next() {

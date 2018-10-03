@@ -9,33 +9,6 @@ struct BBox
    BBox (Point a, Point b) : a(a), b(b) {};
    virtual ~BBox () {}
 
-   /*
-   Expands a bounding box by the factor provided, scaling it around its centre
-   point.
-   */
-   BBox expand(float multiplier)
-   {
-       // The expanded bounding box.
-       BBox newBox;
-
-       // The amount by which the bounding box should be expanded on each side.
-       int xExpand = (width()*(multiplier-1.0f))/2.0f;
-       int yExpand = (height()*(multiplier-1.0f))/2.0f;
-
-       // Initialise the new bounding box with the old one.
-       newBox.a = a;
-       newBox.b = b;
-
-       // Expand the new bounding box by multiplier.
-       newBox.a.x() -= xExpand;
-       newBox.b.x() += xExpand;
-       newBox.a.y() -= yExpand;
-       newBox.b.y() += yExpand;
-
-       // Return the expanded bounding box.
-       return(newBox);
-   }
-
    int width() const
    {
       return b.x() - a.x();
@@ -48,14 +21,14 @@ struct BBox
 
    bool within(const Point p) const
    {
-      return (a.x() <= p.x() && p.x() <= b.x())
-         && (a.y() <= p.y() && p.y() <= b.y());
+      return (a.x() <= p.x() && p.x() < b.x())
+          && (a.y() <= p.y() && p.y() < b.y());
    }
 
    bool validIndex(const Point p) const
    {
-      return (0 <= p.x() && p.x() <= width())
-         && (0 <= p.y() && p.y() <= height());
+      return (0 <= p.x() && p.x() < width())
+          && (0 <= p.y() && p.y() < height());
    }
 
    Point a, b;

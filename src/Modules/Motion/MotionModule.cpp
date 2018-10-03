@@ -119,7 +119,8 @@ void MotionModule::Tick(float ellapsedTime)
     }
     else if(tipOver)
     {
-        request.body = ActionCommand::Body(ActionCommand::Body::TIP_OVER);
+        //request.body = ActionCommand::Body(ActionCommand::Body::TIP_OVER);
+        request.body = ActionCommand::Body(ActionCommand::Body::DEAD);
     }
     else if(getupFront)
     {
@@ -157,8 +158,8 @@ void MotionModule::Tick(float ellapsedTime)
         }
         //else
         //    request.body = ActionCommand::Body();       
-        request.body.leftArmLimp = limpLeft;
-        request.body.leftArmLimp = limpRight;
+        //request.body.leftArmLimp = limpLeft;
+        //request.body.leftArmLimp = limpRight;
     }
     motion->Tick(request);
     #else

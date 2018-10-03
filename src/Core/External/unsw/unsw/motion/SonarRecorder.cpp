@@ -1,6 +1,5 @@
 #include "SonarRecorder.hpp"
-#include <iostream>
-using namespace std;
+
 
 SonarRecorder::SonarRecorder(){
 
@@ -12,8 +11,8 @@ SonarRecorder::SonarRecorder(){
    commands.push_back(Sonar::Mode::TLRL); // left   
    commands.push_back(Sonar::Mode::TLRR); // middle
    commands.push_back(Sonar::Mode::TRRR); // right
-   commands.push_back(Sonar::Mode::TLRL); // left
-   commands.push_back(Sonar::Mode::TRRL); // other middle
+   commands.push_back(Sonar::Mode::TLRL); // left  
+   commands.push_back(Sonar::Mode::TRRL); // other middle 
    commands.push_back(Sonar::Mode::TRRR); // right
 
    std::vector<int> left;
@@ -38,7 +37,7 @@ float SonarRecorder::update(float sonar[Sonar::NUMBER_OF_READINGS]){
    if (cycle_counter == CYCLES_PER_PING){
       cycle_counter = 0;
       // add RBOTH so we can continue to read left and right instead of just one set of values
-      return processUpdate(sonar)+Sonar::Mode::RBOTH;
+      return processUpdate(sonar) + Sonar::Mode::RBOTH; 
    } else {
       return Sonar::Mode::NO_PING; 
    }
@@ -53,24 +52,15 @@ float SonarRecorder::processUpdate(float sonar[Sonar::NUMBER_OF_READINGS]){
    std::vector<int> right;
 
    for(int i=Sonar::Left0; i<=Sonar::Left9; i++){
-      if (sonar[i] < Sonar::MAX) {
-         if(sonar[i] <= Sonar::MIN){
-        	 left.push_back(static_cast <int>(Sonar::MIN*1000.f));
-         } else {
-        	 left.push_back(static_cast <int>(sonar[i]*1000.f));
-         }
-      }
+      if (sonar[i] < Sonar::MAX && sonar[i] >= Sonar::MIN)
+         left.push_back(static_cast <int>(sonar[i]*1000.f));
    }
 
    for(int i=Sonar::Right0; i<=Sonar::Right9; i++){
-	   if (sonar[i] < Sonar::MAX) {
-		   if(sonar[i] <= Sonar::MIN){
-			   right.push_back(static_cast<int>(Sonar::MIN*1000.f));
-		   } else {
-			   right.push_back(static_cast <int>(sonar[i]*1000.f));
-		   }
-	   }
+      if (sonar[i] < Sonar::MAX && sonar[i] >= Sonar::MIN)
+         right.push_back(static_cast <int>(sonar[i]*1000.f));
    }
+
    if(command == Sonar::Mode::TLRL ){  
       // receiving on left
       sonarWindow[Sonar::LEFT].insert(sonarWindow[Sonar::LEFT].end(), left.begin(), left.end());

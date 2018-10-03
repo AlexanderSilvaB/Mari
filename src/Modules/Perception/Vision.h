@@ -6,7 +6,7 @@
 #include "Core/Utils/CameraFrame.h"
 
 #ifdef USE_V4L2
-#include "perception/vision/camera/CombinedCamera.hpp"
+#include "Core/Utils/CombinedCamera.hpp"
 #else
 #ifdef USE_QIBUILD
 #include <RinoLib/Perception/Capture.h>

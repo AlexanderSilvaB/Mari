@@ -5,9 +5,6 @@
 #include <boost/program_options/variables_map.hpp>
 
 #define llog(X) ((Logger::instance())->realLlog(X))
-#define llog_open(X) ((Logger::instance())->realLlog(X, 1))
-#define llog_middle(X) ((Logger::instance())->realLlog(X, 0))
-#define llog_close(X) ((Logger::instance())->realLlog(X, -1))
 
 /**
  * Possible log levels
@@ -32,7 +29,7 @@ enum LogLevel {
    WARNING = 10,
    INFO    = 20,
    VERBOSE = 40,
-   DEBUG   = 60,
+   /*DEBUG   = 60,*/
    DEBUG1  = 60,
    DEBUG2  = 80,
    DEBUG3  = 100
@@ -45,11 +42,9 @@ class Logger {
       static void init(std::string logPath, std::string logLevel, bool motion);
       static Logger *instance();
       std::ostream &realLlog(int logLevel);
-      std::ostream &realLlog(int logLevel, int indentInc);
-      static void readOptions(const boost::program_options::variables_map &config);
 
-   private:
-      static int indentLevel;
+   //private:
+      static void readOptions(const boost::program_options::variables_map &config);
       static void init(std::string logLevel, bool motion);
       static __thread Logger *logger;
       static enum LogLevel logLevel;

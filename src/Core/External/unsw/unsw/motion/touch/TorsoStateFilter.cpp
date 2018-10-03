@@ -10,11 +10,7 @@
 #define PROCESS_VEL_SD 0.1
 #define SIDE_ANGLE_SD 0.01
 #define SIDE_VEL_SD 0.1
-#define BACK_LIM -55
-#define FRONT_LIM 90
-#define COP_OFFSET 0
 #define H 245
-#define g 9810.0
 
 TorsoStateFilter::TorsoStateFilter(){
    est = matrix<float>(STATE_DIM, 1);
@@ -70,6 +66,9 @@ matrix<float> invert(matrix<float> &m){
 }
 
 float TorsoStateFilter::getFulcrum(matrix<float> obs, FeetState feetState){
+#define BACK_LIM -55
+#define FRONT_LIM 90
+#define COP_OFFSET 0
    float fulcrum = 0.0;
    if(frontal){  //frontal plane pendulum
       //these are just estimates and empirically tuned
@@ -91,6 +90,7 @@ float TorsoStateFilter::getFulcrum(matrix<float> obs, FeetState feetState){
 }
 
 matrix<float> TorsoStateFilter::update(matrix<float> obs, FeetState feetState) {
+#define g 9810.0
    float fulcrum = getFulcrum(obs, feetState);
 
    //process update

@@ -1,5 +1,4 @@
-#ifndef FIELD_FEATURE_INFO_HPP
-#define FIELD_FEATURE_INFO_HPP
+#pragma once
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/split_member.hpp>
@@ -14,7 +13,7 @@ struct FieldLinePointInfo {
 
    FieldLinePointInfo () {
    }
-   FieldLinePointInfo (Point p, Point rrp)
+   FieldLinePointInfo (Point p, Point rrp) 
       : p (p), rrp (rrp) {
    }
 
@@ -62,10 +61,10 @@ struct LineInfo {
       rr = RRCoord();
    }
    LineInfo (Point p1, Point p2, RRCoord rr = RRCoord(0,0))
-      : p1(p1), p2(p2), rr(rr) {
-      t1 = p1.y() - p2.y();
-      t2 = p2.x() - p1.x();
-      t3 = p1.x() * p2.y() - p2.x() * p1.y();
+      : p1 (p1), p2 (p2), rr (rr) {
+      t1 = p2.y() - p1.y();
+      t2 = p1.x() - p2.x();
+      t3 = p1.y() * (p2.x() - p1.x()) - p1.x() * (p2.y() - p1.y());
    }
 
 
@@ -108,47 +107,32 @@ BOOST_CLASS_VERSION(LineInfo, 4);
 
 struct CornerInfo
 {
-   // The main corner (kink) point.
    Point p;
 
-   // The points that form the ends of the corner.
-   // e1
-   // |
-   // |
-   // p --- e2
-   Point e1;
-   Point e2;
-
    CornerInfo () {}
-   CornerInfo (Point p, Point e1, Point e2) : p (p), e1 (e1), e2 (e2) {}
+   CornerInfo (Point p) : p (p) {}
 
    template<class Archive>
    void serialize(Archive &ar, const unsigned int file_version)
    {
       ar & p;
-      ar & e1;
-      ar & e2;
    }
 };
 
 inline std::ostream& operator<<(std::ostream& os, const CornerInfo& cornerInfo) {
    os << cornerInfo.p;
-   os << cornerInfo.e1;
-   os << cornerInfo.e2;
    return os;
 }
 
 inline std::istream& operator>>(std::istream& is, CornerInfo& cornerInfo) {
    is >> cornerInfo.p;
-   is >> cornerInfo.e1;
-   is >> cornerInfo.e2;
    return is;
 }
 
 struct TJunctionInfo
 {
    Point p;
-
+   
    TJunctionInfo() {}
    TJunctionInfo(Point p) : p (p) {}
 
@@ -173,41 +157,6 @@ inline std::istream& operator>>(std::istream& is, TJunctionInfo& tJunctionInfo) 
 
 #ifndef SWIG
 BOOST_CLASS_VERSION(TJunctionInfo, 3);
-#endif
-
-struct GoalBoxCornerInfo
-{
-   Point p;
-   /* Left is from the orientation of the STRIKER */
-   bool left_corner;
-
-   GoalBoxCornerInfo() {}
-   GoalBoxCornerInfo(Point p, bool left_corner) : p (p), left_corner (left_corner) {}
-
-   template<class Archive>
-   void serialize(Archive &ar, const unsigned int file_version)
-   {
-      if (file_version >= 5) {
-         ar & p;
-         ar & left_corner;
-      }
-   }
-};
-
-inline std::ostream& operator<<(std::ostream& os, const GoalBoxCornerInfo& goal_box_corner_info) {
-   os << goal_box_corner_info.p;
-   os << goal_box_corner_info.left_corner;
-   return os;
-}
-
-inline std::istream& operator>>(std::istream& is, GoalBoxCornerInfo& goal_box_corner_info) {
-   is >> goal_box_corner_info.p;
-   is >> goal_box_corner_info.left_corner;
-   return is;
-}
-
-#ifndef SWIG
-BOOST_CLASS_VERSION(GoalBoxCornerInfo, 5);
 #endif
 
 struct PenaltySpotInfo
@@ -245,7 +194,7 @@ BOOST_CLASS_VERSION(PenaltySpotInfo, 3);
 struct XJunctionInfo
 {
    Point p;
-
+   
    XJunctionInfo() {}
    XJunctionInfo(Point p) : p (p) {}
 
@@ -312,7 +261,8 @@ BOOST_CLASS_VERSION(ParallelLinesInfo, 3);
 #endif
 
 
-struct FieldFeatureInfo {
+struct FieldFeatureInfo
+{
 
    enum Type
    {
@@ -324,8 +274,7 @@ struct FieldFeatureInfo {
       fCentreCircle   = 0x05,
       fFieldLinePoint = 0x06,
       fXJunction      = 0x07,
-      fParallelLines  = 0x08,
-      fGoalBoxCorner  = 0x09
+      fParallelLines  = 0x08
    };
 
    /* Names of corresponding enums from above */
@@ -355,13 +304,6 @@ struct FieldFeatureInfo {
       rr (rr),
       type (fTJunction),
       tjunction (tjunction)
-   {
-   }
-
-   FieldFeatureInfo (RRCoord rr, GoalBoxCornerInfo gbc) :
-      rr (rr),
-      type (fGoalBoxCorner),
-      goal_box_corner (gbc)
    {
    }
 
@@ -402,11 +344,11 @@ struct FieldFeatureInfo {
 
    FieldFeatureInfo () {
    }
-
+   
    FieldFeatureInfo(const FieldFeatureInfo &other) {
       this->rr = other.rr;
       this->type = other.type;
-
+      
       if (type == fLine) {
          this->lineUsed = other.lineUsed;
          this->line = other.line;
@@ -424,8 +366,6 @@ struct FieldFeatureInfo {
          this->xjunction = other.xjunction;
       } else if (type == fParallelLines) {
          this->parallellines = other.parallellines;
-      } else if (type == fGoalBoxCorner) {
-         this->goal_box_corner = other.goal_box_corner;
       }
    }
 
@@ -442,10 +382,9 @@ struct FieldFeatureInfo {
    PenaltySpotInfo    penaltyspot;
    XJunctionInfo      xjunction;
    CentreCircleInfo   centrecircle;
-   GoalBoxCornerInfo  goal_box_corner;
    std::vector<FieldLinePointInfo> fieldlinepoints;
    ParallelLinesInfo  parallellines;
-
+   
    double distance(void) const {
       if (type == fLine) {
          return pointSegmentDist(Point(0, 0), line.p1, line.p2);
@@ -472,8 +411,6 @@ struct FieldFeatureInfo {
          double d2 = pointSegmentDist(Point(0, 0), parallellines.l2.p1, parallellines.l2.p2);
          double result = (d1+d2)/2.0;
          return result;
-      } else if (type == fGoalBoxCorner) {
-         return rr.distance();
       } else {
          return 0.0;
       }
@@ -501,8 +438,6 @@ struct FieldFeatureInfo {
          ar & xjunction;
       } else if (type == fParallelLines) {
          ar & parallellines;
-      } else if (type == fGoalBoxCorner){
-         ar & goal_box_corner;
       }
    }
 };
@@ -510,21 +445,20 @@ inline std::ostream& operator<<(std::ostream& os, const FieldFeatureInfo& fieldF
    os << fieldFeatureInfo.rr;
    os.write((char*) &(fieldFeatureInfo.type), sizeof(FieldFeatureInfo::Type));
    os.write((char*) &(fieldFeatureInfo.lineUsed), sizeof(bool));
-
+   
    os << fieldFeatureInfo.line;
    os << fieldFeatureInfo.corner;
    os << fieldFeatureInfo.tjunction;
    os << fieldFeatureInfo.penaltyspot;
    os << fieldFeatureInfo.xjunction;
    os << fieldFeatureInfo.parallellines;
-   os << fieldFeatureInfo.goal_box_corner;
-
+   
    unsigned numFieldlinepoints = fieldFeatureInfo.fieldlinepoints.size();
    os.write((char*) &numFieldlinepoints, sizeof(unsigned));
    for (unsigned i = 0; i < numFieldlinepoints; i++) {
       os << fieldFeatureInfo.fieldlinepoints[i];
    }
-
+  
    return os;
 }
 
@@ -532,15 +466,14 @@ inline std::istream& operator>>(std::istream& is, FieldFeatureInfo& fieldFeature
    is >> fieldFeatureInfo.rr;
    is.read((char*) &(fieldFeatureInfo.type), sizeof(FieldFeatureInfo::Type));
    is.read((char*) &(fieldFeatureInfo.lineUsed), sizeof(bool));
-
+   
    is >> fieldFeatureInfo.line;
    is >> fieldFeatureInfo.corner;
    is >> fieldFeatureInfo.tjunction;
    is >> fieldFeatureInfo.penaltyspot;
    is >> fieldFeatureInfo.xjunction;
    is >> fieldFeatureInfo.parallellines;
-   is >> fieldFeatureInfo.goal_box_corner;
-
+   
    unsigned numFieldlinepoints;
    is.read((char*) &numFieldlinepoints, sizeof(unsigned));
    for (unsigned i = 0; i < numFieldlinepoints; i++) {
@@ -548,8 +481,6 @@ inline std::istream& operator>>(std::istream& is, FieldFeatureInfo& fieldFeature
       is >> fieldLinePointInfo;
       fieldFeatureInfo.fieldlinepoints.push_back(fieldLinePointInfo);
    }
-
+  
    return is;
 }
-
-#endif

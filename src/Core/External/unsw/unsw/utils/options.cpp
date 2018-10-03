@@ -1,34 +1,3 @@
-/*
-Copyright 2010 The University of New South Wales (UNSW).
-
-This file is part of the 2010 team rUNSWift RoboCup entry. You may
-redistribute it and/or modify it under the terms of the GNU General
-Public License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version as
-modified below. As the original licensors, we add the following
-conditions to that license:
-
-In paragraph 2.b), the phrase "distribute or publish" should be
-interpreted to include entry into a competition, and hence the source
-of any derived work entered into a competition must be made available
-to all parties involved in that competition under the terms of this
-license.
-
-In addition, if the authors of a derived work publish any conference
-proceedings, journal articles or other academic papers describing that
-derived work, then appropriate academic citations to the original work
-must be included in that publication.
-
-This rUNSWift source is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-General Public License for more details.
-
-You should have received a copy of the GNU General Public License along
-with this source code; if not, write to the Free Software Foundation,
-Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-*/
-
 #include <boost/program_options.hpp>
 #include <ext/slist>
 #include <fstream>
@@ -37,7 +6,7 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #include <map>
 
 #include "utils/options.hpp"
-//#include "transmitter/TransmitterDefs.hpp"
+#include "transmitter/TransmitterDefs.hpp"
 
 namespace po = boost::program_options;
 using namespace std;
@@ -85,30 +54,15 @@ void populate_options(po::options_description &config_file_options) {
        "enable Nao Receiver module")
       ("debug.remotecontrol", po::value<bool>()->default_value(true),
        "enable Remote Control Receiver module")
-      ("debug.act_on_whistle", po::value<bool>()->default_value(true),
-       "Go to PLAYING state when in SET state and whistle heard")
       ("debug.dump,D", po::value<string>()->default_value(""),
       "Dump blackboard in .bbd format. Empty string disables.")
-      //("debug.mask", po::value<int>()->default_value(INITIAL_MASK),
-      ("debug.mask", po::value<int>()->default_value(0),
-      "Blackboard mask determining what is serialised")
-      ("debug.set_initial_pose", po::value<bool>()->default_value(false),
-      "set intial pose")
-      ("debug.initial_x", po::value<int>()->default_value(0),
-      "initial x value (if debug.set_initial_pose == true)")
-      ("debug.initial_y", po::value<int>()->default_value(0),
-      "initial y value (if debug.set_initial_pose == true)")
-      ("debug.initial_theta", po::value<int>()->default_value(0),
-      "initial theta value (if debug.set_initial_pose == true)")
-      ("debug.set_fallen", po::value<bool>()->default_value(false),
-      "set fallen state")
-      ("debug.getup_lost", po::value<bool>()->default_value(false),
-      "set whether lost after getup");
+      ("debug.mask", po::value<int>()->default_value(INITIAL_MASK),
+      "Blackboard mask determining what is serialised");
 
    po::options_description behaviour_config("Behaviour options");
    behaviour_config.add_options()
       ("behaviour.skill,s",
-      po::value<string>()->default_value("GameController"),
+      po::value<string>()->default_value("Default"),
       "The desired top level Python skill class.")
       ("behaviour.path", po::value<string>()->default_value("/home/nao/data/behaviours/"),
       "path containing python behaviours.")
@@ -131,11 +85,7 @@ void populate_options(po::options_description &config_file_options) {
       ("default.kickDirection", po::value<float>()->default_value(0.0),
       "default kickDirection (degrees)")
       ("default.whichCamera", po::value<string>()->default_value("BEHAVIOUR"),
-      "which camera to use")
-      ("behaviour.remote_stiffen", po::value<bool>()->default_value(false),
-      "Remotely stiffen (and standup) when a READY packet is received from gamecontroller.")
-      ("behaviour.use_getups", po::value<bool>()->default_value(true),
-      "Getups on/off (TRUE, FALSE)");
+      "which camera to use");
 
    po::options_description motion_config("Motion options");
    motion_config.add_options()
@@ -146,10 +96,7 @@ void populate_options(po::options_description &config_file_options) {
       ("motion.path",
       po::value<string>()->default_value("/home/nao/data/pos/"),
       "the path of .pos files for ActionGenerator")
-      ("motion.individualConfigPath",
-      po::value<string>()->default_value("/home/nao/data/pos/individualPoses"),
-      "the path of .pos files for ActionGenerator, for individual robots")
-      ("motion.v4", po::value<bool>()->default_value(false),
+      ("motion.v3", po::value<bool>()->default_value(false),
       "whether to use v3 version of getup instead")
       ("walk.f", po::value<float>()->default_value(0.5),
       "frequency of coronal plane rocking (Hz)")
@@ -180,15 +127,7 @@ void populate_options(po::options_description &config_file_options) {
       ("walk.moveFrac", po::value<float>()->default_value(0.4f),
       "fraction of cycle in which leg move is performed.")
       ("walk.m", po::value<float>()->default_value(0.0),
-      "leg lift frequency multiplier (must be multiple of two)")
-      ("motion.getup_speed", po::value<string>()->default_value("FAST"),
-      "Speed of getups (FAST, MODERATE, SLOW)")
-      ("motion.kick_speed", po::value<string>()->default_value("SLOW"),
-      "Speed of kicks (FAST, SLOW)")
-      ("motion.kick_lean_offset", po::value<float>()->default_value(0.0f),
-      "Lean offset of normal kick (degrees)")
-      ("motion.fast_kick_lean_offset", po::value<float>()->default_value(0.0f),
-      "Lean offset of fast kicks (degrees)");
+      "leg lift frequency multiplier (must be multiple of two)");
 
    po::options_description vision_config("Vision options");
    vision_config.add_options()
@@ -201,14 +140,20 @@ void populate_options(po::options_description &config_file_options) {
       "dump frames to disk")
       ("vision.dumprate,r", po::value<int>()->default_value(1000),
       "dump frames every arg milliseconds")
+      ("vision.top_calibration", po::value<string>()->default_value("/home/nao/data/top.nnmc"),
+      "location of colour calibration file")
+      ("vision.bot_calibration", po::value<string>()->default_value("/home/nao/data/bot.nnmc"),
+      "location of colour calibration file")
+      ("vision.goal_map", po::value<string>()->default_value("/home/nao/data/goals.map"),
+      "location of surf natural landmarks starting goal map")
+		("vision.vocab", po::value<string>()->default_value("/home/nao/data/words.vocab"),
+      "location of dictionary of visual words for surf localisation")
+      ("vision.seeBluePosts", po::value<bool>()->default_value(false),
+      "blue posts are detected")
+      ("vision.seeLandmarks", po::value<bool>()->default_value(true),
+      "landmarks are detected")      
       ("vision.dumpfile,f", po::value<string>()->default_value("dump.yuv"),
-      "file to store frames in")
-      ("vision.run_colour_calibration", po::value<bool>()->default_value(false),
-      "runs a calibration")
-      ("vision.load_nnmc", po::value<bool>()->default_value(true),
-      "loads /home/nao/data/green_yuv_classifier.nnmc to nnmc_")
-      ("vision.save_nnmc", po::value<bool>()->default_value(false),
-      "saves our calibration to an nnmc file");
+      "file to store frames in");
 
    po::options_description camera_config("Camera options");
    camera_config.add_options()
@@ -220,7 +165,7 @@ void populate_options(po::options_description &config_file_options) {
        "camera top brightness")
       ("camera.top.contrast", po::value<int>()->default_value(60),
        "camera top contrast")
-      ("camera.top.saturation", po::value<int>()->default_value(210),
+      ("camera.top.saturation", po::value<int>()->default_value(130),
        "camera top saturation")
       ("camera.top.hue", po::value<int>()->default_value(0),
        "camera top hue")
@@ -228,7 +173,7 @@ void populate_options(po::options_description &config_file_options) {
        "camera top sharpness")
       ("camera.top.backlightcompensation", po::value<int>()->default_value(0x00),
        "camera top backlight compensation")
-      ("camera.top.exposure", po::value<int>()->default_value(90),
+      ("camera.top.exposure", po::value<int>()->default_value(13),
        "camera top exposure")
       ("camera.top.gain", po::value<int>()->default_value(250),
        "camera top gain")
@@ -320,8 +265,8 @@ void populate_options(po::options_description &config_file_options) {
    transmitter_config.add_options()
       ("transmitter.address", po::value<string>()->default_value
          ("192.168.0.255"), "address to broadcast to")
-      ("transmitter.base_port", po::value<int>()->default_value(10000),
-      "port to which we add team number, and then broadcast on");
+      ("transmitter.port", po::value<int>()->default_value(13371),
+      "port to broadcast on");
 
    po::options_description network_config("Networking options");
    network_config.add_options()
@@ -373,7 +318,6 @@ po::options_description store_and_notify(vector<string> argv,
    /** Config hierarchy:
     *  - first,  command line arguments
     *  - second, /home/nao/data/configs/$hostname.cfg
-    *            if a hostname config is not found, then it will use __default__.cfg
     *  - third,  /home/nao/data/runswift.cfg
     *  - fourth, `pwd`/runswift.cfg
     **/
@@ -395,15 +339,8 @@ po::options_description store_and_notify(vector<string> argv,
    ifs.close();
 
    ifs.open(string("/home/nao/data/configs/" + hostname + ".cfg").c_str());
-   bool noHostCofig = ifs.fail();
    store(parse_config_file(ifs, config_file_options), vm);
    ifs.close();
-
-   if (noHostCofig) {
-      ifs.open("image/home/nao/data/configs/__default__.cfg");
-      store(parse_config_file(ifs, config_file_options), vm);
-      ifs.close();
-   }
 
    ifs.open("/home/nao/data/rinobot.cfg");
    store(parse_config_file(ifs, config_file_options), vm);
@@ -412,7 +349,6 @@ po::options_description store_and_notify(vector<string> argv,
    ifs.open("rinobot.cfg");
    store(parse_config_file(ifs, config_file_options), vm);
    ifs.close();
-
 
    /** Doesn't do anything right now, but will 'notify' any variables
     * we try to set via program_options */

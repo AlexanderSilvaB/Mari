@@ -1,60 +1,16 @@
-/*
-Copyright 2010 The University of New South Wales (UNSW).
-
-This file is part of the 2010 team rUNSWift RoboCup entry. You may
-redistribute it and/or modify it under the terms of the GNU General
-Public License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version as
-modified below. As the original licensors, we add the following
-conditions to that license:
-
-In paragraph 2.b), the phrase "distribute or publish" should be
-interpreted to include entry into a competition, and hence the source
-of any derived work entered into a competition must be made available
-to all parties involved in that competition under the terms of this
-license.
-
-In addition, if the authors of a derived work publish any conference
-proceedings, journal articles or other academic papers describing that
-derived work, then appropriate academic citations to the original work
-must be included in that publication.
-
-This rUNSWift source is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-General Public License for more details.
-
-You should have received a copy of the GNU General Public License along
-with this source code; if not, write to the Free Software Foundation,
-Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-*/
-
 #include "motion/effector/AgentEffector.hpp"
 #include <sys/mman.h>        /* For shared memory */
 #include <fcntl.h>           /* For O_* constants */
 #include <stdexcept>
 #include "utils/Logger.hpp"
 #include "utils/speech.hpp"
-//#include "gamecontroller/RoboCupGameControlData.hpp"
 
 /*-----------------------------------------------------------------------------
  * Agent effector constructor
  *---------------------------------------------------------------------------*/
-AgentEffector::AgentEffector(int team, int player_number) {
-
-   std::string mem_path(AGENT_MEMORY);
-#ifdef SIMULATION
-   // If we're running a simulator build, modify the memory path so we don't 
-   // use the same memory as another instance of the sim build running at
-   // the same time
-   int mod = (team * MAX_NUM_PLAYERS) + player_number;
-   std::stringstream ss;
-   ss << mod;
-   mem_path += ss.str();
-#endif
-
+AgentEffector::AgentEffector() {
    // open shared memory as RW
-   shared_fd = shm_open(mem_path.c_str(), O_CREAT | O_RDWR, 0600);
+   shared_fd = shm_open(AGENT_MEMORY, O_RDWR, 0600);
    if (shared_fd < 0) {
       throw std::runtime_error("AgentEffector: shm_open() failed");
    }
@@ -96,7 +52,7 @@ void AgentEffector::actuate(JointValues joints, ActionCommand::LED leds,
    shared_data->leds[i] = leds;
    shared_data->joints[i] = joints;
    shared_data->sonar[i] = sonar;
-   shared_data->stiffen[i] = stiffen;
+   //shared_data->stiffen[i] = stiffen;
    std::string sayText = GET_SAYTEXT();
    int size = sizeof(shared_data->sayTexts[i]);
    strncpy(shared_data->sayTexts[i], sayText.c_str(), size);

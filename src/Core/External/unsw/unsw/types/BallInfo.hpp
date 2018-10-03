@@ -1,27 +1,20 @@
-#ifndef BALL_INFO_HPP
-#define BALL_INFO_HPP
+#pragma once
 
 #include "types/Point.hpp"
 #include "types/RRCoord.hpp"
 #include "types/XYZ_Coord.hpp"
 
 #include <iostream>
-#include <cmath>
 
-
-struct BallInfo {
-   BallInfo () : visionVar(-1) {}
+struct BallInfo
+{
+   BallInfo () {}
    BallInfo (RRCoord rr, int radius, Point imageCoords, XYZ_Coord neckRelative) :
       rr(rr),
       radius(radius),
       imageCoords(imageCoords),
       neckRelative(neckRelative),
-      visionVar(0.0f),
-      darkestPoint(0),
-      angleVar(0.0f),
-      ccdRating(0),
-      lastSeen(0),
-      lifetime(0){}
+      visionVar(0.0f) {}
 
    virtual ~BallInfo () {}
 
@@ -34,22 +27,6 @@ struct BallInfo {
    /* A measure of truth as provided by vision */
    float visionVar;
 
-   /* The darkest point in the sub-fovea around the ball
-      as a percentage of the darkest point in the whole image*/
-   int darkestPoint;
-
-   /* Variance of the number of angles throughout the ball */
-   float angleVar;
-
-   /* The number of valid points from the CCD */
-   int ccdRating;
-
-   /* Number of frames since this ball estimate was seen */
-   int lastSeen;
-
-   /* Length of life for this ball so far */
-   int lifetime;
-
    bool operator== (const BallInfo &other) const
    {
       return rr           == other.rr
@@ -57,9 +34,7 @@ struct BallInfo {
           && imageCoords  == other.imageCoords
           && visionVar    == other.visionVar
           && neckRelative == other.neckRelative
-          && topCamera    == other.topCamera
-          && lastSeen     == other.lastSeen
-          && lifetime     == other.lifetime;
+          && topCamera    == other.topCamera;
    }
 
    template<class Archive>
@@ -76,9 +51,6 @@ struct BallInfo {
       } else {
          visionVar = 0.0;
       }
-
-      ar & lastSeen;
-      ar & lifetime;
    }
 };
 
@@ -88,8 +60,7 @@ inline std::ostream& operator<<(std::ostream& os, const BallInfo& ballInfo) {
    os.write((char*) &(ballInfo.radius), sizeof(int));
    os.write((char*) &(ballInfo.neckRelative), sizeof(XYZ_Coord));
    os.write((char*) &(ballInfo.visionVar), sizeof(float));
-   os.write((char*) &(ballInfo.lastSeen), sizeof(int));
-   os.write((char*) &(ballInfo.lifetime), sizeof(int));
+   
    return os;
 }
 
@@ -99,8 +70,7 @@ inline std::istream& operator>>(std::istream& is, BallInfo& ballInfo) {
    is.read((char*) &(ballInfo.radius), sizeof(int));
    is.read((char*) &(ballInfo.neckRelative), sizeof(XYZ_Coord));
    is.read((char*) &(ballInfo.visionVar), sizeof(float));
-   is.read((char*) &(ballInfo.lastSeen), sizeof(int));
-   is.read((char*) &(ballInfo.lifetime), sizeof(int));
+   
    return is;
 }
 
@@ -142,4 +112,3 @@ struct BallHint
 BOOST_CLASS_VERSION(BallInfo, 1);
 #endif
 
-#endif

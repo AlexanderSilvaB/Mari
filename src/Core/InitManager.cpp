@@ -12,14 +12,14 @@
 
 #include "utils/Logger.hpp"
 #include "utils/options.hpp"
-#include "utils/set_cloexec.hpp"
 
 #include "thread/ThreadManager.hpp"
 #include "motion/MotionAdapter.hpp"
 #include "perception/PerceptionThread.hpp"
-#include "perception/vision/camera/NaoCamera.hpp"
-#include "perception/vision/camera/NaoCameraV4.hpp"
-#include "perception/vision/camera/CombinedCamera.hpp"
+#include "perception/vision/NaoCamera.hpp"
+#include "perception/vision/NaoCameraV4.hpp"
+#include "Utils/CombinedCamera.hpp"
+#include "Utils/set_cloexec.hpp"
 
 #ifdef USE_QIBUILD
 #include <RinoLib/Robot.h>
@@ -130,14 +130,14 @@ void InitManager::InitCameras()
 {
     cout << "InitCameras" << endl;
     llog(INFO) << "Initialising v4 /dev/video0" << std::endl;
-    topCamera = new NaoCameraV4(blackboard, "/dev/video0", "camera.top",
+    topCamera = new NaoCameraV4(blackboard, "/dev/video0",
                                 IO_METHOD_MMAP,
-                                AL::kQVGA);
+                                AL::kQVGA, TOP_CAMERA);
 
     llog(INFO) << "Initialising v4 /dev/video1" << std::endl;
-    botCamera = new NaoCameraV4(blackboard, "/dev/video1", "camera.bot",
+    botCamera = new NaoCameraV4(blackboard, "/dev/video1",
                                 IO_METHOD_MMAP,
-                                AL::kQVGA);
+                                AL::kQVGA, BOTTOM_CAMERA);
 
     CombinedCamera::setCameraTop(topCamera);
     CombinedCamera::setCameraBot(botCamera);

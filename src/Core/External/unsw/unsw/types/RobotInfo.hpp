@@ -1,13 +1,11 @@
-#ifndef ROBOT_INFO_HPP
-#define ROBOT_INFO_HPP
+#pragma once
 
 #include "types/Point.hpp"
 #include "types/RRCoord.hpp"
 #include "types/BBox.hpp"
 
-namespace UNSW
+struct RobotInfo
 {
-struct RobotInfo {
 
    enum Type
    {
@@ -92,10 +90,3 @@ struct RobotInfo {
       ar & botImageCoords;
    }
 };
-}
-
-inline std::ostream& operator<<(std::ostream& os, const UNSW::RobotInfo& r) {
-   os << "RRCoord: " << r.rr << " imageCoords [ " << r.imageCoords << " ]";
-   return os;
-}
-#endif

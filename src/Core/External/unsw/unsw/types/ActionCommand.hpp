@@ -1,34 +1,3 @@
-/*
-Copyright 2010 The University of New South Wales (UNSW).
-
-This file is part of the 2010 team rUNSWift RoboCup entry. You may
-redistribute it and/or modify it under the terms of the GNU General
-Public License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version as
-modified below. As the original licensors, we add the following
-conditions to that license:
-
-In paragraph 2.b), the phrase "distribute or publish" should be
-interpreted to include entry into a competition, and hence the source
-of any derived work entered into a competition must be made available
-to all parties involved in that competition under the terms of this
-license.
-
-In addition, if the authors of a derived work publish any conference
-proceedings, journal articles or other academic papers describing that
-derived work, then appropriate academic citations to the original work
-must be included in that publication.
-
-This rUNSWift source is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-General Public License for more details.
-
-You should have received a copy of the GNU General Public License along
-with this source code; if not, write to the Free Software Foundation,
-Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-*/
-
 /**
  * ActionCommand.hpp
  * Modified: 2009-11-08
@@ -67,26 +36,28 @@ namespace ActionCommand {
          // Walk
          WALK,    //2
          DRIBBLE, //3
-         TURN_DRIBBLE, //4
 
          // Actions
-         GETUP_FRONT, GETUP_BACK,         //5,6
-         TIP_OVER,                        //7
-         KICK,                            //8
-         INITIAL,                         //9
-         DEAD, REF_PICKUP,                //10, 11
+         GETUP_FRONT, GETUP_BACK,   //4,5
+         KICK,                            //6
+         INITIAL,                         //7
+         DEAD, REF_PICKUP,                //8, 9
+         OPEN_FEET,                       //10
+         THROW_IN,                        //11
          GOALIE_SIT,                      //12
          GOALIE_DIVE_RIGHT,               //13
          GOALIE_DIVE_LEFT,                //14
          GOALIE_CENTRE,                   //15
          GOALIE_UNCENTRE,                 //16
-         GOALIE_INITIAL,                  //17
-         GOALIE_AFTERSIT_INITIAL,         //18
-         DEFENDER_CENTRE,                 //19
-         GOALIE_FAST_SIT,                 //20
-         MOTION_CALIBRATE,                //21
-         STAND_STRAIGHT,                  //22
-         LINE_UP,                         //23
+         GOALIE_STAND,                    //17
+         GOALIE_INITIAL,                  //18
+         GOALIE_AFTERSIT_INITIAL,         //19
+         DEFENDER_CENTRE,                 //20
+         GOALIE_FAST_SIT,                 //21
+         GOALIE_PICK_UP,                  //22
+         MOTION_CALIBRATE,                //23
+         STAND_STRAIGHT,                  //24
+         LINE_UP,                         //25
          NUM_ACTION_TYPES
       };
       ActionType actionType;
@@ -97,6 +68,8 @@ namespace ActionCommand {
       float turn; // How much anti-clockwise turn (negative for clockwise) (rad)
       float power; // How much kick power (0.0-1.0)
       float bend;
+      bool caughtLeft;
+      bool caughtRight;
 
       // Kick parameters
       float speed;
@@ -108,15 +81,10 @@ namespace ActionCommand {
       };
       Foot foot;
       bool isFast;
-
+      
       // Set this to true if you want the robot to do a kick that tries to kick it not straight
       // but angled, primarily to avoid an opponent straight ahead of it.
       bool misalignedKick; 
-      bool useShuffle;
-
-      // Set this to true if we want to put our arms back
-      bool leftArmLimp;
-      bool rightArmLimp;
 
       /**
        * Constructor for walks and kicks
@@ -130,14 +98,11 @@ namespace ActionCommand {
        * @param k  Direction to kick (rad)
        * @param ft  Which foot to use
        * @param fast  go fast or not
-       * @param useShuffle use shuffle (low step height) or not
-       * @param leftArmLimp make left arm limp
-       * @param rightArmLimp make right arm limp
        * @see http://runswift.cse.unsw.edu.au/confluence/display/rc2010/Movement%2C+walk%2C+kicks
        */
-      Body(ActionType at, int f = 0, int l = 0, float t = 0.0, float p = 1.0,
+      Body(ActionType at, int f = 0, int l = 0, float t = 0.0, float p = 1.0, 
            float bend = 15.0, float s = 1.0, float k = 0.0, Foot ft = LEFT, bool fast=false,
-           bool misalignedKick=false, bool useShuffle=false, bool leftArmLimp=false, bool rightArmLimp=false)
+           bool misalignedKick=false)
          : actionType(at),
            forward(f),
            left(l),
@@ -148,10 +113,7 @@ namespace ActionCommand {
            kickDirection(k),
            foot(ft),
            isFast(fast),
-           misalignedKick(misalignedKick),
-           useShuffle(useShuffle),
-           leftArmLimp(leftArmLimp),
-           rightArmLimp(rightArmLimp) {}
+           misalignedKick(misalignedKick) {}
 
       /* Boost python makes using default arguements difficult.
        * Define an arguementless constructor to wrap
@@ -167,10 +129,7 @@ namespace ActionCommand {
            kickDirection(0),
            foot(LEFT),
            isFast(false),
-           misalignedKick(false),
-           useShuffle(false),
-           leftArmLimp(false),
-           rightArmLimp(false) {}
+           misalignedKick(false) {}
 
       template<class Archive>
       void serialize(Archive &ar, const unsigned int file_version) {
@@ -187,26 +146,28 @@ namespace ActionCommand {
       0, // STAND
       0, // WALK
       0, // DRIBBLE
-      0, // TURN_DRIBBLE
-      3, // GETUP_FRONT
-      3, // GETUP_BACK
-      3, // TIP_OVER
+      2, // GETUP_FRONT
+      2, // GETUP_BACK
       0, // KICK
       2, // INITIAL
       1, // DEAD
       0, // REF_PICKUP
+      0, // OPEN_FEET
+      0, // THROW_IN
       2, // GOALIE_SIT
       2, // GOALIE_DIVE_LEFT
       2, // GOALIE_DIVE_RIGHT
       2, // GOALIE_CENTRE
       2, // GOALIE_UNCENTRE
+      0, // GOALIE_STAND
       0, // GOALIE_INITIAL
       0, // GOALIE_AFTERSIT_INITIAL
       2, // DEFENDER_CENTRE
       2, // GOALIE FAST SIT
+      2,  // GOALIE_PICK_UP
       0, // MOTION_CALIBRATE
       0, // STAND_STRAIGHT
-      0, // LINE_UP
+      0  // LINE_UP
    };
 
 /**
@@ -308,12 +269,11 @@ namespace ActionCommand {
       }
    };
 
-   enum Stiffen
-   {
-      NONE = 0,
-      STIFFEN
-   };
-
+  enum Stiffen
+  {
+    NONE = 0,
+    STIFFEN
+  };
 
 /**
  * Wrapper for the other action commands, makes it easier to pass them around
@@ -325,10 +285,17 @@ namespace ActionCommand {
       float sonar;
       Stiffen stiffen;
 
-      All() : head(), body(Body::NONE), leds(),
+      All() : head(), body(Body::NONE), leds(), 
                sonar(Sonar::Mode::NO_PING),
-               stiffen(NONE)
-      { }
+               stiffen(NONE) {}
+
+    All(Head h, Body b, LED l, float s) {
+         head = h;
+         body = b;
+         leds = l;
+         sonar = s;
+         stiffen = NONE;
+      }
 
       All(Head h, Body b, LED l, float s, Stiffen stf) {
          head = h;

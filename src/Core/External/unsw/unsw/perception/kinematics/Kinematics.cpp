@@ -1,5 +1,4 @@
 #include "Kinematics.hpp"
-#include "soccer.hpp"
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -8,7 +7,7 @@
 #include <climits>
 #include <vector>
 
-#include <perception/vision/VisionDefinitions.hpp>
+#include <perception/vision/VisionDefs.hpp>
 #include <utils/Timer.hpp>
 #include <utils/Logger.hpp>
 #include <utils/body.hpp>
@@ -19,7 +18,7 @@
 static const float VERY_SMALL = 0.0001;
 
 // These are the offsets of each of the parts in the kinematics chain, see
-// http://runswift.cse.unsw.edu.au/confluence/download/attachments/3047440/100215-NaoForwardKinematicsLegToCamera.pptx.pdf?version=2&modificationDate=1266227985534
+// http://runswift.cse.unsw.edu.au/confluence/download/attachments/3047440/100215-NaoForwardKinematicsLegToCamera.pptx.pdf?version=2&modificationDate=1266227985534 
 // for a visual representation of how the Foot->Camera DH chain was calculated
 // for the v3s.
 // For a more up to date version (v4 H21 robots) with the DH chain for the limbs
@@ -30,6 +29,8 @@ static const float VERY_SMALL = 0.0001;
 // and should be updated in the utils/body.hpp file.
 static const float trunk_length = Limbs::HipOffsetZ + Limbs::NeckOffsetZ;
 
+// eventually will get these static const from constants section
+// TODO(dpad): actually get these from consts section
 static const float camera_out_bottom = 50.71;
 static const float camera_up_bottom = 17.74;
 
@@ -61,6 +62,7 @@ Kinematics::Kinematics() {
    chest.push_back(vec4<float>(-96, 100, Limbs::NeckOffsetZ - 50, 1));
    chest.push_back(vec4<float>(-96, 155, Limbs::NeckOffsetZ - 35, 1));
    chest.push_back(vec4<float>(-91, 155, Limbs::NeckOffsetZ - 34, 1));
+
    chest.push_back(vec4<float>(-90, 155, Limbs::NeckOffsetZ + -30, 1));
    chest.push_back(vec4<float>(-70, 155, Limbs::NeckOffsetZ + 0, 1));
    chest.push_back(vec4<float>(-50, 155, Limbs::NeckOffsetZ + 30, 1));
@@ -74,7 +76,11 @@ Kinematics::Kinematics() {
    chest.push_back(vec4<float>(50, 155, Limbs::NeckOffsetZ + 30, 1));
    chest.push_back(vec4<float>(70, 155, Limbs::NeckOffsetZ + 0, 1));
    chest.push_back(vec4<float>(90, 155, Limbs::NeckOffsetZ + -30, 1));
+
    chest.push_back(vec4<float>(60, 70, Limbs::NeckOffsetZ - 40, 1));
+   // bodyParts.push_back(chest);
+   // chest.clear();
+
    chest.push_back(vec4<float>(60, 60, Limbs::NeckOffsetZ - 70, 1));
    chest.push_back(vec4<float>(62, 50, Limbs::NeckOffsetZ - 70, 1));
    chest.push_back(vec4<float>(63, 40, Limbs::NeckOffsetZ - 70, 1));
@@ -91,9 +97,12 @@ Kinematics::Kinematics() {
    chest.push_back(vec4<float>(63, -40, Limbs::NeckOffsetZ - 70, 1));
    chest.push_back(vec4<float>(62, -50, Limbs::NeckOffsetZ - 70, 1));
    chest.push_back(vec4<float>(60, -60, Limbs::NeckOffsetZ - 70, 1));
+   // bodyParts.push_back(chest);
+   // chest.clear();
 
    // right side of body
    chest.push_back(vec4<float>(60, -70, Limbs::NeckOffsetZ - 40, 1));
+
    chest.push_back(vec4<float>(90, -155, Limbs::NeckOffsetZ + -30, 1));
    chest.push_back(vec4<float>(70, -155, Limbs::NeckOffsetZ + 0, 1));
    chest.push_back(vec4<float>(50, -155, Limbs::NeckOffsetZ + 10, 1));
@@ -107,6 +116,7 @@ Kinematics::Kinematics() {
    chest.push_back(vec4<float>(-50, -155, Limbs::NeckOffsetZ + 10, 1));
    chest.push_back(vec4<float>(-70, -155, Limbs::NeckOffsetZ + 0, 1));
    chest.push_back(vec4<float>(-90, -155, Limbs::NeckOffsetZ + -30, 1));
+
    chest.push_back(vec4<float>(-91, -155, Limbs::NeckOffsetZ - 34, 1));
    chest.push_back(vec4<float>(-96, -155, Limbs::NeckOffsetZ - 35, 1));
    chest.push_back(vec4<float>(-96, -100, Limbs::NeckOffsetZ - 50, 1));
@@ -157,7 +167,7 @@ Kinematics::Kinematics() {
    massesCom.push_back(vec4(Limbs::RightBicepCoM));
    massesCom.push_back(vec4(Limbs::RightElbowCoM));
    massesCom.push_back(vec4(Limbs::RightForearmCoM));
-   massesCom.push_back(vec4(Limbs::RightHandCoM));
+   massesCom.push_back(vec4(Limbs::RightHandCoM)); 
    massesCom.push_back(vec4(Limbs::LeftShoulderCoM)); // L Arm
    massesCom.push_back(vec4(Limbs::LeftBicepCoM));
    massesCom.push_back(vec4(Limbs::LeftElbowCoM));
@@ -175,7 +185,7 @@ Kinematics::Kinematics() {
    massesCom.push_back(vec4(Limbs::LeftTibiaCoM));
    massesCom.push_back(vec4(Limbs::LeftAnkleCoM));
    massesCom.push_back(vec4(Limbs::LeftFootCoM));
-
+   
    // Initialise transform matrices for DH chain
    for (int i = 0; i < CAMERA_DH_CHAIN_LEN; ++i) {
       transformLTop[i] = boost::numeric::ublas::identity_matrix<float>(4);
@@ -303,7 +313,7 @@ void Kinematics::updateDHChain() {
    float KpL = jointValues.angles[Joints::LKneePitch];
    float ApL = jointValues.angles[Joints::LAnklePitch];
    float ArL = jointValues.angles[Joints::LAnkleRoll];
-
+   
    cameraPanInverseHack = createDHMatrix<float>(0, 0, d2, 0.0);
    // DH parameters
    // Some of these are commented out since they're constant and can be calculated
@@ -340,7 +350,7 @@ void Kinematics::updateDHChain() {
    transformRTop[6] = createDHMatrix<float>(0, M_PI / 2, d3, M_PI / 2 - Hyp);
    //transformRTop[7] = createDHMatrix<float>(0, M_PI / 4, 0, 0);
    transformRTop[8] = transformLTop[8];
-   transformRTop[9] = transformLTop[9];
+   transformRTop[9] = transformLTop[9]; 
    transformRTop[10] = transformLTop[10];
    transformRTop[11] = transformLTop[11];
 
@@ -382,7 +392,7 @@ void Kinematics::updateDHChain() {
    transformHB[1] = createDHMatrix<float>(0, -M_PI / 2, 0, Cp);
    //transformHB[2] = createDHMatrix<float>(0, M_PI / 2, 0, 0);
 
-   // Right Arm to Body
+   // Right Arm to Body 
    // Some of these are commented out since they're constant and can be calculated once
    // Just leaving them here so they can be seen in order
    float Sp = jointValues.angles[Joints::RShoulderPitch];
@@ -421,7 +431,7 @@ void Kinematics::updateDHChain() {
    //                                       -Limbs::ElbowOffsetY, M_PI / 2);
    transformLAB[6] = createDHMatrix<float>(0, M_PI / 2, 0, Ey);
    //transformLAB[7] = transformRAB[7];
-   //transformLAB[8] = transformRAB[8];
+   //transformLAB[8] = transformRAB[8]; 
    transformLAB[9] = createDHMatrix<float>(0, 0, 0, Er);
    //transformLAB[10] = transformRAB[10];
    transformLAB[11] = createDHMatrix<float>(0, M_PI / 2, 0, Wy);
@@ -451,7 +461,7 @@ void Kinematics::updateDHChain() {
    transformRFB[17] = createDHMatrix<float>(0, -M_PI / 2, 0, ArR);
    //transformRFB[18] = createDHMatrix<float>(0, M_PI / 2, 0, M_PI / 2);
 
-   // Left Foot to Body
+   // Left Foot to Body 
    HpL = jointValues.angles[Joints::LHipPitch];
    HrL = jointValues.angles[Joints::LHipRoll];
    //transformLFB[0] = transformRFB[0];
@@ -477,53 +487,6 @@ void Kinematics::updateDHChain() {
 
 Pose Kinematics::getPose() {
    Chain foot = determineSupportChain();
-
-    for(int sensor_reading=0; sensor_reading<NUM_RECORDED_FRAMES_OF_SIDE_LEAN-1;
-                                                               ++sensor_reading)
-    {
-        previous_side_lean[sensor_reading] =
-                                           previous_side_lean[sensor_reading+1];
-    }
-    previous_side_lean[NUM_RECORDED_FRAMES_OF_SIDE_LEAN-1] =
-                           sensorValues.sensors[Sensors::InertialSensor_AngleX];
-
-    // Predict the current side lean.
-    float cur_reading = previous_side_lean[NUM_RECORDED_FRAMES_OF_SIDE_LEAN-1];
-    float reading_total = cur_reading;
-    int num_readings = 1;
-    if(previous_side_lean[NUM_RECORDED_FRAMES_OF_SIDE_LEAN-1] >
-                         previous_side_lean[NUM_RECORDED_FRAMES_OF_SIDE_LEAN-2])
-    {
-        for(int sensor_reading=0;
-            sensor_reading<NUM_RECORDED_FRAMES_OF_SIDE_LEAN-1 -
-                                       SIDE_LEAN_FRAME_OFFSET; ++sensor_reading)
-        {
-            if(cur_reading > previous_side_lean[sensor_reading] && cur_reading <
-                                           previous_side_lean[sensor_reading+1])
-            {
-                reading_total += previous_side_lean[
-                                       sensor_reading+1+SIDE_LEAN_FRAME_OFFSET];
-                ++num_readings;
-            }
-        }
-        sideLean = reading_total/(float)num_readings;
-    }
-    else
-    {
-        for(int sensor_reading=0;
-            sensor_reading<NUM_RECORDED_FRAMES_OF_SIDE_LEAN-1 -
-                                       SIDE_LEAN_FRAME_OFFSET; ++sensor_reading)
-        {
-            if(cur_reading < previous_side_lean[sensor_reading] && cur_reading >
-                                           previous_side_lean[sensor_reading+1])
-            {
-                reading_total += previous_side_lean[
-                                       sensor_reading+1+SIDE_LEAN_FRAME_OFFSET];
-                ++num_readings;
-            }
-        }
-        sideLean = reading_total/(float)num_readings;
-    }
 
    boost::numeric::ublas::matrix<float> c2wTop = createCameraToWorldTransform(foot, true);
    boost::numeric::ublas::matrix<float> c2wBot = createCameraToWorldTransform(foot, false);
@@ -571,7 +534,7 @@ Kinematics::evaluateDHChain(Link from, Link to, Chain foot, bool top) {
             finalTransform = boost::numeric::ublas::prod(finalTransform,
                                                          transformRBot[i]);
          }
-      }
+      } 
    } else {
       if (top) {
          for (int i = from; i < to; i++) {
@@ -590,36 +553,36 @@ Kinematics::evaluateDHChain(Link from, Link to, Chain foot, bool top) {
 
 // Evaluate kinematics chain from all limbs back to the IMU, taking into account the COM at each part.
 boost::numeric::ublas::matrix<float>
-Kinematics::evaluateMassChain() {
+Kinematics::evaluateMassChain() {   
    int i, joint = 0;
    float totalMass = 0;
    boost::numeric::ublas::matrix<float> finalTransform(4, 1);
    finalTransform = boost::numeric::ublas::zero_matrix<float>(4, 1);
 
    // Mass of torso
-   finalTransform += massesCom[joint] * masses[joint];
+   finalTransform += massesCom[joint] * masses[joint]; 
    totalMass += masses[joint];
    ++joint;
 
    // Mass of head
    boost::numeric::ublas::matrix<float> headTransform = boost::numeric::ublas::identity_matrix<float>(4);
    for (i = 0; i < HEAD_DH_CHAIN_LEN; ++i) {
-      headTransform = boost::numeric::ublas::prod(headTransform, transformHB[i]);
+      headTransform = boost::numeric::ublas::prod(headTransform, transformHB[i]); 
       // Up to head yaw, head pitch
       if (i == 0 || i == 2) {
-         finalTransform += boost::numeric::ublas::prod(headTransform, massesCom[joint]) * masses[joint];
+         finalTransform += boost::numeric::ublas::prod(headTransform, massesCom[joint]) * masses[joint]; 
          totalMass += masses[joint];
          ++joint;
       }
    }
 
-   // Mass of right arm
+   // Mass of right arm 
    boost::numeric::ublas::matrix<float> rArmTransform = boost::numeric::ublas::identity_matrix<float>(4);
-   for (i = 0; i < ARM_DH_CHAIN_LEN; ++i) {
+   for (i = 0; i < ARM_DH_CHAIN_LEN; ++i) { 
       rArmTransform = boost::numeric::ublas::prod(rArmTransform, transformRAB[i]);
       // Up to shoulder pitch, shoulder roll, elbow yaw, elbow roll, wrist yaw
       if (i == 3 || i == 4 || i == 8 || i == 9 || i == 13) {
-         finalTransform += boost::numeric::ublas::prod(rArmTransform, massesCom[joint]) * masses[joint];
+         finalTransform += boost::numeric::ublas::prod(rArmTransform, massesCom[joint]) * masses[joint]; 
          totalMass += masses[joint];
          ++joint;
       }
@@ -631,31 +594,31 @@ Kinematics::evaluateMassChain() {
       // Up to shoulder pitch, shoulder roll, elbow yaw, elbow roll, wrist yaw
       lArmTransform = boost::numeric::ublas::prod(lArmTransform, transformLAB[i]);
       if (i == 3 || i == 4 || i == 8 || i == 9 || i == 13) {
-         finalTransform += boost::numeric::ublas::prod(lArmTransform, massesCom[joint]) * masses[joint];
+         finalTransform += boost::numeric::ublas::prod(lArmTransform, massesCom[joint]) * masses[joint]; 
          totalMass += masses[joint];
          ++joint;
       }
    }
 
-   // Mass of right leg
+   // Mass of right leg 
    boost::numeric::ublas::matrix<float> rLegTransform = boost::numeric::ublas::identity_matrix<float>(4);
-   for (i = 0; i < LEG_DH_CHAIN_LEN; ++i) {
+   for (i = 0; i < LEG_DH_CHAIN_LEN; ++i) { 
       rLegTransform = boost::numeric::ublas::prod(rLegTransform, transformRFB[i]);
       // Up to hip yaw pitch, hip roll, hip pitch, knee pitch, ankle pitch, ankle roll
       if (i == 3 || i == 7 || i == 9 || i == 12 || i == 15 || i == 18) {
-         finalTransform += boost::numeric::ublas::prod(rLegTransform, massesCom[joint]) * masses[joint];
+         finalTransform += boost::numeric::ublas::prod(rLegTransform, massesCom[joint]) * masses[joint]; 
          totalMass += masses[joint];
          ++joint;
       }
    }
 
-   // Mass of left leg
+   // Mass of left leg 
    boost::numeric::ublas::matrix<float> lLegTransform = boost::numeric::ublas::identity_matrix<float>(4);
-   for (i = 0; i < LEG_DH_CHAIN_LEN; ++i) {
+   for (i = 0; i < LEG_DH_CHAIN_LEN; ++i) { 
       lLegTransform = boost::numeric::ublas::prod(lLegTransform, transformLFB[i]);
       // Up to hip yaw pitch, hip roll, hip pitch, knee pitch, ankle pitch, ankle roll
       if (i == 3 || i == 7 || i == 9 || i == 12 || i == 15 || i == 18) {
-         finalTransform += boost::numeric::ublas::prod(lLegTransform, massesCom[joint]) * masses[joint];
+         finalTransform += boost::numeric::ublas::prod(lLegTransform, massesCom[joint]) * masses[joint]; 
          totalMass += masses[joint];
          ++joint;
       }
@@ -679,15 +642,14 @@ Kinematics::createCameraToFootTransform(Chain foot, bool top) {
    boost::numeric::ublas::matrix<float> hipPt = prod(b2f, z);
    float bodyPitchOffset = DEG2RAD(parameters.bodyPitch);
    float forwardLean = sensorValues.sensors[Sensors::InertialSensor_AngleY];
-   if(offNao)
-      sideLean = sensorValues.sensors[Sensors::InertialSensor_AngleX];
+   float sideLean = sensorValues.sensors[Sensors::InertialSensor_AngleX];
 
    boost::numeric::ublas::matrix<float> transform = createDHMatrix<float>(hipPt(0, 0), 0, 0, 0);
    transform = prod(transform, createDHMatrix<float>(0, 0, hipPt(2, 0), M_PI / 2)); // move up by hip height
    transform = prod(transform, createDHMatrix<float>(hipPt(1, 0), 0, 0, 0)); // move sideways
    transform = prod(transform, createDHMatrix<float>(0, forwardLean + bodyPitchOffset, 0, -M_PI / 2));
    transform = prod(transform, createDHMatrix<float>(0, sideLean, 0, 0));
-
+   
    return prod(transform, evaluateDHChain(BODY, CAMERA, foot, top));
 }
 
@@ -706,8 +668,7 @@ Kinematics::createNeckToFootTransform(Chain foot) {
    boost::numeric::ublas::matrix<float> hipPt = prod(b2f, z);
    float bodyPitchOffset = DEG2RAD(parameters.bodyPitch);
    float forwardLean = sensorValues.sensors[Sensors::InertialSensor_AngleY];
-   if(offNao)
-      sideLean = sensorValues.sensors[Sensors::InertialSensor_AngleX];
+   float sideLean = sensorValues.sensors[Sensors::InertialSensor_AngleX];
 
    boost::numeric::ublas::matrix<float> transform = createDHMatrix<float>(hipPt(0, 0), 0, 0, 0);
    transform = prod(transform, createDHMatrix<float>(0, 0, hipPt(2, 0), M_PI / 2)); // move up by hip height
@@ -758,6 +719,8 @@ Kinematics::createFootToWorldTransform(Chain foot, bool top) {
       boost::numeric::ublas::identity_matrix<float>(4);
    result = prod(translateMatrix<float>(position(0, 0), position(1, 0), 0),
                  result);
+   // result = prod(rotateZMatrix<float>(-atan2(forward(1, 0), forward(0, 0))/2.0),
+   //                            result);
    result = prod(rotateZMatrix<float>(-atan2f(forward(1, 0), forward(0, 0)) / 2.0),
                                       result);
    return result;
@@ -813,12 +776,16 @@ void Kinematics::determineBodyExclusionArray(
             last = m;
             continue;
          }
+         // llog(VERBOSE) << "Pixel " << i << ": " << m << std::endl;
+         // llog(VERBOSE) << "Coord " << i << ": " <<
+         //            prod(transform, bodyParts[part][i]) << std::endl;
          int lIndex = (int)(last(0, 0) / COLS *
                             Pose::EXCLUSION_RESOLUTION);
          int cIndex = (int)(m(0, 0) / COLS *
                             Pose::EXCLUSION_RESOLUTION);
          int lPixel = last(1, 0);
          int cPixel = m(1, 0);
+         // int range = ABS(cIndex - lIndex);
          float gradient = 0;
          if (cIndex - lIndex != 0) {
             float denom = cIndex - lIndex;
@@ -911,3 +878,5 @@ Kinematics::fovToImageSpaceTransform(
    pixel(1, 0) = (pixel(1, 0)) * xscale + yscale;
    return pixel;
 }
+
+

@@ -5,7 +5,6 @@
 #include <string>
 #include "perception/kinematics/KinematicsAdapter.hpp"
 #include "perception/dumper/PerceptionDumper.hpp"
-#include "perception/vision/camera/CombinedCamera.hpp"
 #include "blackboard/Adapter.hpp"
 
 #define THREAD_MAX_TIME 33666
