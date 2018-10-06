@@ -409,6 +409,7 @@ void Agent::preCallback() {
          SAY("lost contact");
          motion->killAll();
       }
+      /*
       if (sit_step < 1.0f) {
          // interpolate legs over 2s, arms over 0.2s
          sit_step += 0.005f;
@@ -441,7 +442,58 @@ void Agent::preCallback() {
             stiffness_command[5][i - 2][0] = 0.0f;
          }
       }
-
+      */
+     if (sit_step < 1.0f)
+        {
+            // sit with arms forward, so they dont get caught on the body
+            sit_step += 0.005f;
+            uint8_t i;
+            float k = sit_step;
+            for (i = Joints::HeadYaw; i <= Joints::HeadPitch; ++i)
+            {
+                head_angle_command[5][i][0] = (1 - k) * sit_joints.angles[i] + k * sit_angles_middle[i];
+                head_stiffness_command[5][i][0] = 1.0f;
+            }
+            for (i = Joints::LShoulderPitch; i < Joints::NUMBER_OF_JOINTS; ++i)
+            {
+                angle_command[5][i - 2][0] = (1 - k) * sit_joints.angles[i] + k * sit_angles_middle[i];
+                stiffness_command[5][i - 2][0] = 1.0f;
+            }
+        }
+        else if (sit_step < 2.0f)
+        {
+            // After crouching, hands on knees to avoid robot falling forward and face planting
+            sit_step += 0.010f;
+            uint8_t i;
+            float k = sit_step - 1.0;
+            for (i = Joints::HeadYaw; i <= Joints::HeadPitch; ++i)
+            {
+                head_angle_command[5][i][0] = (1 - k) * sit_angles_middle[i] + k * sit_angles[i];
+                head_stiffness_command[5][i][0] = 0.2f;
+            }
+            for (i = Joints::LShoulderPitch; i < Joints::NUMBER_OF_JOINTS; ++i)
+            {
+                angle_command[5][i - 2][0] = (1 - k) * sit_angles_middle[i] + k * sit_angles[i];
+                stiffness_command[5][i - 2][0] = 0.2f;
+            }
+        }
+        else
+        {
+            limp = true;
+            sit_step = -1.0f;
+            uint8_t i;
+            for (i = Joints::HeadYaw; i <= Joints::HeadPitch; ++i)
+            {
+                head_angle_command[5][i][0] = sit_angles[i];
+                head_stiffness_command[5][i][0] = 0.0f;
+            }
+            for (i = Joints::LShoulderPitch; i < Joints::NUMBER_OF_JOINTS; ++i)
+            {
+                angle_command[5][i - 2][0] = sit_angles[i];
+                stiffness_command[5][i - 2][0] = 0.0f;
+            }
+        }
+        
       // Make chest button solid red/green if sitting down
       // (depending on whether or not we are back in contact)
       if (skipped_frames > MAX_SKIPS) {

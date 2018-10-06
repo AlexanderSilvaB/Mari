@@ -2,6 +2,12 @@
 #include <boost/bind.hpp>
 #include "Core/InitManager.h"
 
+int step = 0;
+float x = 0;
+float y = 0;
+#define LIM 1.0f
+float tmV = 0;
+
 StrategyModule::StrategyModule(SpellBook *spellBook)
     : Module(spellBook, "Strategy", 30)
 {
@@ -73,7 +79,56 @@ void StrategyModule::Tick(float ellapsedTime)
     spellBook->motion.Stiff = true;
     spellBook->motion.Stand = true;
     spellBook->motion.Walk = true;
-    spellBook->motion.Vx = 0.3f;
+
+    if(step == 0)
+    {
+        x += spellBook->motion.Vx * ellapsedTime;
+        spellBook->motion.Vx = 0.3f;
+        if(x > LIM)
+        {
+            step = 1;
+            spellBook->motion.Vx = 0;
+        }
+    }
+    else if(step == 1)
+    {
+        y += spellBook->motion.Vy * ellapsedTime;
+        spellBook->motion.Vy = 0.3f;
+        if(y > LIM)
+        {
+            step = 2;
+            spellBook->motion.Vy = 0;
+        }
+    }
+    else if(step == 2)
+    {
+        x += spellBook->motion.Vx * ellapsedTime;
+        spellBook->motion.Vx = -0.3f;
+        if(x < 0)
+        {
+            step = 3;
+            spellBook->motion.Vx = 0;
+        }
+    }
+    else if(step == 3)
+    {
+        y += spellBook->motion.Vy * ellapsedTime;
+        spellBook->motion.Vy = -0.3f;
+        if(y < 0)
+        {
+            step = 4;
+            spellBook->motion.Vy = 0;
+        }
+    }
+    else if(step == 4)
+    {
+        tmV += ellapsedTime;
+        if(tmV > 5.0f)
+        {
+            step = 0;
+            tmV = 0;
+        }
+    }
     
     if(spellBook->perception.ball.BallDetected)
     {

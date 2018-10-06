@@ -35,7 +35,7 @@ namespace AL {
 #define HEAD_MIDDLE 2 
 #define HEAD_BACK 3
 
-const float sit_angles[Joints::NUMBER_OF_JOINTS] = {
+const float sit_angles_middle[Joints::NUMBER_OF_JOINTS] = {
    0.0,              // HeadYaw
    0.0,              // HeadPitch
 
@@ -64,7 +64,40 @@ const float sit_angles[Joints::NUMBER_OF_JOINTS] = {
    DEG2RAD(92),      // RElbowYaw
    DEG2RAD(61),      // RElbowRoll
    DEG2RAD(-54),     // RWristYaw
-   0.0             // RHand
+   0.0               // RHand
+};
+
+
+const float sit_angles[Joints::NUMBER_OF_JOINTS] = {
+   0.0,              // HeadYaw
+   0.0,              // HeadPitch
+
+   DEG2RAD(72),      // LShoulderPitch
+   DEG2RAD(2),       // LShoulderRoll
+   DEG2RAD(-33),     // LElbowYaw
+   DEG2RAD(-47),     // LElbowRoll
+   DEG2RAD(55),      // LWristYaw
+   0.0,              // LHand
+
+   DEG2RAD(0),       // LHipYawPitch
+   DEG2RAD(0),       // LHipRoll
+   DEG2RAD(-50),     // LHipPitch
+   DEG2RAD(125),     // LKneePitch
+   DEG2RAD(-70),     // LAnklePitch
+   0.0,              // LAnkleRoll
+
+   DEG2RAD(0),       // RHipRoll
+   DEG2RAD(-50),     // RHipPitch
+   DEG2RAD(125),     // RKneePitch
+   DEG2RAD(-70),     // RAnklePitch
+   0.0,              // RAnkleRoll
+
+   DEG2RAD(72),      // RShoulderPitch
+   DEG2RAD(-2),      // RShoulderRoll
+   DEG2RAD(33),      // RElbowYaw
+   DEG2RAD(47),      // RElbowRoll
+   DEG2RAD(-55),     // RWristYaw
+   0.0               // RHand
 };
 
 /**

@@ -11,6 +11,7 @@ using namespace std;
 class BehaviourModule : public Module
 {
     private:
+        float timeSinceAct;
     public:
         BehaviourModule(SpellBook *spellBook);
         ~BehaviourModule();

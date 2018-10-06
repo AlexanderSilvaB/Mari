@@ -9,6 +9,7 @@ GameController::GameController(SpellBook *spellBook)
 void GameController::OnStart()
 {
     gameState = INITIAL;
+    spellBook->behaviour.Started = true;
 }
 
 void GameController::Tick(float ellapsedTime, SensorValues &sensor)
@@ -30,6 +31,7 @@ void GameController::Tick(float ellapsedTime, SensorValues &sensor)
 
     spellBook->strategy.Started = gameState != INITIAL;
     spellBook->strategy.Penalized = gameState == PENALIZED;
+    spellBook->behaviour.Penalized =  gameState == PENALIZED;
 }
 
 void GameController::OnStop()

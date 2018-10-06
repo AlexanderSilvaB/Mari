@@ -52,6 +52,7 @@ void WalkEnginePreProcessor::LineUpEngine::reset() {
 
 bool WalkEnginePreProcessor::LineUpEngine::hasEnded(ActionCommand::All* request, float ballX, float ballY) {
    // Calculate required left gap (needs to be further out for kicks)
+   return true; // Force lineup to allow kick
    int leftGap = LEFT_GAP_DRIBBLE;
    if (request->body.actionType == Body::KICK) {
       leftGap = LEFT_GAP_KICK;

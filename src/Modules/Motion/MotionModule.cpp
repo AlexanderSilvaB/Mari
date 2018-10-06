@@ -138,11 +138,15 @@ void MotionModule::Tick(float ellapsedTime)
     {
         request.body = ActionCommand::Body(ActionCommand::Body::KICK);
         request.body.foot = ActionCommand::Body::LEFT;
+        request.body.caughtRight = true;
+        request.body.caughtLeft = true;
     }
     else if(kickRight)
     {
         request.body = ActionCommand::Body(ActionCommand::Body::KICK);
         request.body.foot = ActionCommand::Body::RIGHT;
+        request.body.caughtRight = true;
+        request.body.caughtLeft = true;
     }
     else if(walk)
     {
@@ -154,12 +158,12 @@ void MotionModule::Tick(float ellapsedTime)
             ScaleWalk2014(&vx, &vy, &vth);
             cout << vx << ", " << vy << ", " << Rad2Deg(vth) << endl;
             request.body = ActionCommand::Body(ActionCommand::Body::WALK, vx, vy, vth);
-            request.body.bend = 30.0f;
+            //request.body.bend = 30.0f;
         }
         //else
         //    request.body = ActionCommand::Body();       
-        //request.body.leftArmLimp = limpLeft;
-        //request.body.leftArmLimp = limpRight;
+        request.body.caughtRight = limpRight;
+        request.body.caughtLeft = limpLeft;
     }
     motion->Tick(request);
     #else

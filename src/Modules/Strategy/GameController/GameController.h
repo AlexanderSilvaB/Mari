@@ -9,7 +9,7 @@ using namespace std;
 class GameController
 {
     public:
-        enum GameStates { INITIAL, PENALIZED, PLAYING };
+        enum GameStates { INITIAL, READY, SET, PENALIZED, PLAYING, FINISHED };
     private:
         float timeSincePress;
         SpellBook *spellBook;

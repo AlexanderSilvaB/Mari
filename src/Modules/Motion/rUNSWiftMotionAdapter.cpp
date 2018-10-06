@@ -246,16 +246,16 @@ void rUNSWiftMotionAdapter::Tick(ActionCommand::All &request)
 
    // When the robot sees another near its side, it lets its arms go limp, so as not
    // to "push" them.
-   bool caughtLR = (readFrom(vision, caughtLeft) || readFrom(vision, caughtRight));
-   request.body.caughtLeft = caughtLR;
-   request.body.caughtRight = caughtLR;
+   //bool caughtLR = (readFrom(vision, caughtLeft) || readFrom(vision, caughtRight));
+   //request.body.caughtLeft = caughtLR;
+   //request.body.caughtRight = caughtLR;
 
    // Get the position of the ball in robot relative cartesian coordinates
    
-   AbsCoord robotPose = readFrom(localisation, robotPos);
-   AbsCoord ballAbs = readFrom(localisation, ballPos);
-   AbsCoord ball = ballAbs.convertToRobotRelativeCartesian(robotPose);
-
+   //AbsCoord robotPose = readFrom(localisation, robotPos);
+   //AbsCoord ballAbs = readFrom(localisation, ballPos);
+   //AbsCoord ball = ballAbs.convertToRobotRelativeCartesian(robotPose);
+    AbsCoord ball(0, 0, 0);
    // Update the body model
    bodyModel.kinematics = &kinematics;
    bodyModel.update(&odo, sensors);

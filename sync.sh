@@ -17,10 +17,13 @@ home=true
 restart=false
 build=false
 configure=false
+clear=false
 
 for i in "$@" ; do
     if [[ $i == "-sudo" ]] ; then
         sudo=true
+    elif [[ $i == "-clear" ]] ; then
+        clear=true
     elif [[ $i == "-ssh" ]] ; then
         ssh=true
     elif [[ $i == "-root" ]] ; then
@@ -56,6 +59,12 @@ for i in "$@" ; do
         configure=true
     fi
 done
+
+if [ $clear == true ]; then
+    echo "Cleaning $toolchain"
+    rm -rf src/build-$toolchain
+    exit
+fi
 
 if [ $build == true ]; then
     if [ $configure == true ]; then
