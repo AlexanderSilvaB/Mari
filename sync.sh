@@ -81,7 +81,8 @@ if [ $ssh == true ]; then
         ssh-keygen -t rsa -f ~/.ssh/id_rsa -q -P ""
     fi
 
-    cat ~/.ssh/id_rsa.pub | $SSH_CMD -l nao $robot "mkdir -p .ssh; sh -c 'cat >> .ssh/authorized_keys'; chmod 700 ~/.ssh; chmod 600 ~/.ssh/authorized_keys ; chmod g-w,o-w /home/nao"
+    #cat ~/.ssh/id_rsa.pub | $SSH_CMD -l nao $robot "mkdir -p .ssh; sh -c 'cat >> .ssh/authorized_keys'; chmod 700 ~/.ssh; chmod 600 ~/.ssh/authorized_keys ; chmod g-w,o-w /home/nao"
+    ssh-copy-id nao@$robot
 fi
 
 if [ $sudo == true ]; then
