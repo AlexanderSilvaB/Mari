@@ -1,38 +1,35 @@
 {
-    "Modules" :
-    {
-        "Motion" : 
-        {
-            "Enabled" : true
+    "Modules": {
+        "Motion": {
+            "Enabled": true
         },
-        "Perception" : 
-        {
-            "Enabled" : true,
-            "BallDetector" : 
-            {
-                "Enabled" : true,
-                "Ball" : 
-                {
-                    "Size" : [0.1, 0.1],
-                    "Method" : "Cascade"
-                }
-            }
+        "Network": {
+            "Enabled": true
         },
-        "Strategy" : 
-        {
-            "Enabled" : true
-        },
-        "Remote" : 
-        {
-            "Enabled" : false,
-            "Joystick" : 
-            {
-                "Enabled" : true
+        "Perception": {
+            "BallDetector": {
+                "Ball": {
+                    "Method": "Cascade",
+                    "Size": [
+                        0.1,
+                        0.1
+                    ]
+                },
+                "Enabled": true
             },
-            "Network" : 
-            {
-                "Enabled" : true
+            "Enabled": true
+        },
+        "Remote": {
+            "Enabled": true,
+            "Joystick": {
+                "Enabled": true
+            },
+            "Network": {
+                "Enabled": true
             }
+        },
+        "Strategy": {
+            "Enabled": true
         }
     }
 }
