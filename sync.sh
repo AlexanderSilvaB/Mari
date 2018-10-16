@@ -135,6 +135,8 @@ if [ $services == true ]; then
     $SSH_CMD $user@$robot "sudo rc-update del connman boot"
     $SSH_CMD $user@$robot "sudo rc-update add qimessaging-json default"
     $SSH_CMD $user@$robot "sudo rc-update del qimessaging-json default"
+    echo "Turning on services needed"
+    $SSH_CMD $user@$robot "sudo rc-update add ntp-client default"
 fi
 
 if [ $restart == true ]; then
