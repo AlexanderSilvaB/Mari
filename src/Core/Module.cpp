@@ -14,11 +14,13 @@ Module::Module(SpellBook *spellBook, std::string name, int ms)
     highPriority = false;
     this->name = name;
     this->us = ms*1000;
-    this->spellBook = spellBook;
+    this->spellBookBase = spellBook;
+    this->spellBook = new SpellBook();
 }
 
 Module::~Module()
 {
+    delete spellBook;
 }
 
 void Module::SetHighPriority(bool highPriority)

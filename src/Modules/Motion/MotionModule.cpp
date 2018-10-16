@@ -80,6 +80,7 @@ void MotionModule::OnStop()
 
 void MotionModule::Tick(float ellapsedTime)
 {
+    LOAD(motion);
     vx = spellBook->motion.Vx;
     vy = spellBook->motion.Vy;
     vth = spellBook->motion.Vth;
@@ -185,6 +186,7 @@ void MotionModule::Tick(float ellapsedTime)
     }
     #endif
     #endif
+    //SAVE(motion);
 }
 
 void MotionModule::ScaleWalk2014(float *forward, float *left, float *turn)

@@ -5,7 +5,12 @@ using namespace std;
 
 SpellBook::SpellBook()
 {
+    pthread_mutex_init(&lock, NULL);
+}
 
+SpellBook::~SpellBook()
+{
+    pthread_mutex_destroy(&lock);
 }
 
 void SpellBook::Load(string fileName)
@@ -30,6 +35,16 @@ void SpellBook::Save(string fileName)
     behaviour.Save(storage);
 
     storage.Save();
+}
+
+void SpellBook::Lock()
+{
+    pthread_mutex_lock(&lock);
+}
+
+void SpellBook::Unlock()
+{
+    pthread_mutex_unlock(&lock);
 }
 
 // Spell
@@ -105,7 +120,14 @@ BallSpell::BallSpell()
 
 void BallSpell::CopyTo(Spell *spell)
 {
-
+    BallSpell *s = (BallSpell*)spell;
+    COPY(s, method)
+    COPY(s, ballWidth)
+    COPY(s, ballHeight)
+    COPY(s, BallAzimuth)
+    COPY(s, BallDetected)
+    COPY(s, BallDistance)
+    COPY(s, BallElevation)
 }
 
 void BallSpell::Load(Storage &storage)
@@ -129,7 +151,9 @@ PerceptionSpell::PerceptionSpell()
 
 void PerceptionSpell::CopyTo(Spell *spell)
 {
-
+    PerceptionSpell *s = (PerceptionSpell*)spell;
+    COPY(s, EnableBallDetector)
+    ball.CopyTo(spell);
 }
 
 void PerceptionSpell::Load(Storage &storage)
@@ -162,7 +186,27 @@ MotionSpell::MotionSpell()
 
 void MotionSpell::CopyTo(Spell *spell)
 {
-
+    MotionSpell *s = (MotionSpell*)spell;
+    COPY(s, Remote)
+    COPY(s, Stand)
+    COPY(s, Stiff)
+    COPY(s, Vx)
+    COPY(s, Vy)
+    COPY(s, Vth)
+    COPY(s, HeadYaw)
+    COPY(s, HeadPitch)
+    COPY(s, HeadSpeed)
+    COPY(s, HeadRelative)
+    COPY(s, KickLeft)
+    COPY(s, KickRight)
+    COPY(s, LimpLeft)
+    COPY(s, LimpRight)
+    COPY(s, GetupBack)
+    COPY(s, GetupFront)
+    COPY(s, TipOver)
+    COPY(s, Dead)
+    COPY(s, Walk)
+    COPY(s, Crouch)
 }
 
 void MotionSpell::Load(Storage &storage)
@@ -183,7 +227,9 @@ RemoteSpell::RemoteSpell()
 
 void RemoteSpell::CopyTo(Spell *spell)
 {
-
+    RemoteSpell *s = (RemoteSpell*)spell;
+    COPY(s, EnableJoystick)
+    COPY(s, EnableNetwork)
 }
 
 void RemoteSpell::Load(Storage &storage)
@@ -210,7 +256,13 @@ StrategySpell::StrategySpell()
 
 void StrategySpell::CopyTo(Spell *spell)
 {
-
+    StrategySpell *s = (StrategySpell*)spell;
+    COPY(s, Started)
+    COPY(s, Penalized)
+    COPY(s, FallenBack)
+    COPY(s, FallenFront)
+    COPY(s, Die)
+    COPY(s, TurnOver)
 }
 
 void StrategySpell::Load(Storage &storage)
@@ -233,7 +285,11 @@ BehaviourSpell::BehaviourSpell()
 
 void BehaviourSpell::CopyTo(Spell *spell)
 {
-
+    BehaviourSpell *s = (BehaviourSpell*)spell;
+    COPY(s, Started)
+    COPY(s, Penalized)
+    COPY(s, Fallen)
+    COPY(s, Die)
 }
 
 void BehaviourSpell::Load(Storage &storage)

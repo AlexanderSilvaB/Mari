@@ -3,6 +3,7 @@
 
 #include <string>
 #include "Core/Utils/Storage.h"
+#include <pthread.h>
 
 class Spell
 {
@@ -125,8 +126,14 @@ class BehaviourSpell : public Spell
         void Save(Storage &storage);
 };
 
+#define COPY(s, var) s->var = var;
+#define LOAD(module) spellBookBase->Lock(), spellBookBase->module.CopyTo(&spellBook->module), spellBookBase->Unlock();
+#define SAVE(module) spellBookBase->Lock(), spellBook->module.CopyTo(&spellBookBase->module), spellBookBase->Unlock();
+
 class SpellBook
 {
+    private:
+        pthread_mutex_t lock;
     public:
         PerceptionSpell perception;
         MotionSpell motion;
@@ -136,8 +143,12 @@ class SpellBook
         BehaviourSpell behaviour;
 
         SpellBook();
+        ~SpellBook();
         void Load(std::string fileName);
         void Save(std::string fileName);
+
+        void Lock();
+        void Unlock();
 };
 
 #endif

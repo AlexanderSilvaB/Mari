@@ -15,8 +15,8 @@ StrategyModule::StrategyModule(SpellBook *spellBook)
     : Module(spellBook, "Strategy", 30)
 {
     touch = NULL;
-    gameController = new GameController(spellBook);   
-    safetyMonitor = new SafetyMonitor(spellBook);
+    gameController = new GameController(this->spellBook);   
+    safetyMonitor = new SafetyMonitor(this->spellBook);
 }
 
 StrategyModule::~StrategyModule()
@@ -45,6 +45,11 @@ void StrategyModule::OnStop()
 
 void StrategyModule::Tick(float ellapsedTime)
 {
+    LOAD(motion)
+    LOAD(perception)
+    LOAD(strategy)
+    LOAD(behaviour)
+
     SensorValues sensor = touch->getSensors(kinematics);
 
     safetyMonitor->Tick(ellapsedTime, sensor);
@@ -150,5 +155,10 @@ void StrategyModule::Tick(float ellapsedTime)
         spellBook->motion.HeadSpeed = spellBook->perception.ball.HeadSpeed;
         spellBook->motion.HeadRelative = spellBook->perception.ball.HeadRelative;
     }
-    // 
+    //
+
+    SAVE(motion)
+    SAVE(perception)
+    SAVE(strategy)
+    SAVE(behaviour) 
 }

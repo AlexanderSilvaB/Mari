@@ -26,6 +26,7 @@ class Module
 
   protected:
     SpellBook *spellBook;
+    SpellBook *spellBookBase;
 
   private:
     static void *Run(void *arg);

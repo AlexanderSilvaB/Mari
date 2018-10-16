@@ -4,7 +4,7 @@
             "Enabled": true
         },
         "Network": {
-            "Enabled": true
+            "Enabled": false
         },
         "Perception": {
             "BallDetector": {
@@ -17,10 +17,10 @@
                 },
                 "Enabled": true
             },
-            "Enabled": true
+            "Enabled": false
         },
         "Remote": {
-            "Enabled": true,
+            "Enabled": false,
             "Joystick": {
                 "Enabled": true
             },
