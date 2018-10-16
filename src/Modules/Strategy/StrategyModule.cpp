@@ -2,11 +2,14 @@
 #include <boost/bind.hpp>
 #include "Core/InitManager.h"
 
+//#define SQUARE
+#ifdef SQUARE
 int step = 0;
 float x = 0;
 float y = 0;
-#define LIM 1.0f
+#define LIM 2.0f
 float tmV = 0;
+#endif
 
 StrategyModule::StrategyModule(SpellBook *spellBook)
     : Module(spellBook, "Strategy", 30)
@@ -80,6 +83,7 @@ void StrategyModule::Tick(float ellapsedTime)
     spellBook->motion.Stand = true;
     spellBook->motion.Walk = true;
 
+    #ifdef SQUARE
     if(step == 0)
     {
         x += spellBook->motion.Vx * ellapsedTime;
@@ -93,7 +97,7 @@ void StrategyModule::Tick(float ellapsedTime)
     else if(step == 1)
     {
         y += spellBook->motion.Vy * ellapsedTime;
-        spellBook->motion.Vy = 0.3f;
+        spellBook->motion.Vy = 0.2f;
         if(y > LIM)
         {
             step = 2;
@@ -113,7 +117,7 @@ void StrategyModule::Tick(float ellapsedTime)
     else if(step == 3)
     {
         y += spellBook->motion.Vy * ellapsedTime;
-        spellBook->motion.Vy = -0.3f;
+        spellBook->motion.Vy = -0.2f;
         if(y < 0)
         {
             step = 4;
@@ -129,7 +133,9 @@ void StrategyModule::Tick(float ellapsedTime)
             tmV = 0;
         }
     }
-    
+    #endif
+
+    // Nossa estratégia
     if(spellBook->perception.ball.BallDetected)
     {
         spellBook->motion.HeadYaw = spellBook->perception.ball.BallAzimuth;
@@ -144,4 +150,5 @@ void StrategyModule::Tick(float ellapsedTime)
         spellBook->motion.HeadSpeed = spellBook->perception.ball.HeadSpeed;
         spellBook->motion.HeadRelative = spellBook->perception.ball.HeadRelative;
     }
+    // 
 }

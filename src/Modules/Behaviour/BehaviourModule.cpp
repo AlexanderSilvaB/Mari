@@ -28,26 +28,27 @@ void BehaviourModule::Tick(float ellapsedTime)
 {
     timeSinceAct += ellapsedTime;
 
-    if(timeSinceAct > 2.0f)
+    if(spellBook->behaviour.Fallen && timeSinceAct > 2.0f)
     {
-        if(spellBook->behaviour.Fallen)
-        {
-            spellBook->behaviour.Fallen = false;
-            SAY("The bakery fell");
-        }
-        else if(spellBook->behaviour.Started)
-        {
-            spellBook->behaviour.Started = false;
-            SAY("Can wait to kill some players");
-        }
-        else if(spellBook->behaviour.Penalized)
-        {
-            SAY("Let me play, now");
-        }
-        else if(spellBook->behaviour.Die)
-        {
-            spellBook->behaviour.Die = false;
-            SAY("I am dead");
-        }
+        spellBook->behaviour.Fallen = false;
+        timeSinceAct = 0;
+        SAY("The bakery fell");
+    }
+    else if(spellBook->behaviour.Started && timeSinceAct > 2.0f)
+    {
+        spellBook->behaviour.Started = false;
+        timeSinceAct = 0;
+        SAY("Can wait to kill some players");
+    }
+    else if(spellBook->behaviour.Penalized && timeSinceAct > 10.0f)
+    {
+        timeSinceAct = 0;
+        SAY("Let me play, now");
+    }
+    else if(spellBook->behaviour.Die && timeSinceAct > 2.0f)
+    {
+        spellBook->behaviour.Die = false;
+        timeSinceAct = 0;
+        SAY("I am dead");
     }
 }

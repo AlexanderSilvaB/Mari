@@ -63,7 +63,6 @@ for i in "$@" ; do
         services=true
         home=true
         restart=true
-        configure=true
     elif [[ $i == "-all" ]] ; then
         build=true
         sudo=true
@@ -72,7 +71,6 @@ for i in "$@" ; do
         services=true
         home=true
         restart=true
-        configure=true
     fi
 done
 
@@ -124,7 +122,7 @@ fi
 
 if [ $home == true ]; then
     echo "Sync home"
-    sshpass -p $pwd rsync -aurvP root/home/nao/ $user@$robot:~/naoqi/
+    sshpass -p $pwd rsync -aurvP root/home/nao/ $user@$robot:~/
 fi
 
 if [ $services == true ]; then
@@ -136,6 +134,7 @@ if [ $services == true ]; then
     $SSH_CMD $user@$robot "sudo rc-update add qimessaging-json default"
     $SSH_CMD $user@$robot "sudo rc-update del qimessaging-json default"
     echo "Turning on services needed"
+    $SSH_CMD $user@$robot "sudo rc-update del ntp-client default"
     $SSH_CMD $user@$robot "sudo rc-update add ntp-client default"
 fi
 

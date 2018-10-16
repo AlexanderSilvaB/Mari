@@ -11,7 +11,7 @@ class GameController
     public:
         enum GameStates { INITIAL, READY, SET, PENALIZED, PLAYING, FINISHED };
     private:
-        float timeSincePress;
+        bool pressed;
         SpellBook *spellBook;
         GameStates gameState;
     public:

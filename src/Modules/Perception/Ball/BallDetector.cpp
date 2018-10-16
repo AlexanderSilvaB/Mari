@@ -125,7 +125,7 @@ void BallDetector::Tick(float ellapsedTime, cv::Mat &img)
         conv_rr_.pose = readFrom(motion, pose);
         conv_rr_.updateAngles(readFrom(kinematics, sensorsLagged));
         RRCoord ballPosRR = conv_rr_.convertToRR(ball.x, ball.y + TOP_IMAGE_ROWS, true);
-        targetYaw = ballPosRR.heading();
+        targetYaw = ballPosRR.heading() - Deg2Rad(20);
         float factor = abs(targetYaw) / 1.06290551;
         speed = 0.75 * factor;
         ballLostCount = 0;

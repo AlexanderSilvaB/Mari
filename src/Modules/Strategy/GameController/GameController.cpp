@@ -3,7 +3,7 @@
 GameController::GameController(SpellBook *spellBook)
 {
     this->spellBook = spellBook;
-    timeSincePress = 0;
+    pressed = false;
 }
 
 void GameController::OnStart()
@@ -14,9 +14,13 @@ void GameController::OnStart()
 
 void GameController::Tick(float ellapsedTime, SensorValues &sensor)
 {
-    timeSincePress += ellapsedTime;
-    if(sensor.sensors[Sensors::ChestBoard_Button] > 0 && timeSincePress > 0.2f)
+    if(sensor.sensors[Sensors::ChestBoard_Button] > 0)
     {
+        pressed = true;
+    }
+    else if(pressed)
+    {
+        pressed = false;
         if(gameState == INITIAL)
             gameState = PENALIZED;
         else
@@ -26,7 +30,6 @@ void GameController::Tick(float ellapsedTime, SensorValues &sensor)
             else
                 gameState = PENALIZED;
         }
-        timeSincePress = 0;
     }
 
     spellBook->strategy.Started = gameState != INITIAL;
