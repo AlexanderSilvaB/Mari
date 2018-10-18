@@ -21,6 +21,8 @@
 #include "Utils/CombinedCamera.hpp"
 #include "Utils/set_cloexec.hpp"
 
+#include "SpellBook.h"
+
 #ifdef USE_QIBUILD
 #include <RinoLib/Robot.h>
 using namespace Rinobot::Nao;
@@ -38,7 +40,7 @@ Blackboard *InitManager::blackboard = NULL;
 Camera *InitManager::topCamera = NULL;
 Camera *InitManager::botCamera = NULL;
 
-void InitManager::Init(int argc, char *argv[])
+void InitManager::Init(int argc, char *argv[], SpellBook &spellBook)
 {
     int pid_file = open("/var/volatile/rinobot.pid", O_CREAT | O_RDWR, 0666);
     int rc = flock(pid_file, LOCK_EX | LOCK_NB);
@@ -63,7 +65,7 @@ void InitManager::Init(int argc, char *argv[])
         // this is the first instance
         set_cloexec_flag(pid_file);
     }
-    ParseArgs(argc, argv);
+    ParseArgs(argc, argv, spellBook);
 
     #ifdef USE_QIBUILD  
     Robot::Connect(argc, argv);
@@ -73,15 +75,22 @@ void InitManager::Init(int argc, char *argv[])
     #endif
 }
 
-void InitManager::ParseArgs(int argc, char *argv[])
+void InitManager::ParseArgs(int argc, char *argv[], SpellBook &spellBook)
 {
     try
     {
         po::options_description generic("Generic options");
         generic.add_options()("help,h", "produce help message")("version,v", "print version string");
+        //("walk.circle", po::value<bool>()->default_value(false), "walks in circle")
+        //("walk.square", po::value<bool>()->default_value(false), "walks in square");
 
-        po::options_description cmdline_options =
-            store_and_notify(argc, argv, vm, &generic);
+        //po::options_description cmdline_options = store_and_notify(argc, argv, vm, &generic);
+        store_and_notify(argc, argv, vm, &generic);
+
+        po::options_description rinobot("Rinobot options");
+        spellBook.AddOptions(rinobot);
+
+        po::options_description cmdline_options = store_and_notify(argc, argv, vm, &rinobot);
 
         if (vm.count("help"))
         {
@@ -91,18 +100,18 @@ void InitManager::ParseArgs(int argc, char *argv[])
 
         if (vm.count("version"))
         {
-            cout << "rUNSWift Nao soccer player " << VERSION_MAJOR << "." << VERSION_MINOR << endl;
+            cout << "Rinobot Nao soccer player " << VERSION_MAJOR << "." << VERSION_MINOR << endl;
             return 1;
         }
 
-        cout << "rUNSWift V." << VERSION_MAJOR << "." << VERSION_MINOR << endl;
+        cout << "Rinobot V." << VERSION_MAJOR << "." << VERSION_MINOR << endl;
 
         options_print(vm);
     }
     catch (program_options::error &e)
     {
         cerr << "Error when parsing command line arguments: " << e.what() << endl;
-        return 1;
+        //return 1;
     }
     catch (std::exception &e)
     {

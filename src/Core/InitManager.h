@@ -6,6 +6,8 @@
 #include "perception/vision/NaoCamera.hpp"
 #include "utils/speech.hpp"
 
+class SpellBook;
+
 class InitManager
 {
     private:
@@ -14,9 +16,9 @@ class InitManager
         static Blackboard *blackboard;
         static Camera *topCamera, *botCamera;
 
-        static void ParseArgs(int argc, char *argv[]);
+        static void ParseArgs(int argc, char *argv[], SpellBook &spellBook);
     public:
-        static void Init(int argc, char *argv[]);
+        static void Init(int argc, char *argv[], SpellBook &spellBook);
         static void InitCameras();
         static Blackboard *GetBlackboard();
         static void Destroy();

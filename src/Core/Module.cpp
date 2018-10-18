@@ -58,6 +58,16 @@ void Module::OnStart()
 
 }
 
+void Module::Load()
+{
+
+}
+
+void Module::Save()
+{
+
+}
+
 void Module::Start()
 {
     cout << "Starting " << name << endl;
@@ -95,7 +105,6 @@ void Module::Stop()
 
 void Module::Join()
 {
-    int rc;
     pthread_join(thread, NULL);
     OnStop();
 }
@@ -112,7 +121,9 @@ void *Module::Run(void *arg)
         if(t < 0.0f)
             t = -t;
         timerWait.restart();
+        module->Load();
         module->Tick(t);
+        module->Save();
         timer.restart();
         us = timerWait.elapsed_us();
         

@@ -3,6 +3,9 @@
 
 #include <string>
 #include "Core/Utils/Storage.h"
+#include <boost/bind.hpp>
+#include <boost/program_options.hpp>
+#include "Core/InitManager.h"
 #include <pthread.h>
 
 class Spell
@@ -13,6 +16,8 @@ class Spell
         virtual void CopyTo(Spell *spell);
         virtual void Load(Storage &storage);
         virtual void Save(Storage &storage);
+        virtual void AddOptions(boost::program_options::options_description &description);
+        virtual void Update(const boost::program_options::variables_map& config);
 };
 
 class ModulesSpell : public Spell
@@ -101,6 +106,7 @@ class RemoteSpell : public Spell
 class StrategySpell : public Spell
 {
     public:
+        bool WalkInCircle, WalkInSquare;
         bool Started;
         bool Penalized;
         bool FallenFront, FallenBack;
@@ -110,6 +116,8 @@ class StrategySpell : public Spell
         void CopyTo(Spell *spell);
         void Load(Storage &storage);
         void Save(Storage &storage);
+        void AddOptions(boost::program_options::options_description &description);
+        void Update(const boost::program_options::variables_map& config);
 };
 
 class BehaviourSpell : public Spell
@@ -124,11 +132,16 @@ class BehaviourSpell : public Spell
         void CopyTo(Spell *spell);
         void Load(Storage &storage);
         void Save(Storage &storage);
+
 };
 
 #define COPY(s, var) s->var = var;
-#define LOAD(module) spellBookBase->Lock(), spellBookBase->module.CopyTo(&spellBook->module), spellBookBase->Unlock();
-#define SAVE(module) spellBookBase->Lock(), spellBook->module.CopyTo(&spellBookBase->module), spellBookBase->Unlock();
+#define LOAD(module)    spellBookBase->Lock(); \
+                        spellBookBase->module.CopyTo(&(spellBook->module)); \
+                        spellBookBase->Unlock();
+#define SAVE(module)    spellBookBase->Lock(); \
+                        spellBook->module.CopyTo(&(spellBookBase->module)); \
+                        spellBookBase->Unlock();
 
 class SpellBook
 {
@@ -146,6 +159,8 @@ class SpellBook
         ~SpellBook();
         void Load(std::string fileName);
         void Save(std::string fileName);
+        void AddOptions(boost::program_options::options_description &description);
+        void Update();
 
         void Lock();
         void Unlock();

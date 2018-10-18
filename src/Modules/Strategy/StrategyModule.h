@@ -20,12 +20,20 @@ class StrategyModule : public Module
 
         GameController *gameController;
         SafetyMonitor *safetyMonitor;
+
+        int squareStep;
+        float squareX, squareY;
+        float squareL;
+        float squareTimer;
+        float circleRadius;
     public:
         StrategyModule(SpellBook *spellBook);
         ~StrategyModule();
         void Tick(float ellapsedTime);
         void OnStart();
         void OnStop();
+        void Load();
+        void Save();
 };
 
 #endif

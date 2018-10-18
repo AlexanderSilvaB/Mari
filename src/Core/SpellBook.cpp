@@ -1,7 +1,12 @@
 #include "SpellBook.h"
+#include "InitManager.h"
 #include <iostream>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 using namespace std;
+namespace po = boost::program_options;
 
 SpellBook::SpellBook()
 {
@@ -37,6 +42,27 @@ void SpellBook::Save(string fileName)
     storage.Save();
 }
 
+void SpellBook::AddOptions(po::options_description &description)
+{
+    modules.AddOptions(description);
+    motion.AddOptions(description);
+    perception.AddOptions(description);
+    remote.AddOptions(description);
+    strategy.AddOptions(description);
+    behaviour.AddOptions(description);    
+}
+
+void SpellBook::Update()
+{
+    po::variables_map config = InitManager::GetBlackboard()->config;
+    modules.Update(config);
+    motion.Update(config);
+    perception.Update(config);
+    remote.Update(config);
+    strategy.Update(config);
+    behaviour.Update(config);
+}
+
 void SpellBook::Lock()
 {
     pthread_mutex_lock(&lock);
@@ -70,6 +96,16 @@ void Spell::Load(Storage &storage)
 }
 
 void Spell::Save(Storage &storage)
+{
+
+}
+
+void Spell::AddOptions(po::options_description &description)
+{
+
+}
+
+void Spell::Update(const po::variables_map &config)
 {
 
 }
@@ -153,7 +189,7 @@ void PerceptionSpell::CopyTo(Spell *spell)
 {
     PerceptionSpell *s = (PerceptionSpell*)spell;
     COPY(s, EnableBallDetector)
-    ball.CopyTo(spell);
+    ball.CopyTo(&(s->ball));
 }
 
 void PerceptionSpell::Load(Storage &storage)
@@ -246,6 +282,7 @@ void RemoteSpell::Save(Storage &storage)
 
 StrategySpell::StrategySpell()
 {
+    WalkInCircle = WalkInSquare = false;
     Started = false;
     Penalized = false;
     FallenBack = false;
@@ -257,6 +294,8 @@ StrategySpell::StrategySpell()
 void StrategySpell::CopyTo(Spell *spell)
 {
     StrategySpell *s = (StrategySpell*)spell;
+    COPY(s, WalkInCircle)
+    COPY(s, WalkInSquare)
     COPY(s, Started)
     COPY(s, Penalized)
     COPY(s, FallenBack)
@@ -273,6 +312,19 @@ void StrategySpell::Load(Storage &storage)
 void StrategySpell::Save(Storage &storage)
 {
     
+}
+
+void StrategySpell::AddOptions(po::options_description &description)
+{
+    description.add_options()
+            ("walk.circle", po::value<bool>()->default_value(false), "walks in circle")
+            ("walk.square", po::value<bool>()->default_value(false), "walks in square");
+}
+
+void StrategySpell::Update(const po::variables_map &config)
+{
+    WalkInCircle = config["walk.circle"].as<bool>();
+    WalkInSquare = config["walk.square"].as<bool>();
 }
 
 BehaviourSpell::BehaviourSpell()

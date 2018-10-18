@@ -58,6 +58,8 @@ class MotionModule : public Module
         void Tick(float ellapsedTime);
         void OnStart();
         void OnStop();
+        void Load();
+        void Save();
 };
 
 #endif

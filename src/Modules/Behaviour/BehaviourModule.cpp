@@ -24,9 +24,19 @@ void BehaviourModule::OnStop()
     
 }
 
-void BehaviourModule::Tick(float ellapsedTime)
+void BehaviourModule::Load()
 {
     LOAD(behaviour);
+}
+
+void BehaviourModule::Save()
+{
+    SAVE(behaviour);
+}
+
+
+void BehaviourModule::Tick(float ellapsedTime)
+{
     timeSinceAct += ellapsedTime;
 
     if(spellBook->behaviour.Fallen && timeSinceAct > 2.0f)
@@ -52,5 +62,4 @@ void BehaviourModule::Tick(float ellapsedTime)
         timeSinceAct = 0;
         SAY("I am dead");
     }
-    SAVE(behaviour);
 }

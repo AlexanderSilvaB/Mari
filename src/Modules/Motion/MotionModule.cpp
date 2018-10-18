@@ -78,9 +78,18 @@ void MotionModule::OnStop()
     #endif
 }
 
-void MotionModule::Tick(float ellapsedTime)
+void MotionModule::Load()
 {
     LOAD(motion);
+}
+
+void MotionModule::Save()
+{
+    SAVE(motion);
+}
+
+void MotionModule::Tick(float ellapsedTime)
+{
     vx = spellBook->motion.Vx;
     vy = spellBook->motion.Vy;
     vth = spellBook->motion.Vth;
@@ -157,7 +166,7 @@ void MotionModule::Tick(float ellapsedTime)
             vx *= 1000.0f;
             vy *= 1000.0f;
             ScaleWalk2014(&vx, &vy, &vth);
-            cout << vx << ", " << vy << ", " << Rad2Deg(vth) << endl;
+            //cout << vx << ", " << vy << ", " << Rad2Deg(vth) << endl;
             request.body = ActionCommand::Body(ActionCommand::Body::WALK, vx, vy, vth);
             //request.body.bend = 30.0f;
         }
@@ -186,7 +195,6 @@ void MotionModule::Tick(float ellapsedTime)
     }
     #endif
     #endif
-    //SAVE(motion);
 }
 
 void MotionModule::ScaleWalk2014(float *forward, float *left, float *turn)

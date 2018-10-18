@@ -2,21 +2,18 @@
 #include <boost/bind.hpp>
 #include "Core/InitManager.h"
 
-//#define SQUARE
-#ifdef SQUARE
-int step = 0;
-float x = 0;
-float y = 0;
-#define LIM 2.0f
-float tmV = 0;
-#endif
-
 StrategyModule::StrategyModule(SpellBook *spellBook)
     : Module(spellBook, "Strategy", 30)
 {
     touch = NULL;
     gameController = new GameController(this->spellBook);   
     safetyMonitor = new SafetyMonitor(this->spellBook);
+
+    squareStep = 1;
+    squareX = squareY = 0;
+    squareL = 2.0f;
+    squareTimer = 0;
+    circleRadius = 2.0f;
 }
 
 StrategyModule::~StrategyModule()
@@ -43,13 +40,25 @@ void StrategyModule::OnStop()
     delete touch;
 }
 
-void StrategyModule::Tick(float ellapsedTime)
+void StrategyModule::Load()
 {
     LOAD(motion)
     LOAD(perception)
     LOAD(strategy)
     LOAD(behaviour)
+}
 
+void StrategyModule::Save()
+{
+    SAVE(motion)
+    SAVE(perception)
+    SAVE(strategy)
+    SAVE(behaviour) 
+}
+
+
+void StrategyModule::Tick(float ellapsedTime)
+{
     SensorValues sensor = touch->getSensors(kinematics);
 
     safetyMonitor->Tick(ellapsedTime, sensor);
@@ -73,72 +82,86 @@ void StrategyModule::Tick(float ellapsedTime)
 
     spellBook->motion.Dead = spellBook->strategy.Die;
     if(spellBook->strategy.Die)
+    {
         return;
+    }
     spellBook->motion.TipOver = spellBook->strategy.TurnOver;
     if(spellBook->strategy.TurnOver)
+    {
         return;
+    }
     spellBook->motion.GetupBack = spellBook->strategy.FallenBack;
     if(spellBook->strategy.FallenBack)
+    {
         return;
+    }
     spellBook->motion.GetupFront = spellBook->strategy.FallenFront;
     if(spellBook->strategy.FallenFront)
+    {
         return;
+    }
 
     spellBook->motion.Stiff = true;
     spellBook->motion.Stand = true;
     spellBook->motion.Walk = true;
 
-    #ifdef SQUARE
-    if(step == 0)
+    if(spellBook->strategy.WalkInSquare)
     {
-        x += spellBook->motion.Vx * ellapsedTime;
+        if(squareStep == 0)
+        {
+            squareX += spellBook->motion.Vx * ellapsedTime;
+            spellBook->motion.Vx = 0.3f;
+            if(squareX > squareL)
+            {
+                squareStep = 1;
+                spellBook->motion.Vx = 0;
+            }
+        }
+        else if(squareStep == 1)
+        {
+            squareY += spellBook->motion.Vy * ellapsedTime;
+            spellBook->motion.Vy = 0.2f;
+            if(squareY > squareL)
+            {
+                squareStep = 2;
+                spellBook->motion.Vy = 0;
+            }
+        }
+        else if(squareStep == 2)
+        {
+            squareX += spellBook->motion.Vx * ellapsedTime;
+            spellBook->motion.Vx = -0.3f;
+            if(squareX < 0)
+            {
+                squareStep = 3;
+                spellBook->motion.Vx = 0;
+            }
+        }
+        else if(squareStep == 3)
+        {
+            squareY += spellBook->motion.Vy * ellapsedTime;
+            spellBook->motion.Vy = -0.2f;
+            if(squareY < 0)
+            {
+                squareStep = 4;
+                spellBook->motion.Vy = 0;
+            }
+        }
+        else if(squareStep == 4)
+        {
+            squareTimer += ellapsedTime;
+            if(squareTimer > 5.0f)
+            {
+                squareStep = 0;
+                squareTimer = 0;
+            }
+        }
+    }
+    else if(spellBook->strategy.WalkInCircle)
+    {
         spellBook->motion.Vx = 0.3f;
-        if(x > LIM)
-        {
-            step = 1;
-            spellBook->motion.Vx = 0;
-        }
+        spellBook->motion.Vth = spellBook->motion.Vx / circleRadius;
     }
-    else if(step == 1)
-    {
-        y += spellBook->motion.Vy * ellapsedTime;
-        spellBook->motion.Vy = 0.2f;
-        if(y > LIM)
-        {
-            step = 2;
-            spellBook->motion.Vy = 0;
-        }
-    }
-    else if(step == 2)
-    {
-        x += spellBook->motion.Vx * ellapsedTime;
-        spellBook->motion.Vx = -0.3f;
-        if(x < 0)
-        {
-            step = 3;
-            spellBook->motion.Vx = 0;
-        }
-    }
-    else if(step == 3)
-    {
-        y += spellBook->motion.Vy * ellapsedTime;
-        spellBook->motion.Vy = -0.2f;
-        if(y < 0)
-        {
-            step = 4;
-            spellBook->motion.Vy = 0;
-        }
-    }
-    else if(step == 4)
-    {
-        tmV += ellapsedTime;
-        if(tmV > 5.0f)
-        {
-            step = 0;
-            tmV = 0;
-        }
-    }
-    #endif
 
     // Nossa estratégia
     if(spellBook->perception.ball.BallDetected)
@@ -156,9 +179,4 @@ void StrategyModule::Tick(float ellapsedTime)
         spellBook->motion.HeadRelative = spellBook->perception.ball.HeadRelative;
     }
     //
-
-    SAVE(motion)
-    SAVE(perception)
-    SAVE(strategy)
-    SAVE(behaviour) 
 }

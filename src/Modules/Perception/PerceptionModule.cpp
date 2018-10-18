@@ -33,13 +33,21 @@ void PerceptionModule::OnStop()
     #endif
 }
 
-void PerceptionModule::Tick(float ellapsedTime)
+void PerceptionModule::Load()
 {
     LOAD(perception);
+}
+
+void PerceptionModule::Save()
+{
+    SAVE(perception);
+}
+
+void PerceptionModule::Tick(float ellapsedTime)
+{
     if(vision != NULL)
         vision->Tick(ellapsedTime);
     #ifdef USE_UNSW
     perception->Tick();
     #endif
-    SAVE(perception);
 }

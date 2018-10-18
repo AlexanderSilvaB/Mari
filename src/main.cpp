@@ -12,11 +12,13 @@ using namespace std;
 
 int main(int argc,char *argv[])
 {
-    InitManager::Init(argc, argv);
-
     ModulesManager manager;
     SpellBook spellBook;
+
+    InitManager::Init(argc, argv, spellBook);
+
     spellBook.Load("/home/nao/data/config.json");
+    spellBook.Update();
         
     if(spellBook.modules.LoadPerception)
         manager.Attach(new PerceptionModule(&spellBook));
