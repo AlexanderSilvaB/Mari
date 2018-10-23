@@ -56,11 +56,12 @@ void RelativeCoords::setPitch(float pitch)
     this->pitch = pitch;
 }
 
-void RelativeCoords::fromPixel(int w, int h, float headYaw, float headPitch)
+void RelativeCoords::fromPixel(int w, int h, float headYaw, float headPitch, bool upper)
 {
     yaw = ((w / CAM_W) - 0.5f) * H_FOV;
-    pitch = - ((h / CAM_H) - 0.5f) * V_FOV;
-    pitch += CAM_OFSET_ANGLE;
+    pitch = -((h / CAM_H) - 0.5f) * V_FOV;
+    if(!upper)
+        pitch += CAM_OFSET_ANGLE;
 
     yaw = yaw + headYaw;
     pitch = pitch + headPitch;

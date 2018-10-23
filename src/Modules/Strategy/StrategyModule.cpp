@@ -1,6 +1,7 @@
 #include "StrategyModule.h"
 #include <boost/bind.hpp>
 #include "Core/InitManager.h"
+#include "Core/Utils/Math.h"
 
 StrategyModule::StrategyModule(SpellBook *spellBook)
     : Module(spellBook, "Strategy", 30)
@@ -164,19 +165,11 @@ void StrategyModule::Tick(float ellapsedTime)
     }
 
     // Nossa estratégia
-    if(spellBook->perception.ball.BallDetected)
-    {
-        spellBook->motion.HeadYaw = spellBook->perception.ball.BallAzimuth;
-        spellBook->motion.HeadPitch = spellBook->perception.ball.BallElevation;
-        spellBook->motion.HeadSpeed = spellBook->perception.ball.HeadSpeed;
-        spellBook->motion.HeadRelative = spellBook->perception.ball.HeadRelative;
-    }
-    else if(spellBook->perception.ball.TimeSinceBallSeen > 2.0f)
-    {
-        spellBook->motion.HeadYaw = 0.0f;
-        spellBook->motion.HeadPitch = 0.0f;
-        spellBook->motion.HeadSpeed = spellBook->perception.ball.HeadSpeed;
-        spellBook->motion.HeadRelative = spellBook->perception.ball.HeadRelative;
-    }
-    //
+    spellBook->motion.HeadYaw = spellBook->perception.ball.BallAzimuth;
+    spellBook->motion.HeadPitch = spellBook->perception.ball.BallElevation;
+    spellBook->motion.HeadSpeed = spellBook->perception.ball.HeadSpeed;
+    spellBook->motion.HeadRelative = spellBook->perception.ball.HeadRelative;
+    spellBook->motion.Vx = spellBook->perception.ball.BallDistance * 0.3f;
+    //spellBook->motion.Vth = spellBook->perception.ball.BallAzimuth * spellBook->perception.ball.HeadSpeed;
+    spellBook->motion.Vth = Deg2Rad(-2.0f) * ellapsedTime;
 }

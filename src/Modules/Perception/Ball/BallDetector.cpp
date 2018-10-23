@@ -51,7 +51,7 @@ void BallDetector::Tick(float ellapsedTime, cv::Mat &img)
         spellBook->perception.ball.BallDetected = false;
         spellBook->perception.ball.TimeSinceBallSeen += ellapsedTime;
         spellBook->perception.ball.HeadRelative = false;
-        if(spellBook->perception.ball.TimeSinceBallSeen > 1.0f)
+        if(spellBook->perception.ball.TimeSinceBallSeen > 0.1f)
         {
             targetPitch = 0.0f;
             targetYaw = 0.0f;
@@ -73,14 +73,19 @@ void BallDetector::Tick(float ellapsedTime, cv::Mat &img)
         RelativeCoords ballPosRR;
         float currHeadYaw = sensor.joints.angles[Joints::HeadYaw];
         float currHeadPitch = sensor.joints.angles[Joints::HeadPitch];
-        ballPosRR.fromPixel(ball.x, ball.y, currHeadYaw, currHeadPitch);
-        targetYaw = ballPosRR.getYaw();
-        targetPitch = ballPosRR.getPitch();
+        //ballPosRR.fromPixel(ball.x, ball.y, -currHeadYaw, currHeadPitch);
+        ballPosRR.fromPixel(ball.x, ball.y);
+        targetYaw = -ballPosRR.getYaw();
+        //targetPitch = ballPosRR.getPitch();
         distance = ballPosRR.getDistance();
-        float factor = abs(targetYaw) / H_FOV;
-        speed = 0.75 * factor;
+        if(distance > 1.0f)
+            targetPitch = 0.0f;
+        else
+            targetPitch = Deg2Rad(17.0f);
+        float factor = abs(targetYaw) / (float)H_FOV;
+        speed = 0.25f * factor;
 
-        cout << "Found: " << pt << " [ " << ball.radius << " ] | [" << Rad2Deg(targetYaw) << "º, " << Rad2Deg(targetPitch) << "º] " << distance << "m" << endl;
+        cout << "Found: " << pt << " [ " << ball.radius << " ] | [" << Rad2Deg(targetYaw) << "º, " << Rad2Deg(ballPosRR.getPitch()) << "º] " << distance << "m | " << speed << endl;
 
         spellBook->perception.ball.BallDetected = true;
         spellBook->perception.ball.HeadRelative = false;

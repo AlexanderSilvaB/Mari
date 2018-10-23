@@ -37,7 +37,6 @@ void PerceptionModule::Save()
 
 void PerceptionModule::Tick(float ellapsedTime)
 {
-    if(vision != NULL)
-        vision->Tick(ellapsedTime);
+    vision->Tick(ellapsedTime);
     perception->Tick();
 }

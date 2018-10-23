@@ -18,7 +18,7 @@ class RelativeCoords
         void setYaw(float yaw);
         void setPitch(float pitch);
 
-        void fromPixel(int w, int h, float headYaw = 0.0f, float headPitch = 0.0f);   
+        void fromPixel(int w, int h, float headYaw = 0.0f, float headPitch = 0.0f, bool upper = false);   
 
 };
 

@@ -16,7 +16,7 @@ class MotionModule : public Module
         rUNSWiftMotionAdapter *motion;
 
         float vx, vy, vth;
-        bool stiff, stand;
+        bool stiff, stand, goalieStand;
 
         void ScaleWalk2014(float *forward, float *left, float *turn);
     public:

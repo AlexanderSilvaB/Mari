@@ -28,7 +28,6 @@ void Vision::Tick(float ellapsedTime)
     //cv::Mat rawYuv(240, 320, CV_8UC2, yuvData);
     //img = imdecode(rawYuv, CV_LOAD_IMAGE_COLOR);
     //cv::cvtColor(rawYuv, img, CV_YUV2BGR_Y422);
-
     if(spellBook->perception.ball.Enabled)
         ballDetector->Tick(ellapsedTime, img);
     if(spellBook->perception.localization.Enabled)

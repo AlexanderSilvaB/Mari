@@ -53,10 +53,10 @@ void MotionModule::Tick(float ellapsedTime)
         stand = spellBook->motion.Stand;
         request.body = ActionCommand::Body(stand ? ActionCommand::Body::STAND : ActionCommand::Body::INITIAL);
     }
-    else if(stand != spellBook->motion.GoalieStand)
+    else if(goalieStand != spellBook->motion.GoalieStand)
     {
-        stand = spellBook->motion.GoalieStand;
-        request.body = ActionCommand::Body(stand ? ActionCommand::Body::GOALIE_STAND : ActionCommand::Body::GOALIE_INITIAL);
+        goalieStand = spellBook->motion.GoalieStand;
+        request.body = ActionCommand::Body(goalieStand ? ActionCommand::Body::GOALIE_STAND : ActionCommand::Body::GOALIE_INITIAL);
     }
     else if(spellBook->motion.Dead)
     {
@@ -115,6 +115,7 @@ void MotionModule::Tick(float ellapsedTime)
         vx = spellBook->motion.Vx * 1000.0f;
         vy = spellBook->motion.Vy * 1000.0f;
         vth = spellBook->motion.Vth * 1000.0f;
+        
         if(vx != 0 || vy != 0 || vth != 0)
         {
             ScaleWalk2014(&vx, &vy, &vth);

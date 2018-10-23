@@ -148,6 +148,7 @@ void ModulesSpell::Save(Storage &storage)
 
 BallSpell::BallSpell()
 {
+    Enabled = true;
     method = "CASCADE";
     ballWidth = ballHeight = 0.1f;
 
@@ -160,10 +161,12 @@ BallSpell::BallSpell()
 void BallSpell::CopyTo(Spell *spell)
 {
     BallSpell *s = (BallSpell*)spell;
+    COPY(s, Enabled)
     COPY(s, method)
     COPY(s, ballWidth)
     COPY(s, ballHeight)
     COPY(s, BallAzimuth)
+    COPY(s, HeadSpeed)
     COPY(s, BallDetected)
     COPY(s, BallDistance)
     COPY(s, BallElevation)
@@ -197,6 +200,7 @@ LocalizationSpell::LocalizationSpell()
 void LocalizationSpell::CopyTo(Spell *spell)
 {
     LocalizationSpell *s = (LocalizationSpell*)spell;
+    COPY(s, Enabled)
     COPY(s, X)
     COPY(s, Y)
     COPY(s, Theta)
