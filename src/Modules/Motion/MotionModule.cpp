@@ -53,6 +53,11 @@ void MotionModule::Tick(float ellapsedTime)
         stand = spellBook->motion.Stand;
         request.body = ActionCommand::Body(stand ? ActionCommand::Body::STAND : ActionCommand::Body::INITIAL);
     }
+    else if(stand != spellBook->motion.GoalieStand)
+    {
+        stand = spellBook->motion.GoalieStand;
+        request.body = ActionCommand::Body(stand ? ActionCommand::Body::GOALIE_STAND : ActionCommand::Body::GOALIE_INITIAL);
+    }
     else if(spellBook->motion.Dead)
     {
         request.body = ActionCommand::Body(ActionCommand::Body::DEAD);
@@ -74,6 +79,22 @@ void MotionModule::Tick(float ellapsedTime)
     {
         request.body = ActionCommand::Body(ActionCommand::Body::WALK, 0, 0, 0, 0.4f, 1.0f);
     }
+    else if(spellBook->motion.GoalieSit)
+    {
+        request.body = ActionCommand::Body(ActionCommand::Body::GOALIE_SIT);
+    }
+    else if(spellBook->motion.GoalieCentre)
+    {
+        request.body = ActionCommand::Body(ActionCommand::Body::GOALIE_CENTRE);
+    }
+    else if(spellBook->motion.GoalieUncentre)
+    {
+        request.body = ActionCommand::Body(ActionCommand::Body::GOALIE_UNCENTRE);
+    }
+    else if(spellBook->motion.DefenderCentre)
+    {
+        request.body = ActionCommand::Body(ActionCommand::Body::DEFENDER_CENTRE);
+    }
     else if(spellBook->motion.KickLeft)
     {
         request.body = ActionCommand::Body(ActionCommand::Body::KICK);
@@ -94,7 +115,7 @@ void MotionModule::Tick(float ellapsedTime)
         vx = spellBook->motion.Vx * 1000.0f;
         vy = spellBook->motion.Vy * 1000.0f;
         vth = spellBook->motion.Vth * 1000.0f;
-        if(spellBook->motion.Vx != 0 || vy != 0 || vth != 0)
+        if(vx != 0 || vy != 0 || vth != 0)
         {
             ScaleWalk2014(&vx, &vy, &vth);
             request.body = ActionCommand::Body(ActionCommand::Body::WALK, vx, vy, vth);

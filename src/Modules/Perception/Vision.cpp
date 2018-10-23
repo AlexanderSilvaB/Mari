@@ -3,8 +3,8 @@
 using namespace cv;
 
 Vision::Vision(SpellBook *spellBook)
+    :   InnerModule(spellBook)
 {
-    this->spellBook = spellBook;
     ballDetector = new BallDetector(spellBook);
     localizer = new Localizer(spellBook);
 

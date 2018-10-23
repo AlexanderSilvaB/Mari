@@ -1,6 +1,7 @@
 #ifndef _Vision_H_
 #define _Vision_H_
 
+#include "Core/Module.h"
 #include "Core/SpellBook.h"
 #include <opencv2/opencv.hpp>
 #include "Core/Utils/CameraFrame.h"
@@ -11,10 +12,9 @@
 
 using namespace std;
 
-class Vision
+class Vision : public InnerModule
 {
     private:
-        SpellBook *spellBook;
         CombinedCamera *capture;
 
         CameraFrame frame;

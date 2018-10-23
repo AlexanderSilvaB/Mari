@@ -254,6 +254,13 @@ MotionSpell::MotionSpell()
     TipOver = Dead = false;
     Walk = false;
     Crouch = false;
+
+    GoalieSit = false;
+    GoalieCentre = false;
+    GoalieUncentre = false;
+    GoalieStand = false;
+    GoalieInitial = false;
+    DefenderCentre = false;
 }
 
 void MotionSpell::CopyTo(Spell *spell)
@@ -279,6 +286,13 @@ void MotionSpell::CopyTo(Spell *spell)
     COPY(s, Dead)
     COPY(s, Walk)
     COPY(s, Crouch)
+
+    COPY(s, GoalieSit)
+    COPY(s, GoalieCentre)
+    COPY(s, GoalieUncentre)
+    COPY(s, GoalieStand)
+    COPY(s, GoalieInitial)
+    COPY(s, DefenderCentre)
 }
 
 void MotionSpell::Load(Storage &storage)

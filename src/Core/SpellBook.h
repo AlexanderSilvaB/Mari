@@ -100,6 +100,13 @@ class MotionSpell : public Spell
         bool Walk;
         bool Crouch;
 
+        bool GoalieSit;
+        bool GoalieCentre;
+        bool GoalieUncentre;
+        bool GoalieStand;
+        bool GoalieInitial;
+        bool DefenderCentre;
+
         MotionSpell();
         void CopyTo(Spell *spell);
         void Load(Storage &storage);
