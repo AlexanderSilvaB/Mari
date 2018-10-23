@@ -4,23 +4,32 @@
             "Enabled": true
         },
         "Network": {
-            "Enabled": false
+            "Enabled": true
         },
         "Perception": {
             "BallDetector": {
+                "Enabled": true,
+                "Method": "Cascade",
                 "Ball": {
-                    "Method": "Cascade",
                     "Size": [
                         0.1,
                         0.1
                     ]
-                },
-                "Enabled": true
+                }
             },
-            "Enabled": false
+            "Localization":
+            {
+                "Enabled": true,
+                "Position": [
+                    0.0, 
+                    0.0,
+                    0.0
+                ]
+            },
+            "Enabled": true
         },
         "Remote": {
-            "Enabled": false,
+            "Enabled": true,
             "Joystick": {
                 "Enabled": true
             },
@@ -29,6 +38,9 @@
             }
         },
         "Strategy": {
+            "Enabled": true
+        },
+        "Behaviour": {
             "Enabled": true
         }
     }

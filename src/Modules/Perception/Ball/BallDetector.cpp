@@ -1,10 +1,8 @@
 #include "Core/Utils/Math.h"
 #include "BallDetector.h"
 #include "Core/InitManager.h"
-
-#if USE_UNSW
-#include "perception/vision/CameraToRR.hpp"
-#endif
+#include "Core/Utils/RobotDefs.h"
+#include "Core/Utils/RelativeCoords.h"
 
 #define R 2.0f
 #define PI_2 1.5707963267f
@@ -13,69 +11,23 @@
 using namespace cv;
 
 BallDetector::BallDetector(SpellBook *spellBook)
+    :   InnerModule(spellBook)
 {
-    this->spellBook = spellBook;
-
-
-    w_ = -1;
-    h_ = -1;
-
-    angles[0] = angles[1] = 0.0f;
 
     if(cascade.load("/home/nao/data/vision/cascade.xml"))
         cout << "Cascade file loaded" << endl;
     else
         cout << "Cascade file not found" << endl;
 
-    ballYaw = 0;
-    ballPitch = 0;
-
-    closeInPitch = Deg2Rad(17.0f);
-    farPitch = Deg2Rad(0);
-
-    ballCloseIn = true;
-    ballCloseInDistance = 800.0f;
-
     targetYaw = 0;
-    targetPitch = closeInPitch;
-    ballLostCount = 0;
+    targetPitch = 0;
 
     method = CASCADE;
 }
 
-#ifdef USE_UNSW
-float BallDetector::CalculateDesiredPitch(XYZ_Coord &neckRelativeTarget)
-{
-    float xSq = neckRelativeTarget.x * neckRelativeTarget.x;
-    float ySq = neckRelativeTarget.y * neckRelativeTarget.y;
-    float horizontalDistance = sqrtf(xSq + ySq);
-
-    if (ballCloseIn && horizontalDistance > 1.1 * ballCloseInDistance)
-        ballCloseIn = false;
-
-    if (!ballCloseIn && horizontalDistance < 0.9 * ballCloseInDistance)
-        ballCloseIn = true;
-
-    if (ballCloseIn)
-        return closeInPitch;
-    return farPitch;
-}
-
-float BallDetector::CalculateDesiredYaw(XYZ_Coord &neckRelativeTarget)
-{
-    return atan2(neckRelativeTarget.y, neckRelativeTarget.x);
-}
-#endif
-
 void BallDetector::Tick(float ellapsedTime, cv::Mat &img)
 {
     img.copyTo(this->img);
-
-    if(w_ < 0)
-        w_ = 2.0f / img.cols;
-    if(h_ < 0)
-        h_ = 2.0f / img.rows;
-
     cv::Mat frame = img.clone();
 
     bool detected = false;
@@ -98,15 +50,12 @@ void BallDetector::Tick(float ellapsedTime, cv::Mat &img)
         cout << "Not found" << endl;
         spellBook->perception.ball.BallDetected = false;
         spellBook->perception.ball.TimeSinceBallSeen += ellapsedTime;
-        spellBook->perception.ball.HeadRelative = true;
-        ballLostCount++;
-        #ifdef USE_UNSW
-        if(ballLostCount > 3)
+        spellBook->perception.ball.HeadRelative = false;
+        if(spellBook->perception.ball.TimeSinceBallSeen > 1.0f)
         {
-            targetPitch = CalculateDesiredPitch(neckRelative);
-            ballYaw = CalculateDesiredYaw(neckRelative);
-            targetYaw = ballYaw;
-            float speed = 0.25f;
+            targetPitch = 0.0f;
+            targetYaw = 0.0f;
+            speed = 0.25f;
 
             spellBook->perception.ball.HeadRelative = false;
             spellBook->perception.ball.BallAzimuth = 0;
@@ -114,82 +63,101 @@ void BallDetector::Tick(float ellapsedTime, cv::Mat &img)
             spellBook->perception.ball.BallDistance = 0.0f;
             spellBook->perception.ball.HeadSpeed = speed;
         }
-        #endif
     }
     else
     {
         cv::Point pt(ball.x, ball.y);
-        cv::circle(frame, pt, ball.radius, cv::Scalar(0, 0, 255), CV_FILLED);
-        #ifdef USE_UNSW
+        //cv::circle(frame, pt, ball.radius, cv::Scalar(0, 0, 255), CV_FILLED);
         Blackboard *blackboard = InitManager::GetBlackboard();
-        conv_rr_.pose = readFrom(motion, pose);
-        conv_rr_.updateAngles(readFrom(kinematics, sensorsLagged));
-        RRCoord ballPosRR = conv_rr_.convertToRR(ball.x, ball.y + TOP_IMAGE_ROWS, true);
-        targetYaw = ballPosRR.heading() - Deg2Rad(20);
-        float factor = abs(targetYaw) / 1.06290551;
+        SensorValues sensor = readFrom(kinematics, sensorsLagged);
+        RelativeCoords ballPosRR;
+        float currHeadYaw = sensor.joints.angles[Joints::HeadYaw];
+        float currHeadPitch = sensor.joints.angles[Joints::HeadPitch];
+        ballPosRR.fromPixel(ball.x, ball.y, currHeadYaw, currHeadPitch);
+        targetYaw = ballPosRR.getYaw();
+        targetPitch = ballPosRR.getPitch();
+        distance = ballPosRR.getDistance();
+        float factor = abs(targetYaw) / H_FOV;
         speed = 0.75 * factor;
-        ballLostCount = 0;
-        neckRelative = conv_rr_.pose.robotRelativeToNeckCoord(ballPosRR, BALL_RADIUS);
-        targetPitch = CalculateDesiredPitch(neckRelative);
-        distance = ballPosRR.distance() / 1000.0f;
-        #else
-        #ifdef USE_QIBUILD    
-        // Azimuth
-        x_ = 1.0f - pt.x * w_;
-        yc = sqrt(R*R - x_*x_);
-        alpha = atan2(yc, x_);
-        if(x_ == 0)
-            targetYaw = 0;
-        else if(x_ < 0)
-            targetYaw = -(alpha - PI_2);
-        else 
-            targetYaw = -(-PI_2 + alpha);
 
-
-        // Elevation
-        y_ = pt.y * h_ - 1.0f;
-        //targetPitch = y_*Deg2Rad(24.06f);       
-        targetPitch = 0;
-        distance = 0.2f;
-        speed = 0.2f;
-        #endif
-        #endif
-
-        cout << "Found: " << pt << " [ " << ball.radius << " ] | [" << Rad2Deg(targetYaw) << "º, " << Rad2Deg(targetPitch) << "º]" << endl;
+        cout << "Found: " << pt << " [ " << ball.radius << " ] | [" << Rad2Deg(targetYaw) << "º, " << Rad2Deg(targetPitch) << "º] " << distance << "m" << endl;
 
         spellBook->perception.ball.BallDetected = true;
-        spellBook->perception.ball.HeadRelative = true;
+        spellBook->perception.ball.HeadRelative = false;
         spellBook->perception.ball.BallAzimuth = targetYaw;
         spellBook->perception.ball.BallElevation = targetPitch;
         spellBook->perception.ball.BallDistance = distance;
         spellBook->perception.ball.TimeSinceBallSeen = 0.0f;
         spellBook->perception.ball.HeadSpeed = speed;
     }
-
-    #ifdef USE_V4L2
-    #else
-    #ifdef USE_QIBUILD    
-    Capture::Show("frame", frame);
-    Capture::Wait(1);
-    #else
-    cv::imshow("frame", frame);
-    cv::waitKey(1);
-    #endif
-    #endif
 }
 
 bool BallDetector::CascadeMethod()
 {
-    vector<cv::Rect> balls;
+    vector<Rect> balls;
     cv::Mat gray;
-    cv::cvtColor(img, gray, CV_BGR2GRAY );
-    cascade.detectMultiScale(gray, balls, 1.1, 5, 8, cv::Size(16, 16));
+    cv::Mat hist;
+    cv::Mat hsv;
+    cv::Mat mask;
+    cv::cvtColor(img, gray, CV_BGR2GRAY);
+    cv::equalizeHist(gray,hist);
+    cv::cvtColor(img, hsv, CV_BGR2HSV);
+    inRange(hsv, Scalar(56, 102, 25), Scalar(116, 255, 255), mask);
+    cascade.detectMultiScale(hist, balls, 1.3, 5, 8, Size(16, 16));
+    //cascade.detectMultiScale(gray, balls, 1.1, 5, 8, cv::Size(16, 16));
     if (balls.size() == 0)
         return false;
 
-    ball.radius = balls[0].width / 2.0f;
-    ball.x = balls[0].x + ball.radius;
-    ball.y = balls[0].y + ball.radius;
+    double melhorRaio;
+    double melhorConfidence = -1; // -1 ele continuar mostrando todos candidatos, =0
+    cv::Point melhorPt;
+    int step = 10;
+    double x;
+    double y;
+    double raio2;
+    for (int j = 0; j < balls.size(); j++)
+    {
+
+        double raio = balls[j].width / 2.0;
+        cv::Point pt(balls[j].x + raio, balls[j].y + raio);
+        raio2 = raio * 1.2;
+
+        double confidence = 0;
+        // quantos dos pontos analisados tem a cor verde (a cor branca da mask)
+        int contverde = 0;
+
+        //i++ e i+=10 tem diferenca, com ++ eu analizo 360 pontos e com 10, 10 ptos
+        for (int i = 0; i < 360; i += step)
+        {
+            //conversao para de grau p rad 0.0174532 = pi/180
+            x = raio2 * cos(i * 0.0174532) + pt.x;
+            y = raio2 * sin(i * 0.0174532) + pt.y;
+
+            if (mask.at<uchar>((int)y, (int)x) > 0)
+            {
+                contverde++;
+            }
+        }
+        //calculo de confianca no valor de acordo com o parametro (a quantidade de verde, só que é branco pela mask)
+        confidence = contverde / (360.0 / step);
+        if (confidence > melhorConfidence)
+        {
+            melhorConfidence = confidence;
+            melhorRaio = raio;
+            melhorPt = pt;
+        }
+    }
+    if (melhorConfidence <= 0)
+    {
+        cout << "seria uma bola?" << "\t" << melhorConfidence << endl;
+        return false;
+    }
+    cout << "Encontrado: " << melhorPt << " [ " << melhorRaio << " ] " << "\t" << (melhorConfidence * 100) << "%" << endl;
+
+
+    ball.radius = melhorRaio;
+    ball.x = melhorPt.x;
+    ball.y = melhorPt.y;
     return true;
 }
 

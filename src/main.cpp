@@ -7,6 +7,7 @@
 #include "Modules/Remote/RemoteModule.h"
 #include "Modules/Perception/PerceptionModule.h"
 #include "Modules/Behaviour/BehaviourModule.h"
+#include "Modules/Network/NetworkModule.h"
 
 using namespace std;
 
@@ -30,6 +31,8 @@ int main(int argc,char *argv[])
         manager.Attach(new RemoteModule(&spellBook));
     if(spellBook.modules.LoadBehaviour)
         manager.Attach(new BehaviourModule(&spellBook));
+    if(spellBook.modules.LoadNetwork)
+        manager.Attach(new NetworkModule(&spellBook));
     
     manager.Run();
 

@@ -133,3 +133,28 @@ void *Module::Run(void *arg)
     }
     pthread_exit(NULL);
 }
+
+InnerModule::InnerModule(SpellBook *spellBook)
+{
+    this->spellBook = spellBook;
+}
+
+InnerModule::~InnerModule()
+{
+    
+}
+
+void InnerModule::Tick(float ellapsedTime)
+{
+    
+}
+
+void InnerModule::OnStop()
+{
+
+}
+
+void InnerModule::OnStart()
+{
+
+}

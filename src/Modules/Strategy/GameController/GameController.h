@@ -1,18 +1,18 @@
 #ifndef _GameController_H_
 #define _GameController_H_
 
+#include "Core/Module.h"
 #include "Core/SpellBook.h"
 #include "types/SensorValues.hpp"
 
 using namespace std;
 
-class GameController
+class GameController : public InnerModule
 {
     public:
         enum GameStates { INITIAL, READY, SET, PENALIZED, PLAYING, FINISHED };
     private:
         bool pressed;
-        SpellBook *spellBook;
         GameStates gameState;
     public:
         GameController(SpellBook *spellBook);

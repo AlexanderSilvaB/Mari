@@ -4,22 +4,12 @@ using namespace cv;
 
 Vision::Vision(SpellBook *spellBook)
 {
-    this->spellbook = spellbook;
-    if(spellBook->perception.EnableBallDetector)
-        ballDetector = new BallDetector(spellBook);
-    else
-        ballDetector = NULL;
+    this->spellBook = spellBook;
+    ballDetector = new BallDetector(spellBook);
+    localizer = new Localizer(spellBook);
 
-    #ifdef USE_V4L2
     img = Mat::zeros(240, 320, CV_8UC3);   
     capture = new CombinedCamera();
-    #else
-    #ifdef USE_QIBUILD
-    capture = Robot::CreateModule<Capture>();
-    #else
-    capture.open(0);
-    #endif
-    #endif
 
     frame.Update(320, 240);
 }
@@ -27,27 +17,20 @@ Vision::Vision(SpellBook *spellBook)
 Vision::~Vision()
 {
     delete ballDetector;
+    delete localizer;
 }
 
 void Vision::Tick(float ellapsedTime)
 {
-    #ifdef USE_V4L2
     const uint8_t *yuvData = capture->getFrameBottom();
     frame.ReadFromYUV422(yuvData);
     img.data = frame.GetDataBGR();
     //cv::Mat rawYuv(240, 320, CV_8UC2, yuvData);
     //img = imdecode(rawYuv, CV_LOAD_IMAGE_COLOR);
     //cv::cvtColor(rawYuv, img, CV_YUV2BGR_Y422);
-    #else
-    #ifdef USE_QIBUILD
-    img = capture->Get();
-    #else
-    capture >> img;
-    cv::flip(img, img, 1);
-    cv::resize(img, img, cv::Size(320, 240));
-    #endif
-    #endif
 
-    if(ballDetector != NULL)
+    if(spellBook->perception.ball.Enabled)
         ballDetector->Tick(ellapsedTime, img);
+    if(spellBook->perception.localization.Enabled)
+        localizer->Tick(ellapsedTime);
 }

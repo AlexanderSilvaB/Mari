@@ -1,6 +1,7 @@
 #ifndef _SAFETY_MONITOR_H_
 #define _SAFETY_MONITOR_H_
 
+#include "Core/Module.h"
 #include "Core/SpellBook.h"
 #include "types/SensorValues.hpp"
 
@@ -12,10 +13,8 @@ using namespace std;
 #define FALLEN_ANG 70
 #define FALLING_ANG 50 
 
-class SafetyMonitor
+class SafetyMonitor : public InnerModule
 {
-    private:
-        SpellBook *spellBook;
     public:
         SafetyMonitor(SpellBook *spellBook);
         void OnStart();

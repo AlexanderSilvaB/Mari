@@ -2,8 +2,9 @@
 #include "Core/Utils/Math.h"
 
 SafetyMonitor::SafetyMonitor(SpellBook *spellBook)
+    : InnerModule(spellBook)
 {
-    this->spellBook = spellBook;
+    
 }
 
 void SafetyMonitor::OnStart()

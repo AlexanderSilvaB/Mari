@@ -23,11 +23,6 @@
 
 #include "SpellBook.h"
 
-#ifdef USE_QIBUILD
-#include <RinoLib/Robot.h>
-using namespace Rinobot::Nao;
-#endif
-
 #include "InitManager.h"
 
 namespace po = boost::program_options;
@@ -67,12 +62,7 @@ void InitManager::Init(int argc, char *argv[], SpellBook &spellBook)
     }
     ParseArgs(argc, argv, spellBook);
 
-    #ifdef USE_QIBUILD  
-    Robot::Connect(argc, argv);
-    #endif
-    #ifdef USE_V4L2
     InitManager::InitCameras();
-    #endif
 }
 
 void InitManager::ParseArgs(int argc, char *argv[], SpellBook &spellBook)
@@ -159,10 +149,6 @@ Blackboard *InitManager::GetBlackboard()
 
 void InitManager::Destroy()
 {
-    #ifdef USE_QIBUILD
-    Robot::Disconnect();
-    #endif
-
     delete blackboard;
 
     delete topCamera;

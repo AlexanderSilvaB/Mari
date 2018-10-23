@@ -39,4 +39,16 @@ class Module
     std::string name;
 };
 
+class InnerModule
+{
+  public:
+    InnerModule(SpellBook*);
+    virtual ~InnerModule();
+    virtual void Tick(float ellapsedTime);
+    virtual void OnStop();
+    virtual void OnStart();
+  protected:
+    SpellBook *spellBook;
+};
+
 #endif

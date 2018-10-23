@@ -1,8 +1,8 @@
 #include "GameController.h"
 
 GameController::GameController(SpellBook *spellBook)
+    :   InnerModule(spellBook)
 {
-    this->spellBook = spellBook;
     pressed = false;
 }
 

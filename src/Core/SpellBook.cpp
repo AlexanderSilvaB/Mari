@@ -118,6 +118,7 @@ ModulesSpell::ModulesSpell()
     LoadPerception = true;
     LoadRemote = true;
     LoadBehaviour = true;
+    LoadNetwork = true;
 }
 
 void ModulesSpell::CopyTo(Spell *spell)
@@ -132,6 +133,7 @@ void ModulesSpell::Load(Storage &storage)
     LoadPerception = storage["Modules"]["Perception"]["Enabled"].Default(true);
     LoadRemote = storage["Modules"]["Remote"]["Enabled"].Default(true);
     LoadBehaviour = storage["Modules"]["Behaviour"]["Enabled"].Default(true);
+    LoadNetwork = storage["Modules"]["Network"]["Enabled"].Default(true);
 }
 
 void ModulesSpell::Save(Storage &storage)
@@ -141,6 +143,7 @@ void ModulesSpell::Save(Storage &storage)
     storage["Modules"]["Perception"]["Enabled"] = LoadPerception;
     storage["Modules"]["Remote"]["Enabled"] = LoadRemote;
     storage["Modules"]["Behaviour"]["Enabled"] = LoadBehaviour;
+    storage["Modules"]["Network"]["Enabled"] = LoadNetwork;
 }
 
 BallSpell::BallSpell()
@@ -168,40 +171,73 @@ void BallSpell::CopyTo(Spell *spell)
 
 void BallSpell::Load(Storage &storage)
 {
-    method = (string)storage["Modules"]["Perception"]["BallDetector"]["Ball"]["Method"].Default("CASCADE");
+    Enabled = storage["Modules"]["Perception"]["BallDetector"]["Enabled"].Default(true);
+    method = (string)storage["Modules"]["Perception"]["BallDetector"]["Method"].Default("CASCADE");
     ballWidth = storage["Modules"]["Perception"]["BallDetector"]["Ball"]["Size"][0].Default(0.1f);
     ballHeight = storage["Modules"]["Perception"]["BallDetector"]["Ball"]["Size"][1].Default(0.1f);
 }
 
 void BallSpell::Save(Storage &storage)
 {
-    storage["Modules"]["Perception"]["BallDetector"]["Ball"]["Method"] = method;
+    storage["Modules"]["Perception"]["BallDetector"]["Enabled"] = Enabled;
+    storage["Modules"]["Perception"]["BallDetector"]["Method"] = method;
     storage["Modules"]["Perception"]["BallDetector"]["Ball"]["Size"][0] = ballWidth;
     storage["Modules"]["Perception"]["BallDetector"]["Ball"]["Size"][1] = ballHeight;
 }
 
+LocalizationSpell::LocalizationSpell()
+{
+    Enabled = true;
+
+    X = 0;
+    Y = 0;
+    Theta = 0;
+}
+
+void LocalizationSpell::CopyTo(Spell *spell)
+{
+    LocalizationSpell *s = (LocalizationSpell*)spell;
+    COPY(s, X)
+    COPY(s, Y)
+    COPY(s, Theta)
+}
+
+void LocalizationSpell::Load(Storage &storage)
+{
+    Enabled = storage["Modules"]["Perception"]["Localization"]["Enabled"].Default(true);
+    
+    X = storage["Modules"]["Perception"]["Localization"]["Position"][0].Default(0.0f);
+    Y = storage["Modules"]["Perception"]["Localization"]["Position"][1].Default(0.0f);
+    Theta = storage["Modules"]["Perception"]["Localization"]["Position"][2].Default(0.0f);
+}
+
+void LocalizationSpell::Save(Storage &storage)
+{
+    storage["Modules"]["Perception"]["Localization"]["Enabled"] = Enabled;
+}
+
 PerceptionSpell::PerceptionSpell()
 {
-    EnableBallDetector = true;
+    
 }
 
 void PerceptionSpell::CopyTo(Spell *spell)
 {
     PerceptionSpell *s = (PerceptionSpell*)spell;
-    COPY(s, EnableBallDetector)
     ball.CopyTo(&(s->ball));
+    localization.CopyTo(&(s->localization));
 }
 
 void PerceptionSpell::Load(Storage &storage)
 {
-    EnableBallDetector = storage["Modules"]["Perception"]["BallDetector"]["Enabled"].Default(true);
     ball.Load(storage);
+    localization.Load(storage);
 }
 
 void PerceptionSpell::Save(Storage &storage)
 {
-    storage["Modules"]["Perception"]["BallDetector"]["Enabled"] = EnableBallDetector;
     ball.Save(storage);
+    localization.Save(storage);
 }
 
 MotionSpell::MotionSpell()
@@ -333,6 +369,8 @@ BehaviourSpell::BehaviourSpell()
     Penalized = false;
     Fallen = false;
     Die = false;
+    LeftEye = WHITE;
+    RightEye = WHITE;
 }
 
 void BehaviourSpell::CopyTo(Spell *spell)
@@ -342,6 +380,8 @@ void BehaviourSpell::CopyTo(Spell *spell)
     COPY(s, Penalized)
     COPY(s, Fallen)
     COPY(s, Die)
+    COPY(s, LeftEye)
+    COPY(s, RightEye)
 }
 
 void BehaviourSpell::Load(Storage &storage)

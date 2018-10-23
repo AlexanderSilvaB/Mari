@@ -9,192 +9,108 @@ using namespace std;
 MotionModule::MotionModule(SpellBook *spellBook) : Module(spellBook, "Motion", 0)
 {
     SetHighPriority(true);
-    #ifdef USE_UNSW
     InitManager::GetBlackboard()->thread.configCallbacks["motion"];
     motion = new rUNSWiftMotionAdapter();
-    #else
-    #ifdef USE_QIBUILD
-    motion = Robot::CreateModule<Motion>();
-    posture = Robot::CreateModule<Posture>();
-    moveConfig["MaxStepX"] = 0.020f;
-    moveConfig["StepHeight"] = 0.01f;
-    namesList.push_back("HeadYaw");
-    namesList.push_back("HeadPitch");
-    anglesList.push_back(0.0f);
-    anglesList.push_back(0.0f);
-    #endif
-    #endif
-
-    headYaw = headPitch = 0;
-
-    minDistanceToBall = 0.20f;
-
     vx = vy = vth = 0;
-    headSpeed = 0;
-    _stiff = false;
-    _stand = false;
-
-    stiff = false;
-    stand = false;
-    kickLeft = kickRight = false;
-    limpLeft = limpRight = false;
-    getupFront = getupBack = false;
-    tipOver = dead = false;
-    walk = false;
-    crouch = false;
 }
 
 MotionModule::~MotionModule()
 {
-    #ifdef USE_UNSW
     delete motion;
-    #endif
 }
 
 void MotionModule::OnStart()
 {
-    #ifdef USE_UNSW
     motion->Start();
-    #else
-    #ifdef USE_QIBUILD
-    posture->GoToPosture("StandInit", 1.0f);
-    motion->Move(0.01f, 0.0f, 0.0f);
-    usleep(200*1000);
-    motion->Move(0.0f, 0.0f, 0.0f);
-    #endif
-    #endif
 }
 
 void MotionModule::OnStop()
 {
-    #ifdef USE_UNSW
     motion->Stop();
-    #else
-    #ifdef USE_QIBUILD
-    motion->KillAll();
-    posture->GoToPosture("Crouch", 1.0f);
-    motion->Rest();
-    #endif
-    #endif
 }
 
 void MotionModule::Load()
 {
     LOAD(motion);
+    LOAD(behaviour);
 }
 
 void MotionModule::Save()
 {
-    SAVE(motion);
+    
 }
 
 void MotionModule::Tick(float ellapsedTime)
 {
-    vx = spellBook->motion.Vx;
-    vy = spellBook->motion.Vy;
-    vth = spellBook->motion.Vth;
-    headYaw = spellBook->motion.HeadYaw;
-    headPitch = spellBook->motion.HeadPitch;
-    headSpeed = spellBook->motion.HeadSpeed;
-    headRelative = spellBook->motion.HeadRelative;
-    kickLeft = spellBook->motion.KickLeft;
-    kickRight = spellBook->motion.KickRight;
-    limpLeft = spellBook->motion.LimpLeft;
-    limpRight = spellBook->motion.LimpRight;
-    stand = spellBook->motion.Stand;
-    stiff = spellBook->motion.Stiff;
-    getupFront = spellBook->motion.GetupFront;
-    getupBack = spellBook->motion.GetupBack;
-    tipOver = spellBook->motion.TipOver;
-    dead = spellBook->motion.Dead;
-    walk = spellBook->motion.Walk;
-    crouch = spellBook->motion.Crouch;
-
-
-    #ifdef USE_UNSW
     ActionCommand::All request;
-    if(stiff != _stiff)
+    if(stiff != spellBook->motion.Stiff)
     {
+        stiff = spellBook->motion.Stiff;
         request.stiffen = stiff ? ActionCommand::STIFFEN : ActionCommand::NONE;
-        _stiff = stiff;
     }
-    else if(stand != _stand)
+    else if(stand != spellBook->motion.Stand)
     {
+        stand = spellBook->motion.Stand;
         request.body = ActionCommand::Body(stand ? ActionCommand::Body::STAND : ActionCommand::Body::INITIAL);
-        _stand = stand;
     }
-    else if(dead)
+    else if(spellBook->motion.Dead)
     {
         request.body = ActionCommand::Body(ActionCommand::Body::DEAD);
     }
-    else if(tipOver)
+    else if(spellBook->motion.TipOver)
     {
         //request.body = ActionCommand::Body(ActionCommand::Body::TIP_OVER);
         request.body = ActionCommand::Body(ActionCommand::Body::DEAD);
     }
-    else if(getupFront)
+    else if(spellBook->motion.GetupFront)
     {
         request.body = ActionCommand::Body(ActionCommand::Body::GETUP_FRONT);
     }
-    else if(getupBack)
+    else if(spellBook->motion.GetupBack)
     {
         request.body = ActionCommand::Body(ActionCommand::Body::GETUP_BACK);
     }
-    else if(crouch)
+    else if(spellBook->motion.Crouch)
     {
         request.body = ActionCommand::Body(ActionCommand::Body::WALK, 0, 0, 0, 0.4f, 1.0f);
     }
-    else if(kickLeft)
+    else if(spellBook->motion.KickLeft)
     {
         request.body = ActionCommand::Body(ActionCommand::Body::KICK);
         request.body.foot = ActionCommand::Body::LEFT;
         request.body.caughtRight = true;
         request.body.caughtLeft = true;
     }
-    else if(kickRight)
+    else if(spellBook->motion.KickRight)
     {
         request.body = ActionCommand::Body(ActionCommand::Body::KICK);
         request.body.foot = ActionCommand::Body::RIGHT;
         request.body.caughtRight = true;
         request.body.caughtLeft = true;
     }
-    else if(walk)
+    else if(spellBook->motion.Walk)
     {
-        request.head = ActionCommand::Head(headYaw, headPitch, !headRelative, headSpeed, 0.2f);
-        //if(vx != 0 || vy != 0 || vth != 0)
+        request.head = ActionCommand::Head(spellBook->motion.HeadYaw, spellBook->motion.HeadPitch, !spellBook->motion.HeadRelative, spellBook->motion.HeadSpeed, 0.2f);
+        vx = spellBook->motion.Vx * 1000.0f;
+        vy = spellBook->motion.Vy * 1000.0f;
+        vth = spellBook->motion.Vth * 1000.0f;
+        if(spellBook->motion.Vx != 0 || vy != 0 || vth != 0)
         {
-            vx *= 1000.0f;
-            vy *= 1000.0f;
             ScaleWalk2014(&vx, &vy, &vth);
-            //cout << vx << ", " << vy << ", " << Rad2Deg(vth) << endl;
             request.body = ActionCommand::Body(ActionCommand::Body::WALK, vx, vy, vth);
-            //request.body.bend = 30.0f;
         }
-        //else
-        //    request.body = ActionCommand::Body();       
-        request.body.caughtRight = limpRight;
-        request.body.caughtLeft = limpLeft;
-    }
-    motion->Tick(request);
-    #else
-    #ifdef USE_QIBUILD
-    if(stand != _stand)
-    {
-        if(stand)
-            motion->WakeUp();
         else
-            motion->Rest();
-        _stand = stand;
+            request.body = ActionCommand::Body(ActionCommand::Body::WALK, 0, 0, 0, 0.4f, 1.0f);
+        request.body.caughtRight = spellBook->motion.LimpRight;
+        request.body.caughtLeft = spellBook->motion.LimpLeft;
     }
-    else
-    {
-        anglesList[0] = headYaw;
-        anglesList[1] = headPitch;
-        motion->AnglesInterpolation(namesList, anglesList, 0.1f);
-        motion->Move(vx, vy, vth, moveConfig);
-    }
-    #endif
-    #endif
+    request.leds.leftEye.red = ((spellBook->behaviour.LeftEye & 0xFF0000) >> 16) > 128;
+    request.leds.leftEye.green = ((spellBook->behaviour.LeftEye & 0x00FF00) >> 8) > 128;
+    request.leds.leftEye.blue = ((spellBook->behaviour.LeftEye & 0x0000FF)) > 128;
+    request.leds.rightEye.red = ((spellBook->behaviour.RightEye & 0xFF0000) >> 16) > 128;
+    request.leds.rightEye.green = ((spellBook->behaviour.RightEye & 0x00FF00) >> 8) > 128;
+    request.leds.rightEye.blue = ((spellBook->behaviour.RightEye & 0x0000FF)) > 128;
+    motion->Tick(request);
 }
 
 void MotionModule::ScaleWalk2014(float *forward, float *left, float *turn)

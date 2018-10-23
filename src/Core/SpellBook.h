@@ -3,6 +3,7 @@
 
 #include <string>
 #include "Core/Utils/Storage.h"
+#include "Core/Utils/Colors.h"
 #include <boost/bind.hpp>
 #include <boost/program_options.hpp>
 #include "Core/InitManager.h"
@@ -28,6 +29,7 @@ class ModulesSpell : public Spell
         bool LoadMotion;
         bool LoadPerception;
         bool LoadBehaviour;
+        bool LoadNetwork;
 
         ModulesSpell();
         void CopyTo(Spell *spell);
@@ -38,6 +40,7 @@ class ModulesSpell : public Spell
 class BallSpell : public Spell
 {
     public:
+        bool Enabled;
         std::string method;
         float ballWidth, ballHeight;
 
@@ -56,12 +59,24 @@ class BallSpell : public Spell
 
 };
 
+class LocalizationSpell : public Spell
+{
+    public:
+        bool Enabled;
+        float X, Y, Theta;
+
+        LocalizationSpell();
+        void CopyTo(Spell *spell);
+        void Load(Storage &storage);
+        void Save(Storage &storage);
+
+};
+
 class PerceptionSpell : public Spell
 {
     public:
-        bool EnableBallDetector;
-
         BallSpell ball;
+        LocalizationSpell localization;
 
         PerceptionSpell();
         void CopyTo(Spell *spell);
@@ -127,6 +142,8 @@ class BehaviourSpell : public Spell
         bool Penalized;
         bool Fallen;
         bool Die;
+        int LeftEye;
+        int RightEye;
 
         BehaviourSpell();
         void CopyTo(Spell *spell);
