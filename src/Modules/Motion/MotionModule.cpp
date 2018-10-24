@@ -114,7 +114,7 @@ void MotionModule::Tick(float ellapsedTime)
         request.head = ActionCommand::Head(spellBook->motion.HeadYaw, spellBook->motion.HeadPitch, !spellBook->motion.HeadRelative, spellBook->motion.HeadSpeed, 0.2f);
         vx = spellBook->motion.Vx * 1000.0f;
         vy = spellBook->motion.Vy * 1000.0f;
-        vth = spellBook->motion.Vth * 1000.0f;
+        vth = spellBook->motion.Vth;
         
         if(vx != 0 || vy != 0 || vth != 0)
         {

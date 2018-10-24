@@ -165,11 +165,10 @@ void StrategyModule::Tick(float ellapsedTime)
     }
 
     // Nossa estratégia
-    spellBook->motion.HeadYaw = spellBook->perception.ball.BallAzimuth;
-    spellBook->motion.HeadPitch = spellBook->perception.ball.BallElevation;
-    spellBook->motion.HeadSpeed = spellBook->perception.ball.HeadSpeed;
-    spellBook->motion.HeadRelative = spellBook->perception.ball.HeadRelative;
-    spellBook->motion.Vx = spellBook->perception.ball.BallDistance * 0.3f;
-    //spellBook->motion.Vth = spellBook->perception.ball.BallAzimuth * spellBook->perception.ball.HeadSpeed;
-    spellBook->motion.Vth = Deg2Rad(-2.0f) * ellapsedTime;
+    spellBook->motion.HeadYaw = spellBook->perception.vision.ball.BallAzimuth;
+    spellBook->motion.HeadPitch = spellBook->perception.vision.ball.BallElevation;
+    spellBook->motion.HeadSpeed = spellBook->perception.vision.ball.HeadSpeed;
+    spellBook->motion.HeadRelative = spellBook->perception.vision.ball.HeadRelative;
+    spellBook->motion.Vx = spellBook->perception.vision.ball.BallDistance * 0.3f;
+    spellBook->motion.Vth = spellBook->perception.vision.ball.BallAzimuth * spellBook->perception.vision.ball.HeadSpeed;
 }

@@ -37,6 +37,7 @@ void PerceptionModule::Save()
 
 void PerceptionModule::Tick(float ellapsedTime)
 {
-    vision->Tick(ellapsedTime);
+    if(spellBook->perception.vision.Enabled)
+        vision->Tick(ellapsedTime);
     perception->Tick();
 }

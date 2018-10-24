@@ -8,10 +8,10 @@ Vision::Vision(SpellBook *spellBook)
     ballDetector = new BallDetector(spellBook);
     localizer = new Localizer(spellBook);
 
-    img = Mat::zeros(240, 320, CV_8UC3);   
     capture = new CombinedCamera();
 
-    frame.Update(320, 240);
+    top.Update(320, 240);
+    bottom.Update(320, 240);
 }
 
 Vision::~Vision()
@@ -22,14 +22,11 @@ Vision::~Vision()
 
 void Vision::Tick(float ellapsedTime)
 {
-    const uint8_t *yuvData = capture->getFrameBottom();
-    frame.ReadFromYUV422(yuvData);
-    img.data = frame.GetDataBGR();
-    //cv::Mat rawYuv(240, 320, CV_8UC2, yuvData);
-    //img = imdecode(rawYuv, CV_LOAD_IMAGE_COLOR);
-    //cv::cvtColor(rawYuv, img, CV_YUV2BGR_Y422);
-    if(spellBook->perception.ball.Enabled)
-        ballDetector->Tick(ellapsedTime, img);
-    if(spellBook->perception.localization.Enabled)
-        localizer->Tick(ellapsedTime);
+    top.ReadFromYUV422(capture->getFrameTop(), spellBook->perception.vision.BGR, spellBook->perception.vision.HSV, spellBook->perception.vision.GRAY);
+    bottom.ReadFromYUV422(capture->getFrameBottom(), spellBook->perception.vision.BGR, spellBook->perception.vision.HSV, spellBook->perception.vision.GRAY);
+
+    if(spellBook->perception.vision.ball.Enabled)
+        ballDetector->Tick(ellapsedTime, top, bottom);
+    if(spellBook->perception.vision.localization.Enabled)
+        localizer->Tick(ellapsedTime, top, bottom);
 }

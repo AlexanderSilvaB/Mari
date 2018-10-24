@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <sys/time.h>
 
+using namespace cv;
+
 static int clamp(double x)
 {
 	if (x < 0)
@@ -126,20 +128,42 @@ void CameraFrame::Resize(uint32_t width, uint32_t height)
 
 	m_width  = width;
 	m_height = height;
+	BGR.create(m_height, m_width, CV_8UC3);
+	HSV.create(m_height, m_width, CV_8UC3);
+	YUV.create(m_height, m_width, CV_8UC2);
+	GRAY.create(m_height, m_width, CV_8UC1);
 }
 
-void CameraFrame::ReadFromYUV422(const uint8_t *yuvData)
+void CameraFrame::ReadFromYUV422(const uint8_t *yuvData, bool rgb, bool hsv, bool gray)
 {
-	uint32_t width  = GetWidth();
-	uint32_t height = GetHeight();
-	uint32_t bpl    = 640;//m_fmt_pix.fmt.pix.bytesperline;
-	uint8_t *dst_data = GetDataBGR();
+	YUV.data = (uchar*)yuvData;
+	if(rgb)
+	{	
+		uint32_t width  = GetWidth();
+		uint32_t height = GetHeight();
+		uint32_t bpl    = 640;//m_fmt_pix.fmt.pix.bytesperline;
+		uint8_t *dst_data = GetDataBGR();
 
-	for (size_t y = 0; y < height; y += 1)
-		for (size_t x = 0; x < width;  x += 2) 
+		for (size_t y = 0; y < height; y += 1)
 		{
-			uint8_t *src = (uint8_t *)(yuvData) + (y * bpl) + (x * 2);
-			uint8_t *dst = (uint8_t *)dst_data + (y * width * 3) + (x * 3);
-			yuv422_to_rgb(src, dst);
+			for (size_t x = 0; x < width;  x += 2) 
+			{
+				uint8_t *src = (uint8_t *)(yuvData) + (y * bpl) + (x * 2);
+				uint8_t *dst = (uint8_t *)dst_data + (y * width * 3) + (x * 3);
+				yuv422_to_rgb(src, dst);
+			}
 		}
+		BGR.data = GetDataBGR();
+	}
+	if(hsv && rgb)
+	{
+		//cv::Mat rawYuv(240, 320, CV_8UC2, yuvData);
+    	//img = imdecode(rawYuv, CV_LOAD_IMAGE_COLOR);
+    	//cv::cvtColor(rawYuv, img, CV_YUV2BGR_Y422);
+		cvtColor(BGR, HSV, CV_BGR2HSV);
+	}
+	if(gray && rgb)
+	{
+		cvtColor(BGR, GRAY, CV_BGR2GRAY);
+	}
 }

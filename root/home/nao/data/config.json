@@ -7,26 +7,30 @@
             "Enabled": false
         },
         "Perception": {
-            "BallDetector": {
-                "Enabled": true,
-                "Method": "Cascade",
-                "Ball": {
-                    "Size": [
-                        0.1,
-                        0.1
-                    ]
-                }
-            },
-            "Localization":
+            "Enabled": true,
+            "Vision":
             {
                 "Enabled": true,
-                "Position": [
-                    0.0, 
-                    0.0,
-                    0.0
-                ]
-            },
-            "Enabled": true
+                "BallDetector": {
+                    "Enabled": true,
+                    "Method": "Cascade",
+                    "Ball": {
+                        "Size": [
+                            0.1,
+                            0.1
+                        ]
+                    }
+                },
+                "Localization":
+                {
+                    "Enabled": true,
+                    "Position": [
+                        0.0, 
+                        0.0,
+                        0.0
+                    ]
+                }
+            }
         },
         "Remote": {
             "Enabled": false,

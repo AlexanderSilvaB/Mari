@@ -7,9 +7,12 @@
 #include <cstring>
 #include <stdint.h>
 #include <sys/time.h>
+#include <opencv2/opencv.hpp>
 
 class CameraFrame {
     public:
+        cv::Mat BGR, HSV, YUV, GRAY;
+
         CameraFrame(void);
         CameraFrame(CameraFrame const &src);
         ~CameraFrame(void);
@@ -27,7 +30,7 @@ class CameraFrame {
         void Update(uint32_t width, uint32_t height);
         void Update(uint32_t width, uint32_t height, timeval time);
 
-        void ReadFromYUV422(const uint8_t *yuvData);
+        void ReadFromYUV422(const uint8_t *yuvData, bool rgb, bool hsv, bool gray);
 
     private:
         uint32_t m_width;

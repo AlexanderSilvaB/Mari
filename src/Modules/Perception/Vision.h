@@ -17,8 +17,8 @@ class Vision : public InnerModule
     private:
         CombinedCamera *capture;
 
-        CameraFrame frame;
-        cv::Mat img;
+        CameraFrame top;
+        CameraFrame bottom;
 
         BallDetector *ballDetector;
         Localizer *localizer;

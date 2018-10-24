@@ -174,18 +174,18 @@ void BallSpell::CopyTo(Spell *spell)
 
 void BallSpell::Load(Storage &storage)
 {
-    Enabled = storage["Modules"]["Perception"]["BallDetector"]["Enabled"].Default(true);
-    method = (string)storage["Modules"]["Perception"]["BallDetector"]["Method"].Default("CASCADE");
-    ballWidth = storage["Modules"]["Perception"]["BallDetector"]["Ball"]["Size"][0].Default(0.1f);
-    ballHeight = storage["Modules"]["Perception"]["BallDetector"]["Ball"]["Size"][1].Default(0.1f);
+    Enabled = storage["Modules"]["Perception"]["Vision"]["BallDetector"]["Enabled"].Default(true);
+    method = (string)storage["Modules"]["Perception"]["Vision"]["BallDetector"]["Method"].Default("CASCADE");
+    ballWidth = storage["Modules"]["Perception"]["Vision"]["BallDetector"]["Ball"]["Size"][0].Default(0.1f);
+    ballHeight = storage["Modules"]["Perception"]["Vision"]["BallDetector"]["Ball"]["Size"][1].Default(0.1f);
 }
 
 void BallSpell::Save(Storage &storage)
 {
-    storage["Modules"]["Perception"]["BallDetector"]["Enabled"] = Enabled;
-    storage["Modules"]["Perception"]["BallDetector"]["Method"] = method;
-    storage["Modules"]["Perception"]["BallDetector"]["Ball"]["Size"][0] = ballWidth;
-    storage["Modules"]["Perception"]["BallDetector"]["Ball"]["Size"][1] = ballHeight;
+    storage["Modules"]["Perception"]["Vision"]["BallDetector"]["Enabled"] = Enabled;
+    storage["Modules"]["Perception"]["Vision"]["BallDetector"]["Method"] = method;
+    storage["Modules"]["Perception"]["Vision"]["BallDetector"]["Ball"]["Size"][0] = ballWidth;
+    storage["Modules"]["Perception"]["Vision"]["BallDetector"]["Ball"]["Size"][1] = ballHeight;
 }
 
 LocalizationSpell::LocalizationSpell()
@@ -208,16 +208,49 @@ void LocalizationSpell::CopyTo(Spell *spell)
 
 void LocalizationSpell::Load(Storage &storage)
 {
-    Enabled = storage["Modules"]["Perception"]["Localization"]["Enabled"].Default(true);
+    Enabled = storage["Modules"]["Perception"]["Vision"]["Localization"]["Enabled"].Default(true);
     
-    X = storage["Modules"]["Perception"]["Localization"]["Position"][0].Default(0.0f);
-    Y = storage["Modules"]["Perception"]["Localization"]["Position"][1].Default(0.0f);
-    Theta = storage["Modules"]["Perception"]["Localization"]["Position"][2].Default(0.0f);
+    X = storage["Modules"]["Perception"]["Vision"]["Localization"]["Position"][0].Default(0.0f);
+    Y = storage["Modules"]["Perception"]["Vision"]["Localization"]["Position"][1].Default(0.0f);
+    Theta = storage["Modules"]["Perception"]["Vision"]["Localization"]["Position"][2].Default(0.0f);
 }
 
 void LocalizationSpell::Save(Storage &storage)
 {
-    storage["Modules"]["Perception"]["Localization"]["Enabled"] = Enabled;
+    storage["Modules"]["Perception"]["Vision"]["Localization"]["Enabled"] = Enabled;
+}
+
+VisionSpell::VisionSpell()
+{
+    Enabled = true;
+    BGR = false;
+    HSV = false;
+    GRAY = false;  
+}
+
+void VisionSpell::CopyTo(Spell *spell)
+{
+    VisionSpell *s = (VisionSpell*)spell;
+    ball.CopyTo(&(s->ball));
+    localization.CopyTo(&(s->localization));
+    COPY(s, Enabled)
+    COPY(s, BGR)
+    COPY(s, HSV)
+    COPY(s, GRAY)
+}
+
+void VisionSpell::Load(Storage &storage)
+{
+    Enabled = storage["Modules"]["Perception"]["Vision"]["Localization"]["Enabled"].Default(true);
+    ball.Load(storage);
+    localization.Load(storage);
+}
+
+void VisionSpell::Save(Storage &storage)
+{
+    ball.Save(storage);
+    localization.Save(storage);
+    storage["Modules"]["Perception"]["Vision"]["Localization"]["Enabled"] = Enabled;
 }
 
 PerceptionSpell::PerceptionSpell()
@@ -228,20 +261,17 @@ PerceptionSpell::PerceptionSpell()
 void PerceptionSpell::CopyTo(Spell *spell)
 {
     PerceptionSpell *s = (PerceptionSpell*)spell;
-    ball.CopyTo(&(s->ball));
-    localization.CopyTo(&(s->localization));
+    vision.CopyTo(&(s->vision));
 }
 
 void PerceptionSpell::Load(Storage &storage)
 {
-    ball.Load(storage);
-    localization.Load(storage);
+    vision.Load(storage);
 }
 
 void PerceptionSpell::Save(Storage &storage)
 {
-    ball.Save(storage);
-    localization.Save(storage);
+    vision.Save(storage);
 }
 
 MotionSpell::MotionSpell()

@@ -73,7 +73,7 @@ void BehaviourModule::Tick(float ellapsedTime)
     }
     else
     {
-        if(spellBook->perception.ball.BallDetected)
+        if(spellBook->perception.vision.ball.BallDetected)
             spellBook->behaviour.LeftEye = BLUE;
         else
             spellBook->behaviour.LeftEye = GREEN;

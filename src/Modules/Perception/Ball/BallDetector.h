@@ -5,6 +5,7 @@
 #include "Core/Utils/Circle.h"
 #include <opencv2/opencv.hpp>
 #include <vector>
+#include "Core/Utils/CameraFrame.h"
 
 #include "Core/SpellBook.h"
 
@@ -20,17 +21,16 @@ class BallDetector : public InnerModule
         float speed;
 
         cv::CascadeClassifier cascade;
-        cv::Mat img;
         Circle ball;
 
         Methods method;
 
-        bool CascadeMethod();
-        bool GeometricMethod();
-        bool NeuralMethod();
+        bool CascadeMethod(CameraFrame &top, CameraFrame &bottom);
+        bool GeometricMethod(CameraFrame &top, CameraFrame &bottom);
+        bool NeuralMethod(CameraFrame &top, CameraFrame &bottom);
     public:
         BallDetector(SpellBook *spellBook);
-        void Tick(float ellapsedTime, cv::Mat &img);
+        void Tick(float ellapsedTime, CameraFrame &top, CameraFrame &bottom);
 };
 
 #endif

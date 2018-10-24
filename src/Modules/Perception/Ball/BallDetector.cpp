@@ -23,24 +23,25 @@ BallDetector::BallDetector(SpellBook *spellBook)
     targetPitch = 0;
 
     method = CASCADE;
+
+    spellBook->perception.vision.BGR = true;
+    spellBook->perception.vision.HSV = true;
+    spellBook->perception.vision.GRAY = true;
 }
 
-void BallDetector::Tick(float ellapsedTime, cv::Mat &img)
+void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &bottom)
 {
-    img.copyTo(this->img);
-    cv::Mat frame = img.clone();
-
     bool detected = false;
     switch(method)
     {
         case CASCADE:
-            detected = CascadeMethod();
+            detected = CascadeMethod(top, bottom);
             break;
         case GEOMETRIC:
-            detected = GeometricMethod();
+            detected = GeometricMethod(top, bottom);
             break;
         case NEURAL:
-            detected = NeuralMethod();
+            detected = NeuralMethod(top, bottom);
             break;
         default:
             break;
@@ -48,31 +49,30 @@ void BallDetector::Tick(float ellapsedTime, cv::Mat &img)
     if(!detected)
     {
         cout << "Not found" << endl;
-        spellBook->perception.ball.BallDetected = false;
-        spellBook->perception.ball.TimeSinceBallSeen += ellapsedTime;
-        spellBook->perception.ball.HeadRelative = false;
-        if(spellBook->perception.ball.TimeSinceBallSeen > 0.1f)
+        spellBook->perception.vision.ball.BallDetected = false;
+        spellBook->perception.vision.ball.TimeSinceBallSeen += ellapsedTime;
+        spellBook->perception.vision.ball.HeadRelative = false;
+        if(spellBook->perception.vision.ball.TimeSinceBallSeen > 0.1f)
         {
             targetPitch = 0.0f;
             targetYaw = 0.0f;
             speed = 0.25f;
 
-            spellBook->perception.ball.HeadRelative = false;
-            spellBook->perception.ball.BallAzimuth = 0;
-            spellBook->perception.ball.BallElevation = 0;
-            spellBook->perception.ball.BallDistance = 0.0f;
-            spellBook->perception.ball.HeadSpeed = speed;
+            spellBook->perception.vision.ball.HeadRelative = false;
+            spellBook->perception.vision.ball.BallAzimuth = 0;
+            spellBook->perception.vision.ball.BallElevation = 0;
+            spellBook->perception.vision.ball.BallDistance = 0.0f;
+            spellBook->perception.vision.ball.HeadSpeed = speed;
         }
     }
     else
     {
-        cv::Point pt(ball.x, ball.y);
-        //cv::circle(frame, pt, ball.radius, cv::Scalar(0, 0, 255), CV_FILLED);
         Blackboard *blackboard = InitManager::GetBlackboard();
         SensorValues sensor = readFrom(kinematics, sensorsLagged);
-        RelativeCoords ballPosRR;
         float currHeadYaw = sensor.joints.angles[Joints::HeadYaw];
         float currHeadPitch = sensor.joints.angles[Joints::HeadPitch];
+
+        RelativeCoords ballPosRR;
         //ballPosRR.fromPixel(ball.x, ball.y, -currHeadYaw, currHeadPitch);
         ballPosRR.fromPixel(ball.x, ball.y);
         targetYaw = -ballPosRR.getYaw();
@@ -84,30 +84,26 @@ void BallDetector::Tick(float ellapsedTime, cv::Mat &img)
             targetPitch = Deg2Rad(17.0f);
         float factor = abs(targetYaw) / (float)H_FOV;
         speed = 0.25f * factor;
+        
+        cout << "Found: " << ball.x << ", " << ball.y << " [ " << ball.radius << " ] | [" << Rad2Deg(targetYaw) << "º, " << Rad2Deg(ballPosRR.getPitch()) << "º] " << distance << "m | " << speed << endl;
 
-        cout << "Found: " << pt << " [ " << ball.radius << " ] | [" << Rad2Deg(targetYaw) << "º, " << Rad2Deg(ballPosRR.getPitch()) << "º] " << distance << "m | " << speed << endl;
-
-        spellBook->perception.ball.BallDetected = true;
-        spellBook->perception.ball.HeadRelative = false;
-        spellBook->perception.ball.BallAzimuth = targetYaw;
-        spellBook->perception.ball.BallElevation = targetPitch;
-        spellBook->perception.ball.BallDistance = distance;
-        spellBook->perception.ball.TimeSinceBallSeen = 0.0f;
-        spellBook->perception.ball.HeadSpeed = speed;
+        spellBook->perception.vision.ball.BallDetected = true;
+        spellBook->perception.vision.ball.HeadRelative = false;
+        spellBook->perception.vision.ball.BallAzimuth = targetYaw;
+        spellBook->perception.vision.ball.BallElevation = targetPitch;
+        spellBook->perception.vision.ball.BallDistance = distance;
+        spellBook->perception.vision.ball.TimeSinceBallSeen = 0.0f;
+        spellBook->perception.vision.ball.HeadSpeed = speed;
     }
 }
 
-bool BallDetector::CascadeMethod()
+bool BallDetector::CascadeMethod(CameraFrame &top, CameraFrame &bottom)
 {
     vector<Rect> balls;
-    cv::Mat gray;
     cv::Mat hist;
-    cv::Mat hsv;
     cv::Mat mask;
-    cv::cvtColor(img, gray, CV_BGR2GRAY);
-    cv::equalizeHist(gray,hist);
-    cv::cvtColor(img, hsv, CV_BGR2HSV);
-    inRange(hsv, Scalar(56, 102, 25), Scalar(116, 255, 255), mask);
+    cv::equalizeHist(bottom.GRAY, hist);
+    inRange(bottom.HSV, Scalar(56, 102, 25), Scalar(116, 255, 255), mask);
     cascade.detectMultiScale(hist, balls, 1.3, 5, 8, Size(16, 16));
     //cascade.detectMultiScale(gray, balls, 1.1, 5, 8, cv::Size(16, 16));
     if (balls.size() == 0)
@@ -167,23 +163,19 @@ bool BallDetector::CascadeMethod()
 }
 
 cv::RNG rng(12345);
-bool BallDetector::GeometricMethod()
+bool BallDetector::GeometricMethod(CameraFrame &top, CameraFrame &bottom)
 {
-    cv::Mat hsv;
-    cv::cvtColor(img, hsv, cv::COLOR_BGR2HSV);
-    cv::imshow("hsv", hsv);
-
     cv::Scalar low(0, 0, 0);
     cv::Scalar high(180, 255, 140);
 
     cv::Mat black;
-    cv::inRange(hsv, low, high, black);
+    cv::inRange(bottom.HSV, low, high, black);
     cv::imshow("black", black);
 
     return false;
 }
 
-bool BallDetector::NeuralMethod()
+bool BallDetector::NeuralMethod(CameraFrame &top, CameraFrame &bottom)
 {
     return false;
 }

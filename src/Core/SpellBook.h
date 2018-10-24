@@ -72,11 +72,27 @@ class LocalizationSpell : public Spell
 
 };
 
+class VisionSpell : public Spell
+{
+    public:
+        bool Enabled;
+        bool BGR, HSV, GRAY;
+
+        BallSpell ball;
+        LocalizationSpell localization;
+
+        VisionSpell();
+        void CopyTo(Spell *spell);
+        void Load(Storage &storage);
+        void Save(Storage &storage);
+
+};
+
+
 class PerceptionSpell : public Spell
 {
     public:
-        BallSpell ball;
-        LocalizationSpell localization;
+        VisionSpell vision;
 
         PerceptionSpell();
         void CopyTo(Spell *spell);
