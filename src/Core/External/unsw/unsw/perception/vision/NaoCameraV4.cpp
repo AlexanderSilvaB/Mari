@@ -19,7 +19,7 @@
 /* Used by setCamera only.
  * Can be removed when v3 backwards compadability is nolonger needed
  */
-//#include "perception/vision/Vision.hpp"
+#include "perception/vision/Vision.hpp"
 
 
 using namespace std;
@@ -101,10 +101,10 @@ NaoCameraV4::~NaoCameraV4()
 
 bool NaoCameraV4::setCamera(WhichCamera whichCamera) {
    if (whichCamera == TOP_CAMERA) {
-      //Vision::camera = Vision::top_camera;
+      Vision::camera = Vision::top_camera;
       return true;
    } else if (whichCamera == BOTTOM_CAMERA) {
-      //Vision::camera = Vision::bot_camera;
+      Vision::camera = Vision::bot_camera;
       //Vision::camera = Vision::top_camera;
       return true;
    } else {
@@ -113,12 +113,9 @@ bool NaoCameraV4::setCamera(WhichCamera whichCamera) {
 }
 
 WhichCamera NaoCameraV4::getCamera() {
-	/*
    if (Vision::camera == Vision::top_camera) {
       return TOP_CAMERA;
    } else {
       return BOTTOM_CAMERA;
    }
-*/
-	return BOTTOM_CAMERA;
 }

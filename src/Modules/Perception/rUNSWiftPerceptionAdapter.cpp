@@ -26,6 +26,8 @@ rUNSWiftPerceptionAdapter::rUNSWiftPerceptionAdapter()
     : rUNSWiftAdapter()
 {
     kinematicsAdapter = new KinematicsAdapter(blackboard);
+    visionAdapter = new VisionAdapter(blackboard);
+    localisationAdapter = new LocalisationAdapter(blackboard);
 }
 
 rUNSWiftPerceptionAdapter::~rUNSWiftPerceptionAdapter()
@@ -114,27 +116,27 @@ void rUNSWiftPerceptionAdapter::Tick()
       llog(ERROR) << "Kinematics took " << t.elapsed_us() << " us" << std::endl;
    }
 
-    /*
+    
    t.restart();
    if (blackboard->config["debug.vision"].as<bool>()) {
-      visionAdapter.tick();
+      visionAdapter->tick();
    }
    uint32_t vision = t.elapsed_us();
    llog(VERBOSE) << "vision tick took " << vision << endl;
    if (t.elapsed_us() > 30000) {
       llog(ERROR) << "Vision took " << t.elapsed_us() << " us" << std::endl;
    }
-   */
+   
 
-    /*
+    
    t.restart();
-   localisationAdapter.tick();
+   localisationAdapter->tick();
    uint32_t localisation = t.elapsed_us();
    llog(VERBOSE) << "localisation tick took " << localisation << endl;
    if (t.elapsed_us() > 30000) {
       llog(ERROR) << "Localisation took " << t.elapsed_us() << " us" << std::endl;
    }
-   */
+   
 
    t.restart();
    pthread_yield();
@@ -159,8 +161,8 @@ void rUNSWiftPerceptionAdapter::Tick()
    llog(VERBOSE) << "perception took " << total << endl;
 
    writeTo(perception, kinematics, kinematics);
-   //writeTo(perception, vision, vision);
-   //writeTo(perception, localisation, localisation);
+   writeTo(perception, vision, vision);
+   writeTo(perception, localisation, localisation);
    writeTo(perception, behaviour, behaviour);
    writeTo(perception, total, total);
 

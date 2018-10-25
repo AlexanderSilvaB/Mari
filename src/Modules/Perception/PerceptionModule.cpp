@@ -4,7 +4,7 @@
 
 PerceptionModule::PerceptionModule(SpellBook *spellBook) : Module(spellBook, "Perception", 30)
 {
-    vision = new Vision(this->spellBook);
+    vision = new VisionModule(this->spellBook);
     InitManager::GetBlackboard()->thread.configCallbacks["perception"];
     perception = new rUNSWiftPerceptionAdapter();
 }
@@ -37,7 +37,7 @@ void PerceptionModule::Save()
 
 void PerceptionModule::Tick(float ellapsedTime)
 {
-    if(spellBook->perception.vision.Enabled)
-        vision->Tick(ellapsedTime);
+    //if(spellBook->perception.vision.Enabled)
+    //    vision->Tick(ellapsedTime);
     perception->Tick();
 }

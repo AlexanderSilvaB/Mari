@@ -3,6 +3,8 @@
 
 #include "Core/rUNSWiftAdapter.h"
 #include <string>
+#include "perception/vision/VisionAdapter.hpp"
+#include "perception/localisation/LocalisationAdapter.hpp"
 #include "perception/kinematics/KinematicsAdapter.hpp"
 #include "perception/dumper/PerceptionDumper.hpp"
 #include "blackboard/Adapter.hpp"
@@ -26,6 +28,8 @@ class rUNSWiftPerceptionAdapter : public rUNSWiftAdapter
 
     private:
         KinematicsAdapter *kinematicsAdapter;
+        VisionAdapter *visionAdapter;
+        LocalisationAdapter *localisationAdapter;
 
         PerceptionDumper *dumper;
         Timer dump_timer;

@@ -12,7 +12,7 @@
 
 using namespace std;
 
-class Vision : public InnerModule
+class VisionModule : public InnerModule
 {
     private:
         CombinedCamera *capture;
@@ -24,8 +24,8 @@ class Vision : public InnerModule
         Localizer *localizer;
 
     public:
-        Vision(SpellBook *spellBook);
-        ~Vision();
+        VisionModule(SpellBook *spellBook);
+        ~VisionModule();
         void Tick(float ellapsedTime);
 };
 

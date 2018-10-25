@@ -57,6 +57,7 @@ namespace RANSAC
 
    template <class T> class Generator
    {
+         public:
       bool operator() (
             T &item,
             const std::vector<Point> &points,
@@ -65,6 +66,7 @@ namespace RANSAC
 
    template <> class Generator<RANSACLine>
    {
+         public:
       bool operator() (
             RANSACLine &item,
             const std::vector<Point> &points,
@@ -200,6 +202,7 @@ namespace RANSAC
    template <class T, class G = Generator<T>, class A = Acceptor<T> >
    class Ransac
    {
+         public:
       bool operator() (
             const G                   &generator,
             const std::vector<Point>  &points,
