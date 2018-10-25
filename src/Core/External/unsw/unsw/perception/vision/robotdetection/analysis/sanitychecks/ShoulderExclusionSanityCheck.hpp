@@ -34,6 +34,6 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #include "types/RobotInfo.hpp"
 
 class ShoulderExclusionSanityCheck {
-	public:
+	public:	
 	std::vector<RobotInfo> complete(std::vector<RobotInfo> possibleRobots) const;
 };
