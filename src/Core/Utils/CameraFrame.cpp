@@ -3,8 +3,10 @@
 #include <cstring>
 #include <stdint.h>
 #include <sys/time.h>
+#include <iostream>
 
 using namespace cv;
+using namespace std;
 
 static int clamp(double x)
 {

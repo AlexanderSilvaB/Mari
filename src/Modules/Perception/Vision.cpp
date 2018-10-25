@@ -1,4 +1,5 @@
 #include "Vision.h"
+#include "Core/Utils/RobotDefs.h"
 
 using namespace cv;
 
@@ -10,8 +11,8 @@ Vision::Vision(SpellBook *spellBook)
 
     capture = new CombinedCamera();
 
-    top.Update(320, 240);
-    bottom.Update(320, 240);
+    top.Update(CAM_W, CAM_H);
+    bottom.Update(CAM_W, CAM_H);
 }
 
 Vision::~Vision()

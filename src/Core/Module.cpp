@@ -118,13 +118,14 @@ void *Module::Run(void *arg)
     while (module->is_running)
     {
         t = timer.elapsed_us() * 0.000001f;
+        timer.restart();
+        //t = timer.elapsed();
         if(t < 0.0f)
             t = -t;
         timerWait.restart();
         module->Load();
         module->Tick(t);
         module->Save();
-        timer.restart();
         us = timerWait.elapsed_us();
         
         wt = min(max(module->us - us, 50), 5000000);

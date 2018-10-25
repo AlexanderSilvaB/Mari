@@ -65,6 +65,8 @@ void StrategyModule::Tick(float ellapsedTime)
     safetyMonitor->Tick(ellapsedTime, sensor);
     gameController->Tick(ellapsedTime, sensor);
 
+    cout << "Strategy: " << spellBook->perception.vision.ball.BallDistance << ", " << Rad2Deg(spellBook->perception.vision.ball.BallAzimuth) << "º" << endl;
+
     if(!spellBook->strategy.Started)
     {
         spellBook->motion.Stiff = false;
@@ -169,6 +171,6 @@ void StrategyModule::Tick(float ellapsedTime)
     spellBook->motion.HeadPitch = spellBook->perception.vision.ball.BallElevation;
     spellBook->motion.HeadSpeed = spellBook->perception.vision.ball.HeadSpeed;
     spellBook->motion.HeadRelative = spellBook->perception.vision.ball.HeadRelative;
-    spellBook->motion.Vx = spellBook->perception.vision.ball.BallDistance * 0.3f;
-    spellBook->motion.Vth = spellBook->perception.vision.ball.BallAzimuth * spellBook->perception.vision.ball.HeadSpeed;
+    //spellBook->motion.Vx = spellBook->perception.vision.ball.BallDistance * 0.2f;
+    //spellBook->motion.Vth = spellBook->perception.vision.ball.BallAzimuth;
 }

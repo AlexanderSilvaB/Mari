@@ -71,15 +71,12 @@ void InitManager::ParseArgs(int argc, char *argv[], SpellBook &spellBook)
     {
         po::options_description generic("Generic options");
         generic.add_options()("help,h", "produce help message")("version,v", "print version string");
-        //("walk.circle", po::value<bool>()->default_value(false), "walks in circle")
-        //("walk.square", po::value<bool>()->default_value(false), "walks in square");
-
-        //po::options_description cmdline_options = store_and_notify(argc, argv, vm, &generic);
-        store_and_notify(argc, argv, vm, &generic);
 
         po::options_description rinobot("Rinobot options");
         spellBook.AddOptions(rinobot);
 
+
+        generic.add(rinobot);
         po::options_description cmdline_options = store_and_notify(argc, argv, vm, &rinobot);
 
         if (vm.count("help"))

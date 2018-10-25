@@ -42,6 +42,7 @@ void MotionModule::Save()
 
 void MotionModule::Tick(float ellapsedTime)
 {
+    cout << "Motion: " << spellBook->motion.Vx << ", " << Rad2Deg(spellBook->motion.Vth) << "º" << endl;
     ActionCommand::All request;
     if(stiff != spellBook->motion.Stiff)
     {
@@ -111,7 +112,7 @@ void MotionModule::Tick(float ellapsedTime)
     }
     else if(spellBook->motion.Walk)
     {
-        request.head = ActionCommand::Head(spellBook->motion.HeadYaw, spellBook->motion.HeadPitch, !spellBook->motion.HeadRelative, spellBook->motion.HeadSpeed, 0.2f);
+        request.head = ActionCommand::Head(spellBook->motion.HeadYaw, spellBook->motion.HeadPitch, spellBook->motion.HeadRelative, spellBook->motion.HeadSpeed, 0.2f);
         vx = spellBook->motion.Vx * 1000.0f;
         vy = spellBook->motion.Vy * 1000.0f;
         vth = spellBook->motion.Vth;

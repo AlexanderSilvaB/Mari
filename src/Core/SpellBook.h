@@ -183,6 +183,9 @@ class BehaviourSpell : public Spell
                         spellBook->module.CopyTo(&(spellBookBase->module)); \
                         spellBookBase->Unlock();
 
+//#define LOAD(module) int inutil_##module;
+//#define SAVE(module) int inutil_##module;
+
 class SpellBook
 {
     private:

@@ -23,14 +23,14 @@ BallDetector::BallDetector(SpellBook *spellBook)
     targetPitch = 0;
 
     method = CASCADE;
-
-    spellBook->perception.vision.BGR = true;
-    spellBook->perception.vision.HSV = true;
-    spellBook->perception.vision.GRAY = true;
 }
 
 void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &bottom)
 {
+    spellBook->perception.vision.BGR = true;
+    spellBook->perception.vision.HSV = true;
+    spellBook->perception.vision.GRAY = true;
+    
     bool detected = false;
     switch(method)
     {
@@ -48,11 +48,13 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
     }
     if(!detected)
     {
-        cout << "Not found" << endl;
+        //cout << "Not found" << endl;
         spellBook->perception.vision.ball.BallDetected = false;
         spellBook->perception.vision.ball.TimeSinceBallSeen += ellapsedTime;
-        spellBook->perception.vision.ball.HeadRelative = false;
-        if(spellBook->perception.vision.ball.TimeSinceBallSeen > 0.1f)
+        spellBook->perception.vision.ball.HeadRelative = true;
+        spellBook->perception.vision.ball.BallAzimuth = 0;
+        spellBook->perception.vision.ball.BallElevation = 0;
+        if(spellBook->perception.vision.ball.TimeSinceBallSeen > 1.0f)
         {
             targetPitch = 0.0f;
             targetYaw = 0.0f;
@@ -73,9 +75,9 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
         float currHeadPitch = sensor.joints.angles[Joints::HeadPitch];
 
         RelativeCoords ballPosRR;
-        //ballPosRR.fromPixel(ball.x, ball.y, -currHeadYaw, currHeadPitch);
+        //ballPosRR.fromPixel(ball.x, ball.y, currHeadYaw, currHeadPitch);
         ballPosRR.fromPixel(ball.x, ball.y);
-        targetYaw = -ballPosRR.getYaw();
+        targetYaw = ballPosRR.getYaw();
         //targetPitch = ballPosRR.getPitch();
         distance = ballPosRR.getDistance();
         if(distance > 1.0f)
@@ -88,8 +90,8 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
         cout << "Found: " << ball.x << ", " << ball.y << " [ " << ball.radius << " ] | [" << Rad2Deg(targetYaw) << "º, " << Rad2Deg(ballPosRR.getPitch()) << "º] " << distance << "m | " << speed << endl;
 
         spellBook->perception.vision.ball.BallDetected = true;
-        spellBook->perception.vision.ball.HeadRelative = false;
-        spellBook->perception.vision.ball.BallAzimuth = targetYaw;
+        spellBook->perception.vision.ball.HeadRelative = true;
+        spellBook->perception.vision.ball.BallAzimuth = -targetYaw;
         spellBook->perception.vision.ball.BallElevation = targetPitch;
         spellBook->perception.vision.ball.BallDistance = distance;
         spellBook->perception.vision.ball.TimeSinceBallSeen = 0.0f;
