@@ -21,10 +21,6 @@ int main(int argc,char *argv[])
     spellBook.Load("/home/nao/data/config.json");
     spellBook.Update();
         
-    if(spellBook.modules.LoadPerception)
-        manager.Attach(new PerceptionModule(&spellBook));
-    if(spellBook.modules.LoadMotion)
-        manager.Attach(new MotionModule(&spellBook));
     if(spellBook.modules.LoadStrategy)
         manager.Attach(new StrategyModule(&spellBook));
     if(spellBook.modules.LoadRemote)
@@ -33,7 +29,12 @@ int main(int argc,char *argv[])
         manager.Attach(new BehaviourModule(&spellBook));
     if(spellBook.modules.LoadNetwork)
         manager.Attach(new NetworkModule(&spellBook));
-    
+    if(spellBook.modules.LoadMotion)
+        manager.Attach(new MotionModule(&spellBook));
+    if(spellBook.modules.LoadPerception)
+        manager.Attach(new PerceptionModule(&spellBook));
+
+
     manager.Run();
 
     InitManager::Destroy();

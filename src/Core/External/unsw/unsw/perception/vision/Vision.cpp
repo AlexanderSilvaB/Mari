@@ -42,18 +42,25 @@ Vision::Vision(
 {
    if (offNao) visionEnabled = false;
    if (visionEnabled) {
+         cout << "Vision " << __LINE__ << calibrationFileTop << endl;
       nnmc_top.load(calibrationFileTop.c_str());
+      cout << "Vision " << __LINE__ << calibrationFileBot << endl;
       nnmc_bot.load(calibrationFileBot.c_str());
+      cout << "Vision " << __LINE__ << vocabFile << endl;
       // make sure surfDetection and goalMatcher use the same vocab file!
       surfDetection.loadVocab(vocabFile);
 		goalMatcher.loadVocab(vocabFile);
+            cout << "Vision " << __LINE__ << endl;
       //goalMatcher.loadMap(goalMap); 
       goalArea = PostInfo::pNone;   
       currentFrame = NULL;
       topFrame = NULL;
       botFrame = NULL;
+      cout << "Vision " << __LINE__ << endl;
       if (dumpframes) {
+            cout << "Vision " << __LINE__ << endl;
          camera->startRecording(dumpfile.c_str(), dumprate);
+         cout << "Vision " << __LINE__ << endl;
       }
    }
    

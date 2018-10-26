@@ -42,7 +42,7 @@ void MotionModule::Save()
 
 void MotionModule::Tick(float ellapsedTime)
 {
-    cout << "Motion: " << spellBook->motion.Vx << ", " << Rad2Deg(spellBook->motion.Vth) << "º" << endl;
+    //cout << "Motion: " << spellBook->motion.Vx << ", " << Rad2Deg(spellBook->motion.Vth) << "º" << endl;
     ActionCommand::All request;
     if(stiff != spellBook->motion.Stiff)
     {

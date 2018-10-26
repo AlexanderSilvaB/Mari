@@ -8,7 +8,6 @@ class ModulesManager
 {
     private:
         static vector<Module*> modules;
-        static void SignalHandler(int);
     public:
         ModulesManager();
         virtual ~ModulesManager();

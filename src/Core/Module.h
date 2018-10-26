@@ -11,10 +11,15 @@ using namespace std;
 class Module
 {
   public:
+    static __thread char* threadName;
+
+    
     Module(SpellBook*, std::string, int);
     void SetHighPriority(bool highPriority);
+    void SetMaxTime(int maxTime);
     bool IsRunning();
     bool IsHighPriority();
+    int GetMaxTime();
     std::string Name();
     virtual ~Module();
     virtual void Tick(float ellapsedTime);
@@ -36,7 +41,10 @@ class Module
     int us;
     bool is_running;
     bool highPriority;
+    int maxTime;
     std::string name;
+
+    static void overtimeAlert(int);
 };
 
 class InnerModule

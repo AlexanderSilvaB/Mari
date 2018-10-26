@@ -1,5 +1,7 @@
 #pragma once
 
+#define USING_SMALL_FIELD
+
 /** Field dimensions in mm
  *  NOTE: unless explicitly specified all dimensions includes line width
  */
@@ -26,6 +28,9 @@
 // #define RIGHT_FIELD_WIDTH_OFFSET 80  // 675
 
 // Will need to re-measure field when it is built
+
+
+
 #ifndef USING_SMALL_FIELD
    #define ROBOTS_PER_TEAM 5
    
@@ -87,7 +92,8 @@
    
    /** Center Circle */
    #define CENTER_CIRCLE_DIAMETER 1200
-   #define MARKER_CENTER_X 1200
+   //#define MARKER_CENTER_X 1200
+   #define MARKER_CENTER_X (FIELD_LENGTH / 2 - DIST_GOAL_LINE_TO_MARKER)
    
    /** Goal Posts */
    #define GOAL_POST_DIAMETER 100

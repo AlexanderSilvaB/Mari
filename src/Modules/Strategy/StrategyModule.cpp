@@ -9,6 +9,7 @@ StrategyModule::StrategyModule(SpellBook *spellBook)
     touch = NULL;
     gameController = new GameController(this->spellBook);   
     safetyMonitor = new SafetyMonitor(this->spellBook);
+    potentialFields = new PotentialFields(this->spellBook);
 
     squareStep = 1;
     squareX = squareY = 0;
@@ -21,6 +22,7 @@ StrategyModule::~StrategyModule()
 {
     delete gameController;
     delete safetyMonitor;
+    delete potentialFields;
     touch = NULL;
 }
 
@@ -65,7 +67,8 @@ void StrategyModule::Tick(float ellapsedTime)
     safetyMonitor->Tick(ellapsedTime, sensor);
     gameController->Tick(ellapsedTime, sensor);
 
-    cout << "Strategy: " << spellBook->perception.vision.ball.BallDistance << ", " << Rad2Deg(spellBook->perception.vision.ball.BallAzimuth) << "º" << endl;
+    cout << "Ball: " << spellBook->perception.vision.ball.BallDistance << ", " << Rad2Deg(spellBook->perception.vision.ball.BallAzimuth) << "º" << endl;
+    cout << "Localization: " << spellBook->perception.vision.localization.X << ", " << spellBook->perception.vision.localization.Y << ", " << Rad2Deg(spellBook->perception.vision.localization.Theta) << "º" << endl;
 
     if(!spellBook->strategy.Started)
     {
@@ -167,10 +170,17 @@ void StrategyModule::Tick(float ellapsedTime)
     }
 
     // Nossa estratégia
-    spellBook->motion.HeadYaw = spellBook->perception.vision.ball.BallAzimuth;
-    spellBook->motion.HeadPitch = spellBook->perception.vision.ball.BallElevation;
-    spellBook->motion.HeadSpeed = spellBook->perception.vision.ball.HeadSpeed;
-    spellBook->motion.HeadRelative = spellBook->perception.vision.ball.HeadRelative;
-    //spellBook->motion.Vx = spellBook->perception.vision.ball.BallDistance * 0.2f;
-    //spellBook->motion.Vth = spellBook->perception.vision.ball.BallAzimuth;
+    //spellBook->motion.HeadYaw = spellBook->perception.vision.ball.BallAzimuth;
+    //spellBook->motion.HeadPitch = spellBook->perception.vision.ball.BallElevation;
+    //spellBook->motion.HeadSpeed = spellBook->perception.vision.ball.HeadSpeed;
+    //spellBook->motion.HeadRelative = spellBook->perception.vision.ball.HeadRelative;
+    //spellBook->motion.Vx = 0.1f;
+    //spellBook->motion.Vth = 0;
+
+    spellBook->strategy.WalkForward = true;
+    spellBook->strategy.TargetX = 0;
+    spellBook->strategy.TargetY = 0;
+    spellBook->strategy.TargetTheta = 0;
+
+    potentialFields->Tick(ellapsedTime);
 }

@@ -1,5 +1,6 @@
 #include "CombinedCamera.hpp"
 #include "perception/vision/NaoCamera.hpp"
+#include "perception/vision/Vision.hpp"
 
 Camera *CombinedCamera::top_camera_ = NULL;
 Camera *CombinedCamera::bot_camera_ = NULL;
@@ -40,7 +41,10 @@ Camera* CombinedCamera::getCameraBot() {
 }
 void CombinedCamera::setCameraTop(Camera* camera) {
     top_camera_ = camera;
+    Vision::top_camera = top_camera_;
 }
 void CombinedCamera::setCameraBot(Camera* camera) {
     bot_camera_ = camera;
+    Vision::bot_camera = bot_camera_;
+    Vision::camera = Vision::bot_camera;
 }

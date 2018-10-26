@@ -65,12 +65,12 @@ void SpellBook::Update()
 
 void SpellBook::Lock()
 {
-    pthread_mutex_lock(&lock);
+    //pthread_mutex_lock(&lock);
 }
 
 void SpellBook::Unlock()
 {
-    pthread_mutex_unlock(&lock);
+    //pthread_mutex_unlock(&lock);
 }
 
 // Spell
@@ -373,6 +373,11 @@ StrategySpell::StrategySpell()
     FallenFront = false;
     Die = false;
     TurnOver = false;
+    WalkAside = false;
+    WalkForward = false;
+    TargetX = 0;
+    TargetY = 0;
+    TargetTheta = 0;
 }
 
 void StrategySpell::CopyTo(Spell *spell)
@@ -386,6 +391,11 @@ void StrategySpell::CopyTo(Spell *spell)
     COPY(s, FallenFront)
     COPY(s, Die)
     COPY(s, TurnOver)
+    COPY(s, WalkAside)
+    COPY(s, WalkForward)
+    COPY(s, TargetX)
+    COPY(s, TargetY)
+    COPY(s, TargetTheta)
 }
 
 void StrategySpell::Load(Storage &storage)

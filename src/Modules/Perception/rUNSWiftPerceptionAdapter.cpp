@@ -38,14 +38,14 @@ rUNSWiftPerceptionAdapter::~rUNSWiftPerceptionAdapter()
 void rUNSWiftPerceptionAdapter::Start()
 {
     dumper = NULL;
-
+cout << "Perception->Tick: " << __LINE__ << endl;
     releaseLock(serialization);
-
+cout << "Perception->Tick: " << __LINE__ << endl;
 //uint8_t const* currentFrame = readFrom(vision, currentFrame);
    uint8_t const* topFrame = readFrom(vision, topFrame);
    uint8_t const* botFrame = readFrom(vision, botFrame);
    size_t ret;
-
+cout << "Perception->Tick: " << __LINE__ << endl;
    if (topFrame != NULL && botFrame != NULL) {
       string file = "/home/nao/crashframe-" +
                     boost::lexical_cast<string>(time(NULL)) + ".yuv";
@@ -58,11 +58,12 @@ void rUNSWiftPerceptionAdapter::Start()
       ret = systemCalls::_system(file.c_str());
    }
 
-
+cout << "Perception->Tick: " << __LINE__ << endl;
     ReadOptions(blackboard->config);
     writeTo(thread, configCallbacks["perception"],
            boost::function<void(const boost::program_options::variables_map &)>
            (boost::bind(&rUNSWiftPerceptionAdapter::ReadOptions, this, _1)));
+           cout << "Perception->Tick: " << __LINE__ << endl;
 }
 
 void rUNSWiftPerceptionAdapter::Stop()
@@ -106,6 +107,7 @@ void rUNSWiftPerceptionAdapter::ReadOptions(const boost::program_options::variab
 
 void rUNSWiftPerceptionAdapter::Tick()
 {
+    cout << "Perception->Tick: " << __LINE__ << endl;
    llog(DEBUG1) << "Perception.. ticking away" << endl;
    Timer t1;
    Timer t;

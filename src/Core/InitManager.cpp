@@ -126,14 +126,16 @@ void InitManager::InitCameras()
 {
     cout << "InitCameras" << endl;
     llog(INFO) << "Initialising v4 /dev/video0" << std::endl;
-    topCamera = new NaoCameraV4(blackboard, "/dev/video0",
-                                IO_METHOD_MMAP,
-                                AL::kQVGA, TOP_CAMERA);
+    topCamera = new NaoCameraV4(blackboard, "/dev/video0");//,
+                                //IO_METHOD_MMAP,
+                                //AL::kQVGA, TOP_CAMERA);
+                                //AL::kVGA, TOP_CAMERA);
 
     llog(INFO) << "Initialising v4 /dev/video1" << std::endl;
     botCamera = new NaoCameraV4(blackboard, "/dev/video1",
                                 IO_METHOD_MMAP,
-                                AL::kQVGA, BOTTOM_CAMERA);
+                                //AL::kQVGA, BOTTOM_CAMERA);
+                                AL::kVGA, BOTTOM_CAMERA);
 
     CombinedCamera::setCameraTop(topCamera);
     CombinedCamera::setCameraBot(botCamera);

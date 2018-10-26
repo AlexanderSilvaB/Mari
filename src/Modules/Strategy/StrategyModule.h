@@ -9,6 +9,7 @@
 #include "motion/touch/AgentTouch.hpp"
 #include "GameController/GameController.h"
 #include "Safety/SafetyMonitor.h"
+#include "Control/PotentialFields.h"
 
 using namespace std;
 
@@ -20,6 +21,7 @@ class StrategyModule : public Module
 
         GameController *gameController;
         SafetyMonitor *safetyMonitor;
+        PotentialFields *potentialFields;
 
         int squareStep;
         float squareX, squareY;

@@ -8,9 +8,7 @@ VisionModule::VisionModule(SpellBook *spellBook)
 {
     ballDetector = new BallDetector(spellBook);
     localizer = new Localizer(spellBook);
-
     capture = new CombinedCamera();
-
     top.Update(CAM_W, CAM_H);
     bottom.Update(CAM_W, CAM_H);
 }
