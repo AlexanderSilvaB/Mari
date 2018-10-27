@@ -1,9 +1,9 @@
-#include "Vision.h"
+#include "VisionModule.h"
 #include "Core/Utils/RobotDefs.h"
 
 using namespace cv;
 
-Vision::Vision(SpellBook *spellBook)
+VisionModule::VisionModule(SpellBook *spellBook)
     :   InnerModule(spellBook)
 {
     ballDetector = new BallDetector(spellBook);
@@ -15,13 +15,13 @@ Vision::Vision(SpellBook *spellBook)
     bottom.Update(CAM_W, CAM_H);
 }
 
-Vision::~Vision()
+VisionModule::~VisionModule()
 {
     delete ballDetector;
     delete localizer;
 }
 
-void Vision::Tick(float ellapsedTime)
+void VisionModule::Tick(float ellapsedTime)
 {
     top.ReadFromYUV422(capture->getFrameTop(), spellBook->perception.vision.BGR, spellBook->perception.vision.HSV, spellBook->perception.vision.GRAY);
     bottom.ReadFromYUV422(capture->getFrameBottom(), spellBook->perception.vision.BGR, spellBook->perception.vision.HSV, spellBook->perception.vision.GRAY);

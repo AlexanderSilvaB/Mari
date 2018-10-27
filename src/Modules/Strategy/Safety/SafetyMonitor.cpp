@@ -12,7 +12,7 @@ void SafetyMonitor::OnStart()
     
 }
 
-void SafetyMonitor::Tick(float ellapsedTime, SensorValues &sensor)
+void SafetyMonitor::Tick(float ellapsedTime, const SensorValues &sensor)
 {
 	float ang[2] = {Rad2Deg(sensor.sensors[Sensors::InertialSensor_AngleX]),
 	               Rad2Deg(sensor.sensors[Sensors::InertialSensor_AngleY])};

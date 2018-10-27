@@ -18,7 +18,7 @@ class SafetyMonitor : public InnerModule
     public:
         SafetyMonitor(SpellBook *spellBook);
         void OnStart();
-        void Tick(float ellapsedTime, SensorValues &sensor);
+        void Tick(float ellapsedTime, const SensorValues &sensor);
         void OnStop();
         ~SafetyMonitor();
 };
