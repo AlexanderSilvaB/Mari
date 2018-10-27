@@ -1,9 +1,12 @@
 #include "Pose.hpp"
+#include "soccer.hpp"
 
-#include <perception/vision/VisionDefs.hpp>
+#include <perception/vision/VisionDefinitions.hpp>
 #include <utils/matrix_helpers.hpp>
 
-Pose::Pose() {
+Pose::Pose()
+    : lOrigin(4, 1), lOrigin2(4, 1), cdir(4, 1)
+{
    for (int i = 0; i < EXCLUSION_RESOLUTION; i++) {
       topExclusionArray[i] = TOP_IMAGE_ROWS;
       botExclusionArray[i] = TOP_IMAGE_ROWS+BOT_IMAGE_ROWS;
@@ -30,7 +33,8 @@ Pose::Pose(boost::numeric::ublas::matrix<float> topCameraToWorldTransform,
            boost::numeric::ublas::matrix<float> botCameraToWorldTransform,
            boost::numeric::ublas::matrix<float> neckToWorldTransform,
            std::pair<int, int> horizon)
-   : topWorldToCameraTransform(4, 4), botWorldToCameraTransform(4, 4), worldToNeckTransform(4, 4)
+   : topWorldToCameraTransform(4, 4), botWorldToCameraTransform(4, 4), worldToNeckTransform(4, 4),
+    lOrigin(4, 1), lOrigin2(4, 1), cdir(4, 1)
 {
    this->topCameraToWorldTransform = topCameraToWorldTransform;
    this->botCameraToWorldTransform = botCameraToWorldTransform;
@@ -66,51 +70,86 @@ RRCoord Pose::imageToRobotRelative(int x, int y, int h) const
 
 Point Pose::imageToRobotXY(const Point &image, int h) const
 {
-   // determine which camera
-   bool top = true;
-   Point i = image;
-   if (image.y() >= TOP_IMAGE_ROWS) {
-      top = false;
-      i.y() -= TOP_IMAGE_ROWS;
-   }
+    // Offnao fix.
+    if(offNao)
+        return(imageToRobotXYSlow(image, h));
 
-   // Variations depending on which image we are looking at
-   const int COLS = (top) ? TOP_IMAGE_COLS : BOT_IMAGE_COLS;
-   const int ROWS = (top) ? TOP_IMAGE_ROWS : BOT_IMAGE_ROWS;
-   const float PIXEL = (top) ? TOP_PIXEL_SIZE : BOT_PIXEL_SIZE;
+    // determine which camera
+    bool top = true;
+    if (image.y() >= TOP_IMAGE_ROWS)
+        top = false;
 
-   // calculate vector to pixel in camera space
-   boost::numeric::ublas::matrix<float> lOrigin, lOrigin2;
-   lOrigin2 = vec4<float>(
-      (((COLS) / 2.0 - i.x()) * PIXEL),
-      (((ROWS) / 2.0 - i.y()) * PIXEL),
-      0,
-      1);
+    // Variations depending on which image we are looking at
+    const int COLS = (top) ? TOP_IMAGE_COLS : BOT_IMAGE_COLS;
+    const int ROWS = (top) ? TOP_IMAGE_ROWS : BOT_IMAGE_ROWS;
+    const float PIXEL = (top) ? TOP_PIXEL_SIZE : BOT_PIXEL_SIZE;
 
-   boost::numeric::ublas::matrix<float> cdir;
+    // calculate vector to pixel in camera space
+    lOrigin2(0, 0) = (((COLS) / 2.0 - image.x()) * PIXEL);
+    lOrigin2(1, 0) = (((ROWS) / 2.0 - (image.y() - (!top)*TOP_IMAGE_ROWS))
+                                                                       * PIXEL);
+    lOrigin2(2, 0) = 0;
+    lOrigin2(3, 0) = 1;
 
-   if (top) {
-      lOrigin = prod(
-         topCameraToWorldTransform,
-         lOrigin2);
-      cdir = (topToFocus - lOrigin);
-   } else {
-      lOrigin = prod(
-         botCameraToWorldTransform,
-         lOrigin2);
-      cdir = (botToFocus - lOrigin);
-   }
+    if (top)
+    {
+        noalias(lOrigin) = prod(
+            topCameraToWorldTransform,
+            lOrigin2);
+        noalias(cdir) = (topToFocus - lOrigin);
+    }
+    else
+    {
+        noalias(lOrigin) = prod(
+            botCameraToWorldTransform,
+            lOrigin2);
+        noalias(cdir) = (botToFocus - lOrigin);
+    }
 
+    float lambda = (h - lOrigin(2, 0)) / (1.0 * cdir(2, 0));
 
-   float lambda = (h - lOrigin(2, 0)) / (1.0 * cdir(2, 0));
+    return Point(lOrigin(0, 0) + lambda * cdir(0, 0),
+                                           lOrigin(1, 0) + lambda * cdir(1, 0));
+}
 
-   boost::numeric::ublas::matrix<float> intercept;
-   intercept = vec4<float>(lOrigin(0, 0) + lambda * cdir(0, 0),
-                       lOrigin(1, 0) + lambda * cdir(1, 0),
-                       h,
-                       1);
+Point Pose::imageToRobotXYSlow(const Point &image, int h) const
+{
+    // determine which camera
+    bool top = true;
+    if (image.y() >= TOP_IMAGE_ROWS)
+        top = false;
 
-   return Point(intercept(0, 0), intercept(1, 0));
+    // Variations depending on which image we are looking at
+    const int COLS = (top) ? TOP_IMAGE_COLS : BOT_IMAGE_COLS;
+    const int ROWS = (top) ? TOP_IMAGE_ROWS : BOT_IMAGE_ROWS;
+    const float PIXEL = (top) ? TOP_PIXEL_SIZE : BOT_PIXEL_SIZE;
+
+    // calculate vector to pixel in camera space
+    lOrigin2(0, 0) = (((COLS) / 2.0 - image.x()) * PIXEL);
+    lOrigin2(1, 0) = (((ROWS) / 2.0 - (image.y() - (!top)*TOP_IMAGE_ROWS))
+                                                                       * PIXEL);
+    lOrigin2(2, 0) = 0;
+    lOrigin2(3, 0) = 1;
+
+    if (top)
+    {
+        noalias(lOrigin) = prod(
+            topCameraToWorldTransform,
+            lOrigin2);
+        noalias(cdir) = (topToFocus - lOrigin);
+    }
+    else
+    {
+        noalias(lOrigin) = prod(
+            botCameraToWorldTransform,
+            lOrigin2);
+        noalias(cdir) = (botToFocus - lOrigin);
+    }
+
+    float lambda = (h - lOrigin(2, 0)) / (1.0 * cdir(2, 0));
+
+    return Point(lOrigin(0, 0) + lambda * cdir(0, 0),
+                                           lOrigin(1, 0) + lambda * cdir(1, 0));
 }
 
 
@@ -201,7 +240,7 @@ const boost::numeric::ublas::matrix<float>
       c(1, 3) = botCameraToWorldTransform(1, 3);
       c(2, 3) = botCameraToWorldTransform(2, 3);
       c(3, 3) = botCameraToWorldTransform(3, 3);
-   } 
+   }
    return c;
 }
 
@@ -232,7 +271,7 @@ void Pose::makeConstants()
    topWorldToCameraTransformT = prod(projection, topWorldToCameraTransform);
    invertMatrix(botCameraToWorldTransform, botWorldToCameraTransform);
    botWorldToCameraTransformT = prod(projection, botWorldToCameraTransform);
-   
+
    invertMatrix(neckToWorldTransform, worldToNeckTransform);
 
    origin = vec4<float>(0, 0, 0, 1);
@@ -242,4 +281,3 @@ void Pose::makeConstants()
    topToFocus = prod(topCameraToWorldTransform, vec4<float>(0, 0,FOCAL_LENGTH, 1));
    botToFocus = prod(botCameraToWorldTransform, vec4<float>(0, 0,FOCAL_LENGTH, 1));
 }
-

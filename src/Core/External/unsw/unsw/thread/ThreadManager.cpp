@@ -63,7 +63,7 @@ void handleSignals(int sigNumber, siginfo_t* info, void*) {
       attemptingShutdown = true;
    } else {
       // re-register the signal handler
-      SAY("crash detected");
+	  SAY("crash detected");
       registerSignalHandlers(sigNumber);
       pthread_t thread = pthread_self();
 

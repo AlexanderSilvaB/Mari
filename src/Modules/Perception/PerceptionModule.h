@@ -8,7 +8,7 @@
 
 #include "rUNSWiftPerceptionAdapter.h"
 
-#include "Vision.h"
+#include "VisionModule.h"
 
 using namespace std;
 
@@ -16,7 +16,7 @@ class PerceptionModule : public Module
 {
     private:
         rUNSWiftPerceptionAdapter *perception;
-        Vision *vision;
+        VisionModule *vision;
     public:
         PerceptionModule(SpellBook *spellBook);
         ~PerceptionModule();

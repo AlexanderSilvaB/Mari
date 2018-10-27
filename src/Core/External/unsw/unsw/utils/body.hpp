@@ -1,3 +1,34 @@
+/*
+Copyright 2010 The University of New South Wales (UNSW).
+
+This file is part of the 2010 team rUNSWift RoboCup entry. You may
+redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version as
+modified below. As the original licensors, we add the following
+conditions to that license:
+
+In paragraph 2.b), the phrase "distribute or publish" should be
+interpreted to include entry into a competition, and hence the source
+of any derived work entered into a competition must be made available
+to all parties involved in that competition under the terms of this
+license.
+
+In addition, if the authors of a derived work publish any conference
+proceedings, journal articles or other academic papers describing that
+derived work, then appropriate academic citations to the original work
+must be included in that publication.
+
+This rUNSWift source is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this source code; if not, write to the Free Software Foundation,
+Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+*/
+
 /**
  * Body.hpp
  * Description: Contains Joint Codes, Limits, Motor Reductions and Limb
@@ -130,84 +161,83 @@ namespace Joints {
       "R Hand",
    };
 
-   // TODO(Bel): It looks like this is used in a simulator. If it gets used, it might
-   // need to be updated to match the new joints.
-   const std::string simJointNames[] = {
-      "headPan",
-      "headTilt",
-      "armLeft0",
-      "armLeft1",
-      "armLeft2",
-      "armLeft3",
-      "armLeft4",
-      "legLeft0",
-      "legLeft1",
-      "legLeft2",
-      "legLeft3",
-      "legLeft4",
-      "legLeft5",
-      "legRight1",
-      "legRight2",
-      "legRight3",
-      "legRight4",
-      "legRight5",
-      "armRight0",
-      "armRight1",
-      "armRight2",
-      "armRight3",
-      "armRight4"
-   };
-
    // Limits for Joints in RADIANS
    namespace Radians {
       const float HeadYaw_Min          = DEG2RAD(-119.5);
       const float HeadYaw_Max          = DEG2RAD(119.5);
+
       const float HeadPitch_Min        = DEG2RAD(-38.5);
       const float HeadPitch_Max        = DEG2RAD(29.5);
+
       const float LShoulderPitch_Min   = DEG2RAD(-119.5);
       const float LShoulderPitch_Max   = DEG2RAD(119.5);
-      const float LShoulderRoll_Max    = DEG2RAD(76);
-      const float LShoulderRoll_Min    = DEG2RAD(-18);
+
+      const float LShoulderRoll_Min    = DEG2RAD(-18.0);
+      const float LShoulderRoll_Max    = DEG2RAD(76.0);
+
       const float LElbowYaw_Min        = DEG2RAD(-119.5);
       const float LElbowYaw_Max        = DEG2RAD(119.5);
+
       const float LElbowRoll_Min       = DEG2RAD(-88.5);
-      const float LElbowRoll_Max       = DEG2RAD(-2);
+      const float LElbowRoll_Max       = DEG2RAD(-2.0);
+
       const float LWristYaw_Min        = DEG2RAD(-104.5);
       const float LWristYaw_Max        = DEG2RAD(104.5);
+
       const float LHand_Min            = 0.0;
       const float LHand_Max            = 1.0;
+
+
       const float LHipYawPitch_Min     = DEG2RAD(-65.62);
       const float LHipYawPitch_Max     = DEG2RAD(42.44);
-      const float LHipPitch_Min        = DEG2RAD(-101.63);
+
+      const float LHipPitch_Min        = DEG2RAD(-88.0);
       const float LHipPitch_Max        = DEG2RAD(27.73);
+
       const float LHipRoll_Min         = DEG2RAD(-21.74);
       const float LHipRoll_Max         = DEG2RAD(45.29);
+
       const float LKneePitch_Min       = DEG2RAD(-5.29);
       const float LKneePitch_Max       = DEG2RAD(121.04);
+
       const float LAnklePitch_Min      = DEG2RAD(-68.15);
       const float LAnklePitch_Max      = DEG2RAD(52.86);
+
       const float LAnkleRoll_Min       = DEG2RAD(-22.79);
       const float LAnkleRoll_Max       = DEG2RAD(44.06);
-      const float RHipPitch_Min        = DEG2RAD(-101.54);
-      const float RHipPitch_Max        = DEG2RAD(27.82);
-      const float RHipRoll_Min         = DEG2RAD(-42.30);
-      const float RHipRoll_Max         = DEG2RAD(23.76);
+
+
+      const float RHipPitch_Min        = DEG2RAD(-88.0);
+      const float RHipPitch_Max        = DEG2RAD(27.73);
+
+      const float RHipRoll_Min         = DEG2RAD(-45.29);
+      const float RHipRoll_Max         = DEG2RAD(21.74);
+
       const float RKneePitch_Min       = DEG2RAD(-5.90);
       const float RKneePitch_Max       = DEG2RAD(121.47);
+
       const float RAnklePitch_Min      = DEG2RAD(-67.97);
       const float RAnklePitch_Max      = DEG2RAD(53.40);
-      const float RAnkleRoll_Min       = DEG2RAD(-45.03);
-      const float RAnkleRoll_Max       = DEG2RAD(22.27);
+
+      const float RAnkleRoll_Min       = DEG2RAD(-44.06);
+      const float RAnkleRoll_Max       = DEG2RAD(22.80);
+
+
       const float RShoulderPitch_Min   = DEG2RAD(-119.5);
       const float RShoulderPitch_Max   = DEG2RAD(119.5);
-      const float RShoulderRoll_Min    = DEG2RAD(-76);
-      const float RShoulderRoll_Max    = DEG2RAD(18);
+
+      const float RShoulderRoll_Min    = DEG2RAD(-76.0);
+      const float RShoulderRoll_Max    = DEG2RAD(18.0);
+
       const float RElbowYaw_Min        = DEG2RAD(-119.5);
       const float RElbowYaw_Max        = DEG2RAD(119.5);
-      const float RElbowRoll_Min       = DEG2RAD(2);
+
+      const float RElbowRoll_Min       = DEG2RAD(2.0);
       const float RElbowRoll_Max       = DEG2RAD(88.5);
+
       const float RWristYaw_Min        = DEG2RAD(-104.5);
       const float RWristYaw_Max        = DEG2RAD(104.5);
+
       const float RHand_Min            = 0.0;
       const float RHand_Max            = 1.0;
 
@@ -279,7 +309,7 @@ namespace Joints {
    // This is calculated as follows: No load speed / reduction ratio
    // / 60, then * 360 to get it into degrees as opposed to rotations.
    // Finally divide by 100 to get it into per 10ms. For example,
-   // taking motor 1 type A, 
+   // taking motor 1 type A,
    // (https://community.aldebaran-robotics.com/doc/1-14/family/nao_h25/motors_h25.html)
    // we get 8300 / 201.3 / 60 * 360 / 100. Since it's not a good idea
    // to push the motors to their limits, (overheating issues etc), we
@@ -391,30 +421,30 @@ namespace Limbs {
    };
 
    const float TorsoMass = 1.04956;
-   const float NeckMass = 0.06442; // Head Yaw
+   const float NeckMass = 0.07842; // Head Yaw
    const float HeadMass = 0.60533; // Head Pitch
-   const float RightShoulderMass = 0.07504; // R Shoulder Pitch
-   const float RightBicepMass = 0.15794; // R Shoulder Roll
+   const float RightShoulderMass = 0.09304; // R Shoulder Pitch
+   const float RightBicepMass = 0.15777; // R Shoulder Roll
    const float RightElbowMass = 0.06483; // R Elbow Yaw
-   const float RightForearmMass = 0.07778; // R Elbow Roll
+   const float RightForearmMass = 0.07761; // R Elbow Roll
    const float RightHandMass = 0.18533; // R Wrist Yaw
-   const float RightPelvisMass = 0.07118; // R Hip Yaw Pitch
-   const float RightHipMass = 0.13053; // R Hip Roll
-   const float RightThighMass = 0.38976; // R Hip Pitch
-   const float RightTibiaMass = 0.29163; // R Knee Pitch
-   const float RightAnkleMass = 0.13415; // R Ankle Pitch
-   const float RightFootMass = 0.16171; // R Ankle Roll
-   const float LeftShoulderMass = 0.07504; // L Shoulder Pitch
+   const float RightPelvisMass = 0.06981; // R Hip Yaw Pitch
+   const float RightHipMass = 0.14053; // R Hip Roll
+   const float RightThighMass = 0.38978; // R Hip Pitch
+   const float RightTibiaMass = 0.30142; // R Knee Pitch
+   const float RightAnkleMass = 0.13416; // R Ankle Pitch
+   const float RightFootMass = 0.17184; // R Ankle Roll
+   const float LeftShoulderMass = 0.09304; // L Shoulder Pitch
    const float LeftBicepMass = 0.15777; // L Shoulder Roll
    const float LeftElbowMass = 0.06483; // L Elbow Yaw
    const float LeftForearmMass = 0.07761; // L Elbow Roll
    const float LeftHandMass = 0.18533; // L Wrist Yaw
    const float LeftPelvisMass = 0.06981; // L Hip Yaw Pitch
-   const float LeftHipMass = 0.13053; // L Hip Roll
-   const float LeftThighMass = 0.38968; // L Hip Pitch
-   const float LeftTibiaMass = 0.29142; // L Knee Pitch
+   const float LeftHipMass = 0.14053; // L Hip Roll
+   const float LeftThighMass = 0.38978; // L Hip Pitch
+   const float LeftTibiaMass = 0.30142; // L Knee Pitch
    const float LeftAnkleMass = 0.13416; // L Ankle Pitch
-   const float LeftFootMass = 0.16184; // L Ankle Roll
+   const float LeftFootMass = 0.17184; // L Ankle Roll
 
    const float Mass[] = {
       TorsoMass,
@@ -661,6 +691,13 @@ namespace Sensors {
       InertialSensor_AngleX,
       InertialSensor_AngleY,
 
+      InertialSensor_GyroscopeX,
+      InertialSensor_GyroscopeY,
+      InertialSensor_GyroscopeZ,
+      InertialSensor_AccelerometerX,
+      InertialSensor_AccelerometerY,
+      InertialSensor_AccelerometerZ,
+
       LFoot_FSR_FrontLeft,
       LFoot_FSR_FrontRight,
       LFoot_FSR_RearLeft,
@@ -682,9 +719,9 @@ namespace Sensors {
 
       ChestBoard_Button,
 
-      //Head_Touch_Front,
-      //Head_Touch_Rear,
-      //Head_Touch_Middle,
+      Head_Touch_Front,
+      Head_Touch_Rear,
+      Head_Touch_Middle,
 
       Battery_Charge,
       Battery_Current,
@@ -703,6 +740,13 @@ namespace Sensors {
       InertialSensor_AngleX,
       InertialSensor_AngleY,
 
+      InertialSensor_GyroscopeX,
+      InertialSensor_GyroscopeY,
+      InertialSensor_GyroscopeZ,
+      InertialSensor_AccelerometerX,
+      InertialSensor_AccelerometerY,
+      InertialSensor_AccelerometerZ,
+
       LFoot_FSR_FrontLeft,
       LFoot_FSR_FrontRight,
       LFoot_FSR_RearLeft,
@@ -724,9 +768,9 @@ namespace Sensors {
 
       ChestBoard_Button,
 
-      //Head_Touch_Front,
-      //Head_Touch_Rear,
-      //Head_Touch_Middle,
+      Head_Touch_Front,
+      Head_Touch_Rear,
+      Head_Touch_Middle,
 
       Battery_Charge,
       Battery_Current,
@@ -742,6 +786,13 @@ namespace Sensors {
       "InertialSensor/GyrRef",
       "InertialSensor/AngleX",
       "InertialSensor/AngleY",
+
+      "InertialSensor/GyroscopeX",
+      "InertialSensor/GyroscopeY",
+      "InertialSensor/GyroscopeZ",
+      "InertialSensor/AccelerometerX",
+      "InertialSensor/AccelerometerY",
+      "InertialSensor/AccelerometerZ",
 
       "LFoot/FSR/FrontLeft",
       "LFoot/FSR/FrontRight",
@@ -764,9 +815,9 @@ namespace Sensors {
 
       "ChestBoard/Button",
 
-      //"Head/Touch/Front",
-      //"Head/Touch/Rear",
-      //"Head/Touch/Middle",
+      "Head/Touch/Front",
+      "Head/Touch/Rear",
+      "Head/Touch/Middle",
 
       "Battery/Charge",
       "Battery/Current",
@@ -788,14 +839,14 @@ namespace Sonar {
       const float CONTINUOUS  = 64.0f; // register for periodic capture, then can just read every 100ms
    }
 
-   const float MIN = 0.25f; // min reliable reading  
+   const float MIN = 0.25f; // min reliable reading
    const float MAX = 2.5f; // max reliable reading
    const float INVALID = 2.55f;
    const float DISCARD = 10.f;
 
-   const float RIGHT_START = DEG2RAD(-70.f); 
+   const float RIGHT_START = DEG2RAD(-70.f);
    const float RIGHT_END = DEG2RAD(10.f);
-   const float MIDDLE_START = DEG2RAD(-20.f); 
+   const float MIDDLE_START = DEG2RAD(-20.f);
    const float MIDDLE_END = DEG2RAD(20.f);
    const float LEFT_START = DEG2RAD(-10.f);
    const float LEFT_END = DEG2RAD(70.f);

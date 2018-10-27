@@ -5,6 +5,8 @@ find_package(qibuild)
 include_directories(.)
 include_directories(unsw)
 
+ADD_DEFINITIONS( -DEIGEN_DONT_ALIGN )
+
 file(GLOB_RECURSE UNSW_SRC
     "unsw/*.hpp"
     "unsw/*.cpp")

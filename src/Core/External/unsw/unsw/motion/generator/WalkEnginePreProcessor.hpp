@@ -3,10 +3,11 @@
 #include "motion/generator/Walk2014Generator.hpp"
 #include "motion/generator/Generator.hpp"
 #include "utils/Timer.hpp"
+#include "blackboard/Blackboard.hpp"
 
 class WalkEnginePreProcessor : Generator {
    public:
-      explicit WalkEnginePreProcessor();
+      explicit WalkEnginePreProcessor(Blackboard *bb);
       ~WalkEnginePreProcessor();
       JointValues makeJoints(ActionCommand::All* request,
             Odometry* odometry,
@@ -15,14 +16,14 @@ class WalkEnginePreProcessor : Generator {
             float ballX,
             float ballY);
       bool isActive();
-      void readOptions(boost::program_options::variables_map& config);
+      void readOptions(const boost::program_options::variables_map& config);
       void reset();
       void stop();
 
-   //private:
+   private:
 
       class LineUpEngine {
-	public:
+      public:
          explicit LineUpEngine(Walk2014Generator* walkEngine);
          Walk2014Generator* walkEngine;
          bool hasStarted;
@@ -36,26 +37,45 @@ class WalkEnginePreProcessor : Generator {
       };
 
       class DribbleEngine {
-	public:
+      public:
          explicit DribbleEngine(Walk2014Generator* walkEngine);
 
          enum DribbleState {
-            INIT, TURN, FORWARD, END
+            INIT, STEP, KICK, FOLLOW, END
          };
 
          DribbleState dribbleState;
          Timer dribbleTimer;
          Walk2014Generator* walkEngine;
          ActionCommand::Body::Foot foot;
+         float forward;
+         void reset();
+         bool hasEnded();
+         void start(ActionCommand::Body::Foot foot, int forward);
+         void preProcess(ActionCommand::All* request, BodyModel &bodyModel);
+      };
+
+      class TurnDribbleEngine {
+      public:
+         explicit TurnDribbleEngine(Walk2014Generator* walkEngine);
+
+         enum TurnDribbleState {
+            INIT, TURN, FORWARD, END
+         };
+
+         TurnDribbleState turnDribbleState;
+         Timer turnDribbleTimer;
+         Walk2014Generator* walkEngine;
+         ActionCommand::Body::Foot foot;
          void reset();
          bool hasEnded();
          void start(ActionCommand::Body::Foot foot);
-         void preProcess(ActionCommand::All* request,
-               BodyModel &bodyModel);
+         void preProcess(ActionCommand::All* request, BodyModel &bodyModel);
       };
 
       bool isKicking;
       LineUpEngine* lineUpEngine;
       DribbleEngine* dribbleEngine;
+      TurnDribbleEngine* turnDribbleEngine;
       Walk2014Generator* walkEngine;
 };

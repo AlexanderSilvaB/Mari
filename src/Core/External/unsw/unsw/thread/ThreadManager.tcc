@@ -105,6 +105,7 @@ void ThreadManager::safelyRun(Blackboard *bb) {
          llog(INFO) << "Thread '" << name
                     << "' disabled." << std::endl;
       } catch(const std::exception & e) {
+         // TODO: Replace these with runit or supervisord
          SAY("exception caught");
          free(jumpPoints[threadID]);
          usleep(500000);

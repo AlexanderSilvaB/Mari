@@ -16,9 +16,9 @@
 #include "thread/ThreadManager.hpp"
 #include "motion/MotionAdapter.hpp"
 #include "perception/PerceptionThread.hpp"
-#include "perception/vision/NaoCamera.hpp"
-#include "perception/vision/NaoCameraV4.hpp"
-#include "Utils/CombinedCamera.hpp"
+#include "perception/vision/camera/NaoCamera.hpp"
+#include "perception/vision/camera/NaoCameraV4.hpp"
+#include "perception/vision/camera/CombinedCamera.hpp"
 #include "Utils/set_cloexec.hpp"
 
 #include "SpellBook.h"
@@ -126,14 +126,15 @@ void InitManager::InitCameras()
 {
     cout << "InitCameras" << endl;
     llog(INFO) << "Initialising v4 /dev/video0" << std::endl;
-    topCamera = new NaoCameraV4(blackboard, "/dev/video0",
-                                IO_METHOD_MMAP,
-                                AL::kQVGA, TOP_CAMERA);
+    topCamera = new NaoCameraV4(blackboard, "/dev/video0", "camera.top");//,
+                                //IO_METHOD_MMAP,
+                                //AL::kQVGA);
 
     llog(INFO) << "Initialising v4 /dev/video1" << std::endl;
-    botCamera = new NaoCameraV4(blackboard, "/dev/video1",
+    botCamera = new NaoCameraV4(blackboard, "/dev/video1", "camera.bot",
                                 IO_METHOD_MMAP,
-                                AL::kQVGA, BOTTOM_CAMERA);
+                                AL::kVGA);
+                                //AL::kQVGA);
 
     CombinedCamera::setCameraTop(topCamera);
     CombinedCamera::setCameraBot(botCamera);

@@ -28,7 +28,7 @@ class LeastSquaresLine
        * @param b             b
        * @param c             c
        */
-      bool getLineABC(int *a, int *b, int *c);
+      bool getLineABC(long long *a, long long *b, long long *c);
 
    private:
       int sumX2;
@@ -43,4 +43,3 @@ class LeastSquaresLine
 };
 
 #include "LeastSquaresLineInline.hpp"
-

@@ -8,7 +8,7 @@ using namespace std;
 
 MotionModule::MotionModule(SpellBook *spellBook) : Module(spellBook, "Motion", 0)
 {
-    SetHighPriority(true);
+    SetPriority(65);
     InitManager::GetBlackboard()->thread.configCallbacks["motion"];
     motion = new rUNSWiftMotionAdapter();
     vx = vy = vth = 0;
@@ -42,7 +42,7 @@ void MotionModule::Save()
 
 void MotionModule::Tick(float ellapsedTime)
 {
-    cout << "Motion: " << spellBook->motion.Vx << ", " << Rad2Deg(spellBook->motion.Vth) << "º" << endl;
+    //cout << "Motion: " << spellBook->motion.Vx << ", " << Rad2Deg(spellBook->motion.Vth) << "º" << endl;
     ActionCommand::All request;
     if(stiff != spellBook->motion.Stiff)
     {
@@ -57,7 +57,7 @@ void MotionModule::Tick(float ellapsedTime)
     else if(goalieStand != spellBook->motion.GoalieStand)
     {
         goalieStand = spellBook->motion.GoalieStand;
-        request.body = ActionCommand::Body(goalieStand ? ActionCommand::Body::GOALIE_STAND : ActionCommand::Body::GOALIE_INITIAL);
+        request.body = ActionCommand::Body(goalieStand ? ActionCommand::Body::GOALIE_AFTERSIT_INITIAL : ActionCommand::Body::GOALIE_INITIAL);
     }
     else if(spellBook->motion.Dead)
     {
@@ -65,8 +65,8 @@ void MotionModule::Tick(float ellapsedTime)
     }
     else if(spellBook->motion.TipOver)
     {
-        //request.body = ActionCommand::Body(ActionCommand::Body::TIP_OVER);
-        request.body = ActionCommand::Body(ActionCommand::Body::DEAD);
+        request.body = ActionCommand::Body(ActionCommand::Body::TIP_OVER);
+        //request.body = ActionCommand::Body(ActionCommand::Body::DEAD);
     }
     else if(spellBook->motion.GetupFront)
     {
@@ -100,15 +100,15 @@ void MotionModule::Tick(float ellapsedTime)
     {
         request.body = ActionCommand::Body(ActionCommand::Body::KICK);
         request.body.foot = ActionCommand::Body::LEFT;
-        request.body.caughtRight = true;
-        request.body.caughtLeft = true;
+        request.body.rightArmLimp = true;
+        request.body.leftArmLimp = true;
     }
     else if(spellBook->motion.KickRight)
     {
         request.body = ActionCommand::Body(ActionCommand::Body::KICK);
         request.body.foot = ActionCommand::Body::RIGHT;
-        request.body.caughtRight = true;
-        request.body.caughtLeft = true;
+        request.body.rightArmLimp = true;
+        request.body.leftArmLimp = true;
     }
     else if(spellBook->motion.Walk)
     {
@@ -124,8 +124,8 @@ void MotionModule::Tick(float ellapsedTime)
         }
         else
             request.body = ActionCommand::Body(ActionCommand::Body::WALK, 0, 0, 0, 0.4f, 1.0f);
-        request.body.caughtRight = spellBook->motion.LimpRight;
-        request.body.caughtLeft = spellBook->motion.LimpLeft;
+        request.body.rightArmLimp = spellBook->motion.LimpRight;
+        request.body.leftArmLimp = spellBook->motion.LimpLeft;
     }
     request.leds.leftEye.red = ((spellBook->behaviour.LeftEye & 0xFF0000) >> 16) > 128;
     request.leds.leftEye.green = ((spellBook->behaviour.LeftEye & 0x00FF00) >> 8) > 128;
@@ -141,6 +141,12 @@ void MotionModule::ScaleWalk2014(float *forward, float *left, float *turn)
     float f = *forward;
     float l = *left;
     float t = *turn;
+    if(f > 300.0f)
+        f = 300.0f;
+    if(l > 200.0f)
+        l = 200.0f;
+    if(abs(t) > 1.5f)
+        t = SIG(t)*1.5f;
     float sum = abs(f/300.0f) + abs(l/200.0f) + abs(t/1.5f);
     if(sum <= 1)
         return;

@@ -11,6 +11,9 @@
 #include "LocalisationDefs.hpp"
 #include "types/boostSerializationEigenTypes.hpp"
 #include <Eigen/Eigen>
+#include <vector>
+
+#define MAX_SHARED_BALLS 1
 
 struct SharedLocalisationUpdateBundle {
    SharedLocalisationUpdateBundle() :
@@ -149,6 +152,6 @@ inline std::istream& operator>>(std::istream& is, SharedLocalisationUpdateBundle
    is >> bundle.sharedCovarianceDx;
    is >> bundle.sharedCovarianceDy;
    is >> bundle.sharedCovarianceDh;
-   
+
    return is;
 }

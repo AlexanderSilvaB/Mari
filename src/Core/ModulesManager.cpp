@@ -1,6 +1,8 @@
 #include "ModulesManager.h"
 #include <algorithm>
 #include <signal.h>
+#include <setjmp.h>
+#include "utils/ConcurrentMap.hpp"
 
 using namespace std;
 
@@ -8,10 +10,35 @@ bool system_running = false;
 bool system_cancel = false;
 vector<Module*> ModulesManager::modules;
 
+ConcurrentMap<pthread_t, jmp_buf*> jmpPoints;
+
+void SignalHandler(int sigNumber, siginfo_t* info, void*);
+
 ModulesManager::ModulesManager()
 {
-    signal (SIGINT, ModulesManager::SignalHandler);    
     system_cancel = false;
+
+
+    struct sigaction act;
+    act.sa_sigaction = SignalHandler;
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = SA_SIGINFO | SA_RESETHAND;
+
+    // register the signal handlers
+    if (signal == SIGINT || signal == ALL_SIGNALS)
+        sigaction(SIGINT, &act, NULL);   // CTRL-C termination
+    //if (signal == SIGTERM || signal == ALL_SIGNALS)
+    //    sigaction(SIGTERM, &act, NULL);   // kill -15 termination
+    if (signal == SIGSEGV || signal == ALL_SIGNALS)
+        sigaction(SIGSEGV, &act, NULL);  // seg fault
+    if (signal == SIGFPE || signal == ALL_SIGNALS)
+        sigaction(SIGFPE, &act, NULL);   // floating point exception
+    if (signal == SIGSTKFLT || signal == ALL_SIGNALS)
+        sigaction(SIGSTKFLT, &act, NULL);   // stack faults
+    //if (signal == SIGHUP || signal == ALL_SIGNALS)
+    //    sigaction(SIGHUP, &act, NULL);   // lost controlling terminal
+
+    //signal (SIGINT, ModulesManager::SignalHandler);    
 }
 
 ModulesManager::~ModulesManager()
@@ -19,9 +46,51 @@ ModulesManager::~ModulesManager()
     Cancel();
 }
 
-void ModulesManager::SignalHandler(int s)
+/**
+ * The signal handler. Handles the signal and flag that the thread has died
+ * and allow the watcher thread to restart it.
+ * @param sigNumber The POSIX signal identifier
+ * @param info Signal info struct for the signal
+ * @see registerSignalHandler
+ */
+void SignalHandler(int sigNumber, siginfo_t* info, void*)
 {
-    system_cancel = true;
+    // End the rUNSWift module [CTRL-C]. Call all destructors
+    cout << sigNumber << endl;
+    if (sigNumber == SIGINT) 
+    {
+        cerr << endl;
+        cerr << "###########################" << endl;
+        cerr << "##    SIGINT RECEIVED    ##" << endl;
+        cerr << "##  ATTEMPTING SHUTDOWN  ##" << endl;
+        cerr << "###########################" << endl;
+        system_cancel = true;
+    } 
+    else if (sigNumber == SIGTERM) 
+    {
+        cerr << endl;
+        cerr << "###########################" << endl;
+        cerr << "##   SIGTERM RECEIVED    ##" << endl;
+        cerr << "##  ATTEMPTING SHUTDOWN  ##" << endl;
+        cerr << "###########################" << endl;
+        system_cancel = true;
+    } 
+    else 
+    {
+        // re-register the signal handler
+        SAY("crash detected");
+        registerSignalHandlers(sigNumber);
+        pthread_t thread = pthread_self();
+
+        cerr <<  string(Module::threadName) << " with id " << thread <<
+            " received signal " << sigNumber << " and is restarting" << endl;
+            llog(ERROR) << string(Module::threadName) << " with id "
+                << thread << " received signal "
+                << sigNumber << " and is restarting" << endl;
+
+        longjmp(*jmpPoints[thread], 1);
+    }
+    //system_cancel = true;
 }
 
 void ModulesManager::Attach(Module *module)

@@ -13,7 +13,7 @@ LeastSquaresLine::LeastSquaresLine()
    sum1  = 0;
 }
 
-bool LeastSquaresLine::getLineABC(int *a, int *b, int *c)
+bool LeastSquaresLine::getLineABC(long long *a, long long *b, long long *c)
 {
    /* Standard least squares. We are solving the equation
     *
@@ -80,4 +80,3 @@ bool LeastSquaresLine::getLineABC(int *a, int *b, int *c)
 
    return true;
 }
-

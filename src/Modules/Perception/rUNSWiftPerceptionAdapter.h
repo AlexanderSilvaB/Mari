@@ -3,8 +3,11 @@
 
 #include "Core/rUNSWiftAdapter.h"
 #include <string>
+#include "perception/vision/VisionAdapter.hpp"
+#include "perception/localisation/LocalisationAdapter.hpp"
 #include "perception/kinematics/KinematicsAdapter.hpp"
 #include "perception/dumper/PerceptionDumper.hpp"
+#include "perception/vision/camera/CombinedCamera.hpp"
 #include "blackboard/Adapter.hpp"
 
 #define THREAD_MAX_TIME 33666
@@ -26,6 +29,8 @@ class rUNSWiftPerceptionAdapter : public rUNSWiftAdapter
 
     private:
         KinematicsAdapter *kinematicsAdapter;
+        LocalisationAdapter *localisationAdapter;
+        VisionAdapter *visionAdapter;
 
         PerceptionDumper *dumper;
         Timer dump_timer;

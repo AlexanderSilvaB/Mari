@@ -95,7 +95,8 @@ if [ $build == true ]; then
     fi
 fi
 
-if [ $ssh == true ]; then
+#if [ $ssh == true ]; then
+if [ false == true ]; then
     echo "Sync keys"
     mkdir -p keys
     if [ ! -f ~/.ssh/id_rsa ]; then

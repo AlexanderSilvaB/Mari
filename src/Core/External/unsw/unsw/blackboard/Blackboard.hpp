@@ -1,3 +1,34 @@
+/*
+Copyright 2010 The University of New South Wales (UNSW).
+
+This file is part of the 2010 team rUNSWift RoboCup entry. You may
+redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version as
+modified below. As the original licensors, we add the following
+conditions to that license:
+
+In paragraph 2.b), the phrase "distribute or publish" should be
+interpreted to include entry into a competition, and hence the source
+of any derived work entered into a competition must be made available
+to all parties involved in that competition under the terms of this
+license.
+
+In addition, if the authors of a derived work publish any conference
+proceedings, journal articles or other academic papers describing that
+derived work, then appropriate academic citations to the original work
+must be included in that publication.
+
+This rUNSWift source is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this source code; if not, write to the Free Software Foundation,
+Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+*/
+
 #pragma once
 
 #include <boost/thread/mutex.hpp>
@@ -11,20 +42,20 @@
 #include <vector>
 #include <deque>
 
-#include "perception/behaviour/ReadySkillPositionAllocation.hpp"
-#include "motion/generator/PendulumModel.hpp"
+//#include "perception/behaviour/ReadySkillPositionAllocation.hpp"
 #include "utils/body.hpp"
 #include "utils/boostSerializationVariablesMap.hpp"
 #include "perception/kinematics/Parameters.hpp"
-#include "perception/vision/VisionDefs.hpp"
-#include "perception/vision/RobotRegion.hpp"
+#include "perception/vision/VisionDefinitions.hpp"
+#include "perception/vision/other/RobotRegion.hpp"
 #include "perception/localisation/LocalisationDefs.hpp"
+#include "perception/localisation/LocalisationUtils.hpp"
 #include "perception/localisation/SharedLocalisationUpdateBundle.hpp"
 #include "perception/kinematics/Pose.hpp"
 #include "gamecontroller/RoboCupGameControlData.hpp"
 #include "utils/Logger.hpp"
-#include "transmitter/TransmitterDefs.hpp"
-#include "types/BehaviourRequest.hpp"
+//#include "transmitter/TransmitterDefs.hpp"
+//#include "types/BehaviourRequest.hpp"
 
 #include "types/ActionCommand.hpp"
 #include "types/ButtonPresses.hpp"
@@ -33,19 +64,27 @@
 #include "types/RRCoord.hpp"
 #include "types/AbsCoord.hpp"
 #include "types/XYZ_Coord.hpp"
+#include "types/SPLStandardMessage.hpp"
 #include "types/BroadcastData.hpp"
-#include "types/BehaviourSharedData.hpp"
+//#include "types/BehaviourSharedData.hpp"
 
 #include "types/FootInfo.hpp"
 #include "types/BallInfo.hpp"
 #include "types/PostInfo.hpp"
 #include "types/RobotInfo.hpp"
 #include "types/RobotObstacle.hpp"
-#include "types/FieldEdgeInfo.hpp"
+#include "types/FieldBoundaryInfo.hpp"
 #include "types/FieldFeatureInfo.hpp"
 #include "types/Ipoint.hpp"
 #include "types/Odometry.hpp"
 #include "types/TeamBallInfo.hpp"
+#include "types/CameraSettings.hpp"
+#include "types/LastSecondInfo.hpp"
+
+#include "perception/vision/Region.hpp"
+#include "soccer.hpp"
+
+//#include "simulation/SimVisionAdapter.hpp"
 
 namespace VisionTest
 {
@@ -114,39 +153,49 @@ namespace VisionTest
  */
 
 class NetworkReader;
-
 class OverviewTab;
 
 struct KinematicsBlackboard {
    explicit KinematicsBlackboard();
    void readOptions(const boost::program_options::variables_map& config);
    // Sonar filter is in kinematics because it needs to be run before vision
-   std::vector< std::vector <int> > sonarFiltered; 
+   std::vector< std::vector <int> > sonarFiltered;
    bool isCalibrating;
    Parameters<float> parameters;
    SensorValues sensorsLagged;
 };
 
 /* Data Behaviour module will be sharing with others */
+/*
 struct BehaviourBlackboard {
    explicit BehaviourBlackboard();
    void readOptions(const boost::program_options::variables_map& config);
    BehaviourRequest request[2]; // double buffer to avoid concurrent access with motion
    int readBuf;
    std::string skill;
+   int kickoffSide;
+   AbsCoord walkingTo;
+   AbsCoord shootingTo;
    BehaviourSharedData behaviourSharedData;
+   bool remoteStiffen;
+   bool useGetups;
 };
+*/
 
 /* Data Localisation module will be sharing */
+
 struct LocalisationBlackboard {
    explicit LocalisationBlackboard();
+   void readOptions(const boost::program_options::variables_map& config);
 
-   // Global robot position 
+   // Global robot position
    AbsCoord robotPos;
+   std::vector< AbsCoord > allrobotPos;
 
    // Number of frames since the ball has been seen.
    // TODO: this doesnt belong in localisation! Move to behaviours or vision.
    uint32_t ballLostCount;
+   uint32_t ballSeenCount;
 
    // Robot relative coords.
    RRCoord ballPosRR;
@@ -156,14 +205,15 @@ struct LocalisationBlackboard {
 
    // Robot relative ball velocity.
    // TODO: make this in global coords and change behaviours correspondingly.
+   // Ball Detection currently assumes this is in Robot Relative coordinates
    AbsCoord ballVelRRC;
 
    // Global ball velocity
    AbsCoord ballVel;
-   
+
    double robotPosUncertainty;
    double robotHeadingUncertainty;
-   
+
    double ballPosUncertainty;
    // The maximal eigenvalue of the velocity covariance matrix.
    double ballVelEigenvalue;
@@ -173,77 +223,83 @@ struct LocalisationBlackboard {
 
    // TODO: get rid of this variable from behaviours and everywhere else!
    TeamBallInfo teamBall;
-   
+
    XYZ_Coord ballNeckRelative;
-   
+
    SharedLocalisationUpdateBundle sharedLocalisationBundle;
-   
+
    bool havePendingOutgoingSharedBundle;
    std::vector<bool> havePendingIncomingSharedBundle;
 
-   /** filtered positions of visual robots */
+   //filtered positions of visual robots
    std::vector<RobotObstacle> robotObstacles;
+
+   bool setInitialPose;
+   bool setFallen;
+   bool getupLost;
 };
 
 
 /* Data Vision module will be sharing with others */
+
 struct VisionBlackboard {
+
    explicit VisionBlackboard();
-
-   /* Time the frame was captured */
+   //Time the frame was captured
    int64_t timestamp;
-  
-   /* Detected features */
-   std::vector<Ipoint>           landmarks;
-   std::vector<FootInfo>         feet;
-   std::vector<BallInfo>         balls;
-   BallHint                      ballHint;
-   std::vector<PostInfo>         posts;
-   std::vector<RobotInfo>        robots;
-   std::vector<FieldEdgeInfo>    fieldEdges;
-   std::vector<FieldFeatureInfo> fieldFeatures;	
-   Odometry                      vOdometry;
-   Odometry                      dualOdometry;
-   unsigned int                  missedFrames;
-   std::pair<int, int>           dxdy;
-   bool                          caughtLeft;
-   bool                          caughtRight; // robot is caught on LHS or RHS
-   PostInfo::Type                goalArea;
-   float                         awayGoalProb;
-   int                           homeMapSize;
-   int                           awayMapSize;
 
-   /** Saliency scan */
+   //Info from the previous second's frames 
+   LastSecondInfo lastSecond;
+
+   //Detected features
+   std::vector<Ipoint>              landmarks;
+   std::vector<FootInfo>            feet_boxes;
+   std::vector<BallInfo>            balls;
+   std::vector<BallInfo>            uncertain_balls;
+   BallHint                         ballHint;
+   std::vector<PostInfo>            posts;
+   std::vector<RobotInfo>           robots;
+   std::vector<FieldBoundaryInfo>   fieldBoundaries;
+   std::vector<FieldFeatureInfo>    fieldFeatures;
+   std::vector<RegionI>             regions;
+   unsigned int                     missedFrames;
+   std::pair<int, int>              dxdy;
+   PostInfo::Type                   goalArea;
+   float                            awayGoalProb;
+   int                              homeMapSize;
+   int                              awayMapSize;
+
+   //Saliency scan
    Colour *topSaliency;
    Colour *botSaliency;
    Colour *saliency;
 
-   /** Pointer to the current frame being processed by Vision */
+   //Pointer to the current frame being processed by Vision
    uint8_t const* currentFrame;
    uint8_t const* topFrame;
    uint8_t const* botFrame;
 
-   /**
-    * DO NOT USE ANYTHING BELOW HERE
-    * Kept here only for compatibility with 2010 filter
-    * Will be depricated by daves new filter
-    */
+   //Current camera settings on the robot
+   CameraSettings topCameraSettings;
+   CameraSettings botCameraSettings;
 
-   /** Points on field lines */
+   //Points on field lines
    int numFieldLinePoints;
    RRCoord fieldLinePoints[MAX_FIELD_LINE_POINTS];
    bool canSeeBottom[MAX_POSTS];
    bool canSeeBottomRobot[MAX_ROBOTS];
 };
 
+
 struct PerceptionBlackboard {
    explicit PerceptionBlackboard();
    uint32_t kinematics;
    uint32_t localisation;
    uint32_t vision;
-   uint32_t behaviour;
+   //uint32_t behaviour;
    uint32_t total;
 };
+
 
 struct GameControllerBlackboard {
    explicit GameControllerBlackboard();
@@ -254,7 +310,8 @@ struct GameControllerBlackboard {
    TeamInfo our_team;
    bool team_red;
    int player_number;
-   GameType game_type;
+   uint8_t gameState;
+   char* lastGameControllerIPAddress;
 };
 
 
@@ -262,26 +319,28 @@ struct MotionBlackboard {
    explicit MotionBlackboard();
    SensorValues sensors;
    // A rolling list of recent observations of range (m) readings to potentially multiple obstacles
-   std::vector < std::vector <int> > sonarWindow; 
+   std::vector < std::vector <int> > sonarWindow;
    float uptime;
    ActionCommand::All active;
    Odometry odometry;
    ButtonPresses buttons;
    Pose pose;
    XYZ_Coord com;
-   // pendulum state
-   PendulumModel pendulumModel;
 };
 
+/*
 struct RemoteControlBlackboard {
    explicit RemoteControlBlackboard();
-   BehaviourRequest request;
+   //BehaviourRequest request;
    time_t time_received;
 };
+*/
+
 
 struct ReceiverBlackboard {
    explicit ReceiverBlackboard();
    // one for each robot on the team
+   SPLStandardMessage message[ROBOTS_PER_TEAM];
    BroadcastData data[ROBOTS_PER_TEAM];
    int team;
    void readOptions(const boost::program_options::variables_map& config);
@@ -313,16 +372,17 @@ class Blackboard {
    // Adapter friends
    friend class LocalisationAdapter;
    friend class VisionAdapter;
+   //friend class SimVisionAdapter;
    friend class MotionAdapter;
-   friend class BehaviourAdapter;
+   //friend class BehaviourAdapter;
    friend class GameController;
-   friend class OffNaoTransmitter;
-   friend class NaoTransmitter;
-   friend class TeamTransmitter;
-   friend class NaturalLandmarksTransmitter;
-   friend class NaoReceiver;
-   friend class RemoteControlReceiver;
-   friend class TeamReceiver;
+   //friend class OffNaoTransmitter;
+   //friend class NaoTransmitter;
+   //friend class TeamTransmitter;
+   //friend class NaturalLandmarksTransmitter;
+   //friend class NaoReceiver;
+   //friend class RemoteControlReceiver;
+   //friend class TeamReceiver;
    friend class KinematicsAdapter;
    friend class PerceptionThread;
    friend class KinematicsCalibrationSkill;
@@ -333,6 +393,7 @@ class Blackboard {
    friend class NetworkReader;
    friend class LocalisationReader;
    friend class OverviewTab;
+   friend class nnmcTab;
    friend class CameraTab;
    friend class CalibrationTab;
    friend class VisionTab;
@@ -396,7 +457,7 @@ class Blackboard {
       /**
        * the mask of what is stored/loaded from a file or network
        */
-      OffNaoMask_t mask;
+      //OffNaoMask_t mask;
 
       /* Options callback for changes at runtime */
       void readOptions(const boost::program_options::variables_map& config);
@@ -405,7 +466,7 @@ class Blackboard {
       KinematicsBlackboard kinematics;
 
       /* Data Behaviour module will be sharing with others */
-      BehaviourBlackboard behaviour;
+      //BehaviourBlackboard behaviour;
 
       /* Data Localisation module will be sharing */
       LocalisationBlackboard localisation;
@@ -425,7 +486,7 @@ class Blackboard {
       ReceiverBlackboard receiver;
 
 	  /* Data received from remote-control piece in Off-Nao */
-	  RemoteControlBlackboard remoteControl;
+	  //RemoteControlBlackboard remoteControl;
 
       /* Data ThreadWatcher will be sharing with others */
       ThreadBlackboard thread;
@@ -435,4 +496,3 @@ class Blackboard {
 };
 
 #include "Blackboard.tcc"
-

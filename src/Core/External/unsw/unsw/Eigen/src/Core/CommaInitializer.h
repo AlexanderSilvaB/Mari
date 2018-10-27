@@ -98,9 +98,10 @@ struct CommaInitializer
 
   inline ~CommaInitializer()
   {
+    /*
     ei_assert((m_row+m_currentBlockRows) == m_matrix.rows()
          && m_col == m_matrix.cols()
-         && "Too few coefficients passed to comma initializer (operator<<)");
+         && "Too few coefficients passed to comma initializer (operator<<)");*/
   }
 
   /** \returns the built matrix once all its coefficients have been set.

@@ -7,7 +7,7 @@ const char *const FieldFeatureInfo::TypeName[] =
    "fLine",
    "fCorner",
    "fTJunction",
+   "fGoalBoxCorner",
    "fPenaltySpot",
    "fCentreCircle"
 };
-

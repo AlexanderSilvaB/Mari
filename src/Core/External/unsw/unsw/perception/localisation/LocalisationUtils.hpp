@@ -45,8 +45,11 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #define TEAM_BALL_ABS_FAR_THRESHOLD 2000.0
 #define TEAM_BALL_MAHA_THRESHOLD 1.0
 
+// Assertion call disabled as we don't want to crash if we don't have to.
 #define MY_ASSERT(X, Y) if (!(X)) { std::cout << "ERROR DETECTED: " << Y << std::endl; } assert(X)
 #define MY_ASSERT_2(X) if (!(X)) { std::cout << "ERROR DETECTED" << std::endl; } assert(X)
+
+#define MAX_GAUSSIANS 8
 
 bool absDistClose(const AbsCoord &abs1, const AbsCoord &abs2, float distThreshold);
 
@@ -110,5 +113,3 @@ inline void prettyOutputMatrix(std::string name, const Eigen::MatrixXd &matrix) 
 void logAbsCoord(const AbsCoord abs, std::string name);
 void logAbsCoordVar(const AbsCoord abs, std::string name);
 void logAbsCoordCov(const AbsCoord abs, std::string name);
-
-

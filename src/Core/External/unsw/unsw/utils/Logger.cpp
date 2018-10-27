@@ -81,8 +81,19 @@ std::ostream &Logger::realLlog(int logLevel_) {
    }
 }
 
+std::ostream &Logger::realLlog(int logLevel_, int indentInc_) {
+   indentLevel = std::min(0, indentLevel + indentInc_);
+   for (int i = 0; i < indentLevel; ++i) {
+      *logStream << " ";
+   }
+   //if (indentInc_ > 0) *logStream << "BEGIN: ";
+   //if (indentInc_ < 0) *logStream << "END: ";
+   return Logger::realLlog(logLevel_);
+}
+
 __thread Logger *Logger::logger = NULL;
 bool Logger::initialised = false;
 bool Logger::motion;
+int Logger::indentLevel = 0;
 std::string Logger::logPath;
 enum LogLevel Logger::logLevel;

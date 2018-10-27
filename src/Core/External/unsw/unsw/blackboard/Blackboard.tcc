@@ -4,6 +4,8 @@
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/vector.hpp>
 
+#include "soccer.hpp"
+
 template<class T>
 const T& Blackboard::read(const T *component) {
    return *component;
@@ -14,7 +16,71 @@ void Blackboard::write(T *component, const T& value) {
    *component = value;
 }
 
-BOOST_CLASS_VERSION(Blackboard, 16);
+/* ============================================================================
+ *                     BACKWARDS-COMPATIBLE SERIALISATION
+ * ============================================================================
+ *             IF YOU ARE MODIFYING BLACKBOARD, PLEASE READ THIS!
+ *
+ * When changing the Blackboard (i.e. adding, removing, or changing the type of
+ * a variable), there a few simple steps that must be taken to ensure that the
+ * new Blackboard instance is backwards compatible. Otherwise, offnao (or other
+ * dump readers) will not be able to interpret dumps prior to the change.
+ *
+ * FOR ANY CHANGES
+ * 1. Increment the Boost class version (defined below):
+ *    e.g.
+ *          BOOST_CLASS_VERSION(Blackboard, n);
+ *    Becomes:
+ *          BOOST_CLASS_VERSION(Blackboard, n+1);
+ *
+ * ADDING A VARIABLE
+ * 1. Increment the Boost class version (see above)
+ * 2. Add the variable to the 'shallowSerialize' function with a version
+ * conditional:
+ *    e.g.
+ *          if (version > n)  // where n is the pre-increment version
+ *          {
+ *             ar & x;        // where x is the new variable
+ *          }
+ *
+ * REMOVING A VARIABLE
+ * 1. Increment the Boost class version (see above)
+ * 2. Add a version conditional to the variable in the 'shallowSerialize'
+ * function:
+ *    e.g.
+ *          if (version <= n)  // where n is the pre-increment version
+ *          {
+ *             T tmp;
+ *             ar & tmp;      // this is essentially a default/junk value
+ *          }
+ *
+ * CHANGING THE TYPE OF A VARIABLE
+ * 1. Increment the Boost class version (see above)
+ * 2. Add a version conditional to the variable in the 'shallowSerialize'
+ * function:
+ *     e.g.
+ *          if (version <= n) // where n is the pre-increment version
+ *          {
+ *             T1 tmp;
+ *             ar & tmp;
+ *             x = (T2)tmp;   // assuming T1 can be type-cast converted
+ *                            // to T2 (conversion may be more complicated)
+ *          }
+ *          else
+ *          {
+ *             ar & x;
+ *          }
+ *
+ * GENERAL COMMENT
+ * The above guidelines must be followed when modifying the Blackboard.
+ *
+ * To reviewers: if you are reviewing code that has not followed the above
+ * guidelines, please ask the author to make the appropriate changes before
+ * approving the pull request.
+ *
+ * For more info, see the Wiki page titled 'Serialization'.
+ */
+BOOST_CLASS_VERSION(Blackboard, 19);
 
 template<class Archive>
 void Blackboard::shallowSerialize(Archive & ar,
@@ -24,8 +90,8 @@ void Blackboard::shallowSerialize(Archive & ar,
       throw std::runtime_error("Depricated 2011 dump file detected");
    }
 
-   ar & gameController.team_red;
-   ar & gameController.player_number;
+   //ar & gameController.team_red;
+   //ar & gameController.player_number;
 
    ar & motion.sensors;
    ar & motion.pose;
@@ -33,19 +99,21 @@ void Blackboard::shallowSerialize(Archive & ar,
    ar & motion.odometry;
    ar & motion.active;
 
-   ar & perception.behaviour;
+   //ar & perception.behaviour;
    ar & perception.kinematics;
-   ar & perception.localisation;
+   //ar & perception.localisation;
    ar & perception.total;
-   ar & perception.vision;
+   //ar & perception.vision;
 
-   ar & behaviour.request;
+   // This request was updated for version 19 but not sure if more is required
+   //ar & behaviour.request;
 
    ar & kinematics.sonarFiltered;
    ar & kinematics.parameters;
    ar & kinematics.sensorsLagged;
 
-   if (this->mask & ROBOT_FILTER_MASK) {
+/*
+   if (1) {//(this->mask & ROBOT_FILTER_MASK) {
       ar & localisation.robotObstacles;
    } else {
       std::vector<RobotInfo> empty;
@@ -58,33 +126,52 @@ void Blackboard::shallowSerialize(Archive & ar,
       std::vector<Ipoint> empty;
       ar & empty;
    }
+*/
+   /* Only serialise the things below if WHITEBOARD_MASK is not set.
+    * We also ONLY want this to happen when we are serialising in Offnao,
+    * which occurs when we save the dump. WHITEBOARD_MASK can only be set
+    * in the save funciton in offnao. 
+    */
+   /*
+   if (!(this->mask & WHITEBOARD_MASK)){
+       ar & vision.timestamp;
+       ar & vision.goalArea;
+       ar & vision.awayGoalProb;
+       ar & vision.homeMapSize;
+       ar & vision.awayMapSize;
+       ar & vision.feet_boxes;
+       ar & vision.balls;
+       ar & vision.ballHint;
+       ar & vision.posts;
+       ar & vision.robots;
+       ar & vision.fieldBoundaries;
+       ar & vision.fieldFeatures;
+       ar & vision.missedFrames;
+       ar & vision.dxdy;
 
-   ar & vision.timestamp;
-   ar & vision.caughtLeft;
-   ar & vision.caughtRight;
-   ar & vision.goalArea;
-   ar & vision.awayGoalProb;
-   ar & vision.homeMapSize;
-   ar & vision.awayMapSize;
-   ar & vision.feet;
-   ar & vision.balls;
-   ar & vision.ballHint;
-   ar & vision.posts;
-   ar & vision.robots;
-   ar & vision.fieldEdges;
-   ar & vision.fieldFeatures;
-   ar & vision.vOdometry;
-   ar & vision.dualOdometry;
-   ar & vision.missedFrames;
-   ar & vision.dxdy;
+       if(version >= 17) {
+          ar & vision.regions;
+       }
+   }
 
+   ar & vision.topCameraSettings;
+   ar & vision.botCameraSettings;
+
+   if (version >= 17) ar & vision.lastSecond;
+
+   ar & receiver.message;
    ar & receiver.data;
    ar & receiver.incapacitated;
 
-   ar & motion.pendulumModel;
 
    ar & localisation.robotPos;
+   ar & localisation.allrobotPos;
    ar & localisation.ballLostCount;
+
+   if(version >= 18) {
+      ar & localisation.ballSeenCount;
+   }
+   
    ar & localisation.ballPosRR;
    ar & localisation.ballPosRRC;
    ar & localisation.ballVelRRC;
@@ -101,10 +188,12 @@ void Blackboard::shallowSerialize(Archive & ar,
    ar & localisation.sharedLocalisationBundle;
    ar & localisation.havePendingOutgoingSharedBundle;
    ar & localisation.havePendingIncomingSharedBundle;
+   */
 }
 
 template<class Archive>
 void Blackboard::save(Archive & ar, const unsigned int version) const {
+      /*
    // note, version is always the latest when saving
    OffNaoMask_t mask = this->mask;
    if ((mask & SALIENCY_MASK) && (!vision.topSaliency || !vision.botSaliency))
@@ -156,10 +245,12 @@ void Blackboard::save(Archive & ar, const unsigned int version) const {
    }
 
    ar & localisation.robotPos;
+   */
 }
 
 template<class Archive>
 void Blackboard::load(Archive & ar, const unsigned int version) {
+      /*
    ar & mask;
    if (mask & BLACKBOARD_MASK)
       shallowSerialize(ar, version);
@@ -190,6 +281,7 @@ void Blackboard::load(Archive & ar, const unsigned int version) {
    }
 
    ar & localisation.robotPos;
+   */
 }
 
 namespace boost {

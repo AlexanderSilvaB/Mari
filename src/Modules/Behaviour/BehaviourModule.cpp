@@ -44,39 +44,39 @@ void BehaviourModule::Tick(float ellapsedTime)
     {
         spellBook->behaviour.Fallen = false;
         timeSinceAct = 0;
-        spellBook->behaviour.LeftEye = BLUE;
-        spellBook->behaviour.RightEye = BLUE;
+        spellBook->behaviour.LeftEye = COLOR_BLUE;
+        spellBook->behaviour.RightEye = COLOR_BLUE;
         SAY("The bakery fell");
     }
     else if(spellBook->behaviour.Started && timeSinceAct > 2.0f)
     {
         spellBook->behaviour.Started = false;
         timeSinceAct = 0;
-        spellBook->behaviour.LeftEye = RED;
-        spellBook->behaviour.RightEye = RED;
+        spellBook->behaviour.LeftEye = COLOR_RED;
+        spellBook->behaviour.RightEye = COLOR_RED;
         SAY("Can wait to kill some players");
     }
     else if(spellBook->behaviour.Penalized && timeSinceAct > 10.0f)
     {
         timeSinceAct = 0;
-        spellBook->behaviour.LeftEye = RED;
-        spellBook->behaviour.RightEye = BLACK;
+        spellBook->behaviour.LeftEye = COLOR_RED;
+        spellBook->behaviour.RightEye = COLOR_BLACK;
         SAY("Let me play, now");
     }
     else if(spellBook->behaviour.Die && timeSinceAct > 2.0f)
     {
         spellBook->behaviour.Die = false;
         timeSinceAct = 0;
-        spellBook->behaviour.LeftEye = BLACK;
-        spellBook->behaviour.RightEye = BLACK;
+        spellBook->behaviour.LeftEye = COLOR_BLACK;
+        spellBook->behaviour.RightEye = COLOR_BLACK;
         SAY("I am dead");
     }
     else
     {
         if(spellBook->perception.vision.ball.BallDetected)
-            spellBook->behaviour.LeftEye = BLUE;
+            spellBook->behaviour.LeftEye = COLOR_BLUE;
         else
-            spellBook->behaviour.LeftEye = GREEN;
-        spellBook->behaviour.RightEye = RED;
+            spellBook->behaviour.LeftEye = COLOR_GREEN;
+        spellBook->behaviour.RightEye = COLOR_RED;
     }
 }

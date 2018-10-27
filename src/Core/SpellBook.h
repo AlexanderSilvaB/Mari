@@ -150,6 +150,10 @@ class StrategySpell : public Spell
         bool FallenFront, FallenBack;
         bool Die, TurnOver;
 
+        bool WalkForward;
+        bool WalkAside;
+        float TargetX, TargetY, TargetTheta;
+
         StrategySpell();
         void CopyTo(Spell *spell);
         void Load(Storage &storage);

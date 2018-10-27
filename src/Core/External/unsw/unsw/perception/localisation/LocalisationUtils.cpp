@@ -125,7 +125,7 @@ Eigen::MatrixXd sparseMultiplication(
    result.setZero();
    for (unsigned i = rowStart; i < rowEnd; i++) {
       for (unsigned j = colStart; j < colEnd; j++) {
-         for (unsigned k = 0; k < rhs.cols(); k++) {
+         for (unsigned k = 0; k < (unsigned int) rhs.cols(); k++) {
             result(i, k) += lhs(i, j) * rhs(j, k);
          }
       }
@@ -146,7 +146,7 @@ Eigen::MatrixXd sparseMultiplication(
    Eigen::MatrixXd result(lhs.rows(), rhs.cols());
    result.setZero();
    
-   for (unsigned i = 0; i < lhs.rows(); i++) {
+   for (unsigned i = 0; i < (unsigned int) lhs.rows(); i++) {
       for (unsigned j = rowStart; j < rowEnd; j++) {
          for (unsigned k = colStart; k < colEnd; k++) {
             result(i, k) += lhs(i, j) * rhs(j, k);

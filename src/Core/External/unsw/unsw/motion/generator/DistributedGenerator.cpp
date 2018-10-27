@@ -1,11 +1,46 @@
+/*
+Copyright 2010 The University of New South Wales (UNSW).
+
+This file is part of the 2010 team rUNSWift RoboCup entry. You may
+redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version as
+modified below. As the original licensors, we add the following
+conditions to that license:
+
+In paragraph 2.b), the phrase "distribute or publish" should be
+interpreted to include entry into a competition, and hence the source
+of any derived work entered into a competition must be made available
+to all parties involved in that competition under the terms of this
+license.
+
+In addition, if the authors of a derived work publish any conference
+proceedings, journal articles or other academic papers describing that
+derived work, then appropriate academic citations to the original work
+must be included in that publication.
+
+This rUNSWift source is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this source code; if not, write to the Free Software Foundation,
+Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+*/
+
 #include "motion/generator/DistributedGenerator.hpp"
 #include "motion/generator/ActionGenerator.hpp"
 #include "motion/generator/DeadGenerator.hpp"
 #include "motion/generator/HeadGenerator.hpp"
 #include "motion/generator/NullGenerator.hpp"
 #include "motion/generator/RefPickupGenerator.hpp"
-#include "motion/generator/StandGenerator.hpp"
 #include "motion/generator/WalkEnginePreProcessor.hpp"
+#ifdef SIMULATION
+    typedef ActionGenerator GetupGenerator;
+#else
+    #include "motion/generator/GetupGenerator.hpp"
+#endif
 
 #include "utils/body.hpp"
 #include "utils/Logger.hpp"
@@ -18,7 +53,7 @@ using boost::program_options::variables_map;
  * ---------------------
  * This generator switches between all required generators as requested.
  *---------------------------------------------------------------------------*/
-DistributedGenerator::DistributedGenerator()
+DistributedGenerator::DistributedGenerator(Blackboard *bb)
    : isStopping(false),
      current_generator(Body::NONE),
      prev_generator(Body::NONE),
@@ -34,7 +69,7 @@ DistributedGenerator::DistributedGenerator()
    if (!bodyGenerators[Body::NONE])
       llog(FATAL) << "bodyGenerators[NONE] is NULL!" << std::endl;
 
-   bodyGenerators[Body::STAND] = (Generator*)(new StandGenerator());
+   bodyGenerators[Body::STAND] = (Generator*)(new ActionGenerator("stand"));
    if (!bodyGenerators[Body::STAND])
       llog(FATAL) << "bodyGenerators[STAND] is NULL!" << std::endl;
 
@@ -48,7 +83,7 @@ DistributedGenerator::DistributedGenerator()
    if (!bodyGenerators[Body::STAND_STRAIGHT])
       llog(FATAL) << "bodyGenerators[STAND_STRAIGHT] is NULL!" << std::endl;
 
-   bodyGenerators[Body::WALK] = (Generator*)(new WalkEnginePreProcessor());
+   bodyGenerators[Body::WALK] = (Generator*)(new WalkEnginePreProcessor(bb));
    if (!bodyGenerators[Body::WALK])
       llog(FATAL) << "bodyGenerators[WALK] is NULL!" << std::endl;
 
@@ -58,21 +93,27 @@ DistributedGenerator::DistributedGenerator()
 
    bodyGenerators[Body::DRIBBLE] = bodyGenerators[Body::WALK];
 
+   bodyGenerators[Body::TURN_DRIBBLE] = bodyGenerators[Body::WALK];
+
    bodyGenerators[Body::GETUP_FRONT] = (Generator*)
-                                       (new ActionGenerator("getupFront"));
+                                       (new GetupGenerator("FRONT"));
    if (!bodyGenerators[Body::GETUP_FRONT])
       llog(FATAL) << "bodyGenerators[GETUP_FRONT] is NULL!" << std::endl;
 
    bodyGenerators[Body::GETUP_BACK] = (Generator*)
-                                      (new ActionGenerator("getupBack"));
+                                       (new GetupGenerator("BACK"));
    if (!bodyGenerators[Body::GETUP_BACK])
       llog(FATAL) << "bodyGenerators[GETUP_BACK] is NULL!" << std::endl;
+
+   bodyGenerators[Body::TIP_OVER] = (Generator*)
+                                       (new ActionGenerator("tipOver"));
+   if (!bodyGenerators[Body::TIP_OVER])
+      llog(FATAL) << "bodyGenerators[TIP_OVER] is NULL!" << std::endl;
 
    bodyGenerators[Body::INITIAL] = (Generator*)
                                    (new ActionGenerator("initial"));
    if (!bodyGenerators[Body::INITIAL])
       llog(FATAL) << "bodyGenerators[INITIAL] is NULL!" << std::endl;
-
    bodyGenerators[Body::DEAD] = (Generator*)(new DeadGenerator());
    if (!bodyGenerators[Body::DEAD])
       llog(FATAL) << "bodyGenerators[DEAD] is NULL!" << std::endl;
@@ -80,16 +121,6 @@ DistributedGenerator::DistributedGenerator()
    bodyGenerators[Body::REF_PICKUP] = (Generator*)(new RefPickupGenerator());
    if (!bodyGenerators[Body::REF_PICKUP])
       llog(FATAL) << "bodyGenerators[REF_PICKUP] is NULL!" << std::endl;
-
-   bodyGenerators[Body::OPEN_FEET] = (Generator*)
-                                     (new ActionGenerator("openFeet"));
-   if (!bodyGenerators[Body::OPEN_FEET])
-      llog(FATAL) << "bodyGenerators[OPEN_FEET] is NULL!" << std::endl;
-
-   bodyGenerators[Body::THROW_IN] = (Generator*)
-                                    (new ActionGenerator("throwIn"));
-   if (!bodyGenerators[Body::THROW_IN])
-      llog(FATAL) << "bodyGenerators[THROW_IN] is NULL!" << std::endl;
 
    bodyGenerators[Body::GOALIE_SIT] = (Generator*)
                                       (new ActionGenerator("goalieSit"));
@@ -107,7 +138,7 @@ DistributedGenerator::DistributedGenerator()
       llog(FATAL) << "bodyGenerators[GOALIE_DIVE_RIGHT] is NULL!" << std::endl;
 
    bodyGenerators[Body::GOALIE_CENTRE] = (Generator*)
-                                             (new ActionGenerator("goalieCentre"));
+                                             (new ActionGenerator("defenderSquat")); //goalieCentre
    if (!bodyGenerators[Body::GOALIE_CENTRE])
       llog(FATAL) << "bodyGenerators[GOALIE_CENTRE] is NULL!" << std::endl;
 
@@ -115,11 +146,6 @@ DistributedGenerator::DistributedGenerator()
                                              (new ActionGenerator("goalieUncentre"));
    if (!bodyGenerators[Body::GOALIE_UNCENTRE])
       llog(FATAL) << "bodyGenerators[GOALIE_UNCENTRE] is NULL!" << std::endl;
-
-   bodyGenerators[Body::GOALIE_STAND] = (Generator*)
-                                             (new ActionGenerator("goalieStand"));
-   if (!bodyGenerators[Body::GOALIE_STAND])
-      llog(FATAL) << "bodyGenerators[GOALIE_STAND] is NULL!" << std::endl;
 
    bodyGenerators[Body::GOALIE_INITIAL] = (Generator*)
                                              (new ActionGenerator("goalieInitial"));
@@ -136,15 +162,12 @@ DistributedGenerator::DistributedGenerator()
    if (!bodyGenerators[Body::DEFENDER_CENTRE])
      llog(FATAL) << "bodyGenerators[DEFENDER_CENTRE] is NULL!" << std::endl;
 
-   bodyGenerators[Body::GOALIE_PICK_UP] = (Generator*)
-                                          (new ActionGenerator("goaliePickup"));
-   if (!bodyGenerators[Body::GOALIE_PICK_UP])
-     llog(FATAL) << "bodyGenerators[GOALIE_PICK_UP] is NULL!" << std::endl;
-
    bodyGenerators[Body::GOALIE_FAST_SIT] = (Generator*)
                                           (new ActionGenerator("goalieFastSit"));
    if (!bodyGenerators[Body::GOALIE_FAST_SIT])
      llog(FATAL) << "bodyGenerators[GOALIE_FAST_SIT] is NULL!" << std::endl;
+
+   
 
    llog(INFO) << "DistributedGenerator constructed" << std::endl;
 }
@@ -192,6 +215,18 @@ JointValues DistributedGenerator::makeJoints(ActionCommand::All* request,
       requestedDive = request->body.actionType;
    }
 
+   // If we're in the dead state, and we aren't transitioning into one of the
+   // getup/fallen states, ensure that we do not shoot up to standing by first going
+   // to a crouching/ref pickup state, else the motors may experience overdrive
+
+   if (prev_generator == Body::DEAD) {
+      if (!(request->body.actionType == Body::GETUP_FRONT 
+         || request->body.actionType == Body::GETUP_BACK
+         || request->body.actionType == Body::TIP_OVER)) {
+         request->body.actionType = Body::REF_PICKUP;
+      }
+   }
+
    JointValues fromBody;
    bool usesHead = false;
 
@@ -209,56 +244,18 @@ JointValues DistributedGenerator::makeJoints(ActionCommand::All* request,
             || (current_generator == Body::GETUP_BACK && request->body.actionType == Body::GETUP_BACK)) {
          bodyGenerators[current_generator]->reset();
       }
-      // special case for goalie sit
-      if (current_generator == Body::GOALIE_SIT || current_generator == Body::GOALIE_FAST_SIT){  //or fast sit
-//            && request->body.actionType != Body::GOALIE_SIT
-         if(requestedDive != Body::NONE){
-//         if (request->body.actionType == Body::GOALIE_DIVE_LEFT ||
-//             request->body.actionType == Body::GOALIE_CENTRE ||
-//             request->body.actionType == Body::GOALIE_DIVE_RIGHT) {
-            current_generator = requestedDive;
-         } else if(request->body.actionType != Body::GOALIE_SIT){
-            current_generator = Body::GOALIE_AFTERSIT_INITIAL;
-         }
-      // goalie after pick up should transition back through goalie uncentre
-      } else if (current_generator == Body::GOALIE_PICK_UP && request->body.actionType != Body::GOALIE_PICK_UP) {
-	current_generator = Body::GOALIE_UNCENTRE;   //Body::GOALIE_PICK_UP;
-      } else if (current_generator == Body::GOALIE_CENTRE && request->body.actionType != Body::GOALIE_CENTRE) {
-         current_generator = Body::GOALIE_UNCENTRE;
-      // and goalie uncentre should transition back through goalie sit
-      } else if (current_generator == Body::GOALIE_UNCENTRE && request->body.actionType != Body::GOALIE_UNCENTRE && request->body.actionType != Body::GOALIE_CENTRE) {
-         current_generator = Body::GOALIE_SIT;
-      // defender centre should transition back through goalie uncentre
-      } else if (current_generator == Body::DEFENDER_CENTRE && request->body.actionType != Body::DEFENDER_CENTRE) {
-        current_generator = Body::GOALIE_UNCENTRE;
-      // anything else should transition through goalie sit to goalie centre 
-      // commit to it
-      } else if ((current_generator != Body::GOALIE_CENTRE &&
-                 request->body.actionType == Body::GOALIE_CENTRE)
-//                 || (current_generator != Body::GOALIE_DIVE_LEFT &&
-//                       request->body.actionType == Body::GOALIE_DIVE_LEFT)
-//                 || (current_generator != Body::GOALIE_DIVE_RIGHT &&
-//                       request->body.actionType == Body::GOALIE_DIVE_RIGHT)
-                 ) {
-//         current_generator = Body::GOALIE_SIT;
-         current_generator = Body::GOALIE_FAST_SIT;
-      } else if (current_generator == Body::GOALIE_STAND && request->body.actionType != Body::GOALIE_STAND) {
-         current_generator = Body::GOALIE_INITIAL;
-      } else {
-         current_generator = request->body.actionType;
-      }
+
+      current_generator = request->body.actionType;
       isStopping = false;
    } else if (bodyGenerators[current_generator]->isActive() &&
               bodyGenerators[current_generator] !=
               bodyGenerators[request->body.actionType]) {
       // Special case to let kicks continue instead of being interrupted by stand
-//      std::cout << current_generator << " " << request->body.actionType << std::endl;
       if (current_generator != Body::KICK || request->body.actionType != Body::STAND) {
          bodyGenerators[current_generator]->stop();
          isStopping = true;
       }
    }
-//   std::cout << "active " << bodyGenerators[current_generator]->isActive() << " " << current_generator << std::endl;
 
    if(current_generator == requestedDive){
       requestedDive = Body::NONE;
@@ -270,24 +267,22 @@ JointValues DistributedGenerator::makeJoints(ActionCommand::All* request,
    case Body::WALK:             usesHead = false; break;
    case Body::GETUP_FRONT:      usesHead = true;  break;
    case Body::GETUP_BACK:       usesHead = true;  break;
+   case Body::TIP_OVER:         usesHead = true;  break;
    case Body::INITIAL:          usesHead = true;  break;
    case Body::KICK:             usesHead = false; break;
    case Body::DRIBBLE:          usesHead = false; break;
+   case Body::TURN_DRIBBLE:     usesHead = false; break;
    case Body::DEAD:             usesHead = true;  break;
    case Body::REF_PICKUP:       usesHead = false; break;
-   case Body::OPEN_FEET:        usesHead = true;  break;
-   case Body::THROW_IN:         usesHead = false; break;
-   case Body::GOALIE_SIT:       usesHead = false; break;
+   case Body::GOALIE_SIT:       usesHead = true; break;
+   case Body::GOALIE_FAST_SIT:  usesHead = true; break;
    case Body::GOALIE_DIVE_LEFT: usesHead = true; break;
    case Body::GOALIE_DIVE_RIGHT: usesHead = true; break;
-   case Body::GOALIE_CENTRE:    usesHead = false; break;
-   case Body::GOALIE_UNCENTRE:  usesHead = false; break;
-   case Body::GOALIE_STAND:     usesHead = false; break;
-   case Body::GOALIE_INITIAL:   usesHead = false; break;
-   case Body::GOALIE_AFTERSIT_INITIAL: usesHead = false; break;
-   case Body::GOALIE_PICK_UP:   usesHead = true;  break;
+   case Body::GOALIE_CENTRE:    usesHead = true; break;
+   case Body::GOALIE_UNCENTRE:  usesHead = true; break;
+   case Body::GOALIE_INITIAL:   usesHead = true; break;
+   case Body::GOALIE_AFTERSIT_INITIAL: usesHead = true; break;
    case Body::DEFENDER_CENTRE:  usesHead = false; break;
-   case Body::GOALIE_FAST_SIT:  usesHead = false; break;
    case Body::MOTION_CALIBRATE: usesHead = false; break;
    case Body::STAND_STRAIGHT:   usesHead = false; break;
    case Body::LINE_UP:          usesHead = false; break;
@@ -307,13 +302,14 @@ JointValues DistributedGenerator::makeJoints(ActionCommand::All* request,
       turn = DEG2RAD(-dir*80);
    }
    *odometry = *odometry + Odometry(0, 0, turn);
+
+   // Robot will not stiffen without this
    fromBody = bodyGenerators[current_generator]->
-              makeJoints(request, odometry, sensors, bodyModel, ballX, ballY);
+      makeJoints(request, odometry, sensors, bodyModel, ballX, ballY);
 
    if(current_generator == Body::KICK && request->body.actionType == Body::WALK) {
       current_generator = Body::WALK;
    }
-
    if (!usesHead) {
       JointValues fromHead = headGenerator->
                              makeJoints(request, odometry, sensors, bodyModel, ballX, ballY);

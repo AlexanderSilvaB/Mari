@@ -25,7 +25,7 @@ class rUNSWiftMotionAdapter : public rUNSWiftAdapter
         void ReadOptions(const boost::program_options::variables_map& config);
 
     private:
-        std::vector<Odometry> odometryBuffer;
+        Odometry odometry;
         /* Buffers so synchronises with vision thread */
         std::vector<SensorValues> sensorBuffer;
         /* Sonar window recorder */

@@ -21,31 +21,28 @@
 
 #include "Core/InitManager.h"
 
-#define ODOMETRY_LAG 8 // buffer the odometry by 8 motion ticks and it synchronises well with vision
 #define SENSOR_LAG 6
 
 using namespace std;
 
-void construct(Touch** touch, std::string name) {
-  #ifdef SIMULATION
-      if (name == "Sim") *touch = (Touch*) new SimTouch();
-  #else
-      if (name == "Agent") *touch = (Touch*) new AgentTouch();
-  #endif
-   if (name == "Null") *touch = (Touch*) new NullTouch();
-   if (*touch == NULL)
-      llog(FATAL) << "MotionAdapter: NULL " + name + "Touch" << endl;
+void construct(Touch **touch, std::string name, int team, int player_number)
+{
+    if (name == "Agent")
+        *touch = (Touch *)new AgentTouch(team, player_number);
+    if (name == "Null")
+        *touch = (Touch *)new NullTouch();
+    if (*touch == NULL)
+        llog(FATAL) << "MotionAdapter: NULL " + name + "Touch" << endl;
 }
 
-void construct(Effector** effector, std::string name) {
-  #ifdef SIMULATION
-      if (name == "Sim") *effector = (Effector*) new SimEffector();
-  #else
-      if (name == "Agent") *effector = (Effector*) new AgentEffector();
-  #endif
-   if (name == "Null") *effector = (Effector*) new NullEffector();
-   if (*effector == NULL)
-      llog(FATAL) << "MotionAdapter: NULL " + name + "Effector" << endl;
+void construct(Effector **effector, std::string name, int team, int player_number)
+{
+    if (name == "Agent")
+        *effector = (Effector *)new AgentEffector(team, player_number);
+    if (name == "Null")
+        *effector = (Effector *)new NullEffector();
+    if (*effector == NULL)
+        llog(FATAL) << "MotionAdapter: NULL " + name + "Effector" << endl;
 }
 
 rUNSWiftMotionAdapter::rUNSWiftMotionAdapter()
@@ -63,101 +60,92 @@ void rUNSWiftMotionAdapter::Start()
 {
     llog(INFO) << "Constructing MotionAdapter" << endl;
 
-   // Initialise the buffers
-   odometryBuffer.clear();
-   sensorBuffer.clear();
-   while(odometryBuffer.size() < ODOMETRY_LAG){
-      odometryBuffer.push_back(Odometry());
-   }
+    sensorBuffer.clear();
 
-   // We only construct the NullTouch/Generators, the rest are done on demand
-   touches["Null"] = (Touch*)(new NullTouch());
-   if (touches["Null"] == NULL) {
-      llog(FATAL) << "MotionAdapter: NULL NullTouch" << endl;
-   }
+    // We only construct the NullTouch/Generators, the rest are done on demand
+    touches["Null"] = (Touch *)(new NullTouch());
+    if (touches["Null"] == NULL)
+    {
+        llog(FATAL) << "MotionAdapter: NULL NullTouch" << endl;
+    }
 
-#ifdef SIMULATION
-   touches["Sim"] = (Touch*)(NULL);
-#else
-   touches["Agent"] = (Touch*)(NULL);
-#endif
+    touches["Agent"] = (Touch *)(NULL);
+    nakedTouch = touches["Null"];
+    touch = (Touch *)new FilteredTouch(touches["Null"]);
 
-   nakedTouch = touches["Null"];
-   touch = (Touch*) new FilteredTouch(touches["Null"]);
+    DistributedGenerator *g = new DistributedGenerator(InitManager::GetBlackboard());
+    generator = (Generator *)new ClippedGenerator((Generator *)g);
+    if (generator == NULL)
+    {
+        llog(FATAL) << "MotionAdapter: NULL Generator" << endl;
+    }
 
-   generator = (Generator*) new ClippedGenerator(
-      (Generator*) new DistributedGenerator());
-   if (generator == NULL) {
-      llog(FATAL) << "MotionAdapter: NULL Generator" << endl;
-   }
+    effectors["Null"] = (Effector *)(new NullEffector());
+    if (effectors["Null"] == NULL)
+    {
+        llog(FATAL) << "MotionAdapter: NULL NullEffector" << endl;
+    }
+    effectors["Agent"] = (Effector *)(NULL);
+    effector = effectors["Null"];
 
-   effectors["Null"] = (Effector*)(new NullEffector());
-   if (effectors["Null"] == NULL) {
-      llog(FATAL) << "MotionAdapter: NULL NullEffector" << endl;
-   }
-#ifdef SIMULATION
-   effectors["Sim"] = (Effector*)(NULL);
-#else
-   effectors["Agent"] = (Effector*)(NULL);
-#endif
-   effector = effectors["Null"];
+    ReadOptions(InitManager::GetBlackboard()->config);
+    touch->readOptions(InitManager::GetBlackboard()->config); // XXX: Do NOT put this in readOptions or robot will fall
 
-   ReadOptions(InitManager::GetBlackboard()->config);
-   touch->readOptions(InitManager::GetBlackboard()->config); // XXX: Do NOT put this in readOptions or robot will fall
-
-   //writeTo(thread, configCallbacks[Thread::name],
-   //        boost::function<void(const boost::program_options::variables_map &)>
-   //        (boost::bind(&MotionAdapter::readOptions, this, _1)));
-
-   llog(INFO) << "MotionAdapater constructed" << std::endl;
+    llog(INFO) << "MotionAdapater constructed" << std::endl;
 }
 
 void rUNSWiftMotionAdapter::Stop()
 {
     llog(INFO) << "Destroying MotionAdapter" << endl;
 
-   writeTo(thread, configCallbacks["motion"], boost::function<void(const boost::program_options::variables_map &)>());
+    writeTo(thread, configCallbacks["motion"], boost::function<void(const boost::program_options::variables_map &)>());
 
-   for (std::map<std::string, Touch*>::iterator it = touches.begin();
-        it != touches.end(); it++) {
-      delete it->second;
-   }
+    for (std::map<std::string, Touch *>::iterator it = touches.begin();
+         it != touches.end(); it++)
+    {
+        delete it->second;
+    }
 
-   delete generator;
+    delete generator;
 
-   for (std::map<std::string, Effector*>::iterator it = effectors.begin();
-        it != effectors.end(); it++) {
-      delete it->second;
-   }
+    for (std::map<std::string, Effector *>::iterator it = effectors.begin();
+         it != effectors.end(); it++)
+    {
+        delete it->second;
+    }
 }
 
 void rUNSWiftMotionAdapter::ReadOptions(const boost::program_options::variables_map &config)
 {
     std::string e = config["motion.effector"].as<string>();
-   std::string t = config["motion.touch"].as<string>();
-   llog(INFO) << "MotionAdapter using effector " << e << " and touch " << t;
+    std::string t = config["motion.touch"].as<string>();
+    llog(INFO) << "MotionAdapter using effector " << e << " and touch " << t;
 
-   // Look through the list of touches for the one requested,
-   // initialize it if it exists.
-   if (touches.count(t)) {
-      if (touches[t] == NULL) {
-         construct(&touches[t], t);
-      }
-      nakedTouch = touches[t];
-      touch = (Touch*) new FilteredTouch(touches[t]);
-   }
+    // Look through the list of touches for the one requested,
+    // initialize it if it exists.
+    if (touches.count(t))
+    {
+        if (touches[t] == NULL)
+        {
+            construct(&touches[t], t, config["player.team"].as<int>(), config["player.number"].as<int>());
+        }
+        nakedTouch = touches[t];
+        touch = (Touch *)new FilteredTouch(touches[t]);
+    }
 
-   // Look through the list of effectors for the one requested,
-   // initialize it if it exists.
-   if (effectors.count(e)) {
-      if (effectors[e] == NULL) { 
-         construct(&effectors[e], e);
-      }
-      effector = effectors[e];
-   }
+    // Look through the list of effectors for the one requested,
+    // initialize it if it exists.
+    if (effectors.count(e))
+    {
+        if (effectors[e] == NULL)
+        {
+            construct(&effectors[e], e, config["player.team"].as<int>(), config["player.number"].as<int>());
+        }
+        effector = effectors[e];
+    }
 
-   // Read the generator options
-   generator->readOptions(config);
+    // Read the generator options
+    generator->readOptions(config);
 }
 
 void rUNSWiftMotionAdapter::Tick(ActionCommand::All &request)
@@ -169,119 +157,124 @@ void rUNSWiftMotionAdapter::Tick(ActionCommand::All &request)
 
     // Get sensor information from kinematics
     SensorValues sensors;
-   if(request.body.actionType == Body::MOTION_CALIBRATE){
-       // raw sensor values are sent to offnao for calibration
-       // these values are straight forward copy paste into pos files
-       sensors = nakedTouch->getSensors(kinematics);
-       sensors.sensors[Sensors::InertialSensor_AngleX] = -RAD2DEG(sensors.sensors[Sensors::InertialSensor_AngleX]);
-       sensors.sensors[Sensors::InertialSensor_AngleY] = -RAD2DEG(sensors.sensors[Sensors::InertialSensor_AngleY]);
-       sensors.sensors[Sensors::InertialSensor_GyrX] = -sensors.sensors[Sensors::InertialSensor_GyrX];
-       sensors.sensors[Sensors::InertialSensor_GyrY] = -sensors.sensors[Sensors::InertialSensor_GyrY];
-   } else {
-       sensors = touch->getSensors(kinematics);
-   }
+    if (request.body.actionType == Body::MOTION_CALIBRATE)
+    {
+        // raw sensor values are sent to offnao for calibration
+        // these values are straight forward copy paste into pos files
+        sensors = nakedTouch->getSensors(kinematics);
+        sensors.sensors[Sensors::InertialSensor_AngleX] = -RAD2DEG(sensors.sensors[Sensors::InertialSensor_AngleX]);
+        sensors.sensors[Sensors::InertialSensor_AngleY] = -RAD2DEG(sensors.sensors[Sensors::InertialSensor_AngleY]);
+        sensors.sensors[Sensors::InertialSensor_GyrX] = -sensors.sensors[Sensors::InertialSensor_GyrX];
+        sensors.sensors[Sensors::InertialSensor_GyrY] = -sensors.sensors[Sensors::InertialSensor_GyrY];
+        cout << sensors.sensors[Sensors::InertialSensor_AngleX] << endl;
+        cout << sensors.sensors[Sensors::InertialSensor_AngleY] << endl;
+        cout << sensors.sensors[Sensors::InertialSensor_GyrX] << endl;
+        cout << sensors.sensors[Sensors::InertialSensor_GyrY] << endl;
+    }
+    else
+    {
+        sensors = touch->getSensors(kinematics);
+    }
 
-   // For kinematics, give it the lagged sensorValues with the most recent lean angles (because they already
-   // have a lag in them) unless it's the very first one otherwise it will propagate nans everywhere
-   SensorValues sensorsLagged;
-   if (sensorBuffer.size() > 0) {
-      sensorsLagged = sensorBuffer.back(); 
-   } else {
-      sensorsLagged = sensors; 
-   }
-   sensorsLagged.sensors[Sensors::InertialSensor_AngleX] = sensors.sensors[Sensors::InertialSensor_AngleX];
-   sensorsLagged.sensors[Sensors::InertialSensor_AngleY] = sensors.sensors[Sensors::InertialSensor_AngleY];
-   kinematics.setSensorValues(sensorsLagged);
-   kinematics.parameters = readFrom(kinematics, parameters);
-   // Calculate the Denavit-Hartenberg chain
-   kinematics.updateDHChain();
-   writeTo(motion, pose, kinematics.getPose());
+    // For kinematics, give it the lagged sensorValues with the most recent lean angles (because they already
+    // have a lag in them) unless it's the very first one otherwise it will propagate nans everywhere
+    SensorValues sensorsLagged;
+    if (sensorBuffer.size() > 0)
+    {
+        sensorsLagged = sensorBuffer.back();
+    }
+    else
+    {
+        sensorsLagged = sensors;
+    }
+    sensorsLagged.sensors[Sensors::InertialSensor_AngleX] = sensors.sensors[Sensors::InertialSensor_AngleX];
+    sensorsLagged.sensors[Sensors::InertialSensor_AngleY] = sensors.sensors[Sensors::InertialSensor_AngleY];
+    kinematics.setSensorValues(sensorsLagged);
+    kinematics.parameters = readFrom(kinematics, parameters);
 
-   bool standing = touch->getStanding();
-   ButtonPresses buttons = touch->getButtons();
-   llog(VERBOSE) << "touch->getSensors took "
-                 << t.elapsed_ms() << "ms" << std::endl;
-   t.restart();
+    // Calculate the Denavit-Hartenberg chain
+    kinematics.updateDHChain();
+    writeTo(motion, pose, kinematics.getPose());
 
-   // Keep a running time for standing
-   if (standing) {
-      uptime = 0.0f;
-   } else {
-      uptime += 0.01f;
-   }
-   writeTo(motion, uptime, uptime);
+    bool standing = touch->getStanding();
+    ButtonPresses buttons = touch->getButtons();
+    llog(VERBOSE) << "touch->getSensors took "
+                  << t.elapsed_ms() << "ms" << std::endl;
+    t.restart();
 
-   // Sensors are lagged so it correctly synchronises with vision
-   sensorBuffer.insert(sensorBuffer.begin(), sensors);
-   writeTo(motion, sensors, sensors); //Lagged);
-   writeTo(kinematics, sensorsLagged, sensorsLagged);
-//   std::cout << "live = " << sensors.joints.angles[Joints::HeadYaw]
-//             << " delayed = " << sensorsLagged.joints.angles[Joints::HeadYaw]
-//             << std::endl;
+    // Keep a running time for standing
+    if (standing)
+    {
+        uptime = 0.0f;
+    }
+    else
+    {
+        uptime += 0.01f;
+    }
+    writeTo(motion, uptime, uptime);
 
-   if (sensorBuffer.size() > SENSOR_LAG) {
-      sensorBuffer.pop_back();
-   }
+    // Sensors are lagged so it correctly synchronises with vision
+    sensorBuffer.insert(sensorBuffer.begin(), sensors);
+    writeTo(motion, sensors, sensors); //Lagged);
+    writeTo(kinematics, sensorsLagged, sensorsLagged);
 
-   // sonar recorder gets and update and returns the next sonar request
-   request.sonar = sonarRecorder.update(sensors.sonar);
-   writeTo(motion, sonarWindow, sonarRecorder.sonarWindow);
+    if (sensorBuffer.size() > SENSOR_LAG)
+    {
+        sensorBuffer.pop_back();
+    }
 
-   if (isIncapacitated(request.body.actionType)) {
-      uptime = 0.0f;
-   }
-   buttons |= readFrom(motion, buttons);
-   writeTo(motion, buttons, buttons);
-   Odometry odo = Odometry(odometryBuffer.front());
+    // sonar recorder gets and update and returns the next sonar request
+    request.sonar = sonarRecorder.update(sensors.sonar);
+    writeTo(motion, sonarWindow, sonarRecorder.sonarWindow);
 
-   llog(VERBOSE) << "writeTo / readFrom took "
-                 << t.elapsed_ms() << "ms" << std::endl;
-   t.restart();
+    if (isIncapacitated(request.body.actionType))
+    {
+        uptime = 0.0f;
+    }
+    buttons |= readFrom(motion, buttons);
+    writeTo(motion, buttons, buttons);
 
-   if (standing) {
-      generator->reset();
-      request.body = ActionCommand::Body::INITIAL;
-      odo.clear();
-   }
+    llog(VERBOSE) << "writeTo / readFrom took "
+                  << t.elapsed_ms() << "ms" << std::endl;
+    t.restart();
 
-   // When the robot sees another near its side, it lets its arms go limp, so as not
-   // to "push" them.
-   //bool caughtLR = (readFrom(vision, caughtLeft) || readFrom(vision, caughtRight));
-   //request.body.caughtLeft = caughtLR;
-   //request.body.caughtRight = caughtLR;
+    if (standing)
+    {
+        generator->reset();
+        request.body = ActionCommand::Body::INITIAL;
+        odometry.clear();
+    }
 
-   // Get the position of the ball in robot relative cartesian coordinates
-   
-   //AbsCoord robotPose = readFrom(localisation, robotPos);
-   //AbsCoord ballAbs = readFrom(localisation, ballPos);
-   //AbsCoord ball = ballAbs.convertToRobotRelativeCartesian(robotPose);
-    AbsCoord ball(0, 0, 0);
-   // Update the body model
-   bodyModel.kinematics = &kinematics;
-   bodyModel.update(&odo, sensors);
-   // Get the joints requested by whichever generator we're using
-   JointValues joints = generator->makeJoints(&request, &odo, sensors, bodyModel, ball.x(), ball.y());
+    // Get the position of the ball in robot relative cartesian coordinates
 
-   // Save the body model Center of Mass
-   writeTo(motion, com, bodyModel.getCoM());
+    AbsCoord robotPose; // = readFrom(localisation, robotPos);
+    AbsCoord ballAbs;   // = readFrom(localisation, ballPos);
+    AbsCoord ball = ballAbs.convertToRobotRelativeCartesian(robotPose);
 
-   writeTo(motion, active, request);
+    // Update the body model
+    bodyModel.kinematics = &kinematics;
+    bodyModel.update(&odometry, sensors);
 
-   // Odometry is lagged so it correctly synchronises with vision
-   odometryBuffer.insert(odometryBuffer.begin(), Odometry(odo));
-   writeTo(motion, odometry, Odometry(odometryBuffer.back()));
-   odometryBuffer.pop_back();
+    // Get the joints requested by whichever generator we're using
+    JointValues joints = generator->makeJoints(&request, &odometry, sensors, bodyModel, ball.x(), ball.y());
 
-   // Save the pendulum model
-   writeTo(motion, pendulumModel, bodyModel.getPendulumModel());
-   llog(VERBOSE) << "generator->makeJoints took "
-                 << t.elapsed_ms() << "ms" << std::endl;
-   t.restart();
+    // Save the body model Center of Mass
+    writeTo(motion, com, bodyModel.getCoM());
 
-   // Actuate joints as requested.
-   effector->actuate(joints, request.leds, request.sonar, request.stiffen);
-   llog(VERBOSE) << "effector->actuate took "
-                 << t.elapsed_ms() << "ms" << std::endl;
+    writeTo(motion, active, request);
+
+    // Odometry is lagged by walk's estimations, and it also correctly synchronises with vision
+    writeTo(motion, odometry, Odometry(odometry));
+
+    llog(VERBOSE) << "generator->makeJoints took "
+                  << t.elapsed_ms() << "ms" << std::endl;
+
+    t.restart();
+
+    // Actuate joints as requested.
+    effector->actuate(joints, request.leds, request.sonar, request.stiffen);
+    llog(VERBOSE) << "effector->actuate took "
+                  << t.elapsed_ms() << "ms" << std::endl;
 }
 
 SensorValues rUNSWiftMotionAdapter::GetSensors()
