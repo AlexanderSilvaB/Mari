@@ -1,12 +1,12 @@
-#ifndef _VisionModule_H_
-#define _VisionModule_H_
+#ifndef _Vision_H_
+#define _Vision_H_
 
 #include "Core/Module.h"
 #include "Core/SpellBook.h"
 #include <opencv2/opencv.hpp>
 #include "Core/Utils/CameraFrame.h"
 
-#include "perception/vision/camera/CombinedCamera.hpp"
+#include "Core/Utils/CombinedCamera.hpp"
 #include "Ball/BallDetector.h"
 #include "Localization/Localizer.h"
 
@@ -22,6 +22,8 @@ class VisionModule : public InnerModule
 
         BallDetector *ballDetector;
         Localizer *localizer;
+
+        cv::Mat combinedImage;
 
     public:
         VisionModule(SpellBook *spellBook);

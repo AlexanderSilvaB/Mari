@@ -30,7 +30,7 @@ class BallDetector : public InnerModule
         bool NeuralMethod(CameraFrame &top, CameraFrame &bottom);
     public:
         BallDetector(SpellBook *spellBook);
-        void Tick(float ellapsedTime, CameraFrame &top, CameraFrame &bottom);
+        void Tick(float ellapsedTime, CameraFrame &top, CameraFrame &bottom, cv::Mat &combinedImage);
 };
 
 #endif

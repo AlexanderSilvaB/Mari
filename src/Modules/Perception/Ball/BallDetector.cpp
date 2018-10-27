@@ -25,12 +25,12 @@ BallDetector::BallDetector(SpellBook *spellBook)
     method = CASCADE;
 }
 
-void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &bottom)
+void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &bottom, cv::Mat &combinedImage)
 {
     spellBook->perception.vision.BGR = true;
     spellBook->perception.vision.HSV = true;
     spellBook->perception.vision.GRAY = true;
-    
+
     bool detected = false;
     switch(method)
     {
