@@ -10,6 +10,7 @@ StrategyModule::StrategyModule(SpellBook *spellBook)
     safetyMonitor = new SafetyMonitor(this->spellBook);
     potentialFields = new PotentialFields(this->spellBook);
     headController = new HeadController(this->spellBook);
+    ballTracker = new BallTracker(this->spellBook);
 
     squareStep = 1;
     squareX = squareY = 0;
@@ -26,6 +27,9 @@ StrategyModule::~StrategyModule()
     delete safetyMonitor;
     delete potentialFields;
     delete headController;
+
+    delete ballTracker;
+
     delete goalie;
 }
 
@@ -33,12 +37,14 @@ void StrategyModule::OnStart()
 {
     gameController->OnStart();
     safetyMonitor->OnStart();
+    ballTracker->OnStart();
 }
 
 void StrategyModule::OnStop()
 {
     gameController->OnStop();
     safetyMonitor->OnStop();
+    ballTracker->OnStop();
 }
 
 void StrategyModule::Load()
@@ -182,6 +188,7 @@ void StrategyModule::Tick(float ellapsedTime)
         return;
     }
 
+    ballTracker->Tick(ellapsedTime, sensor);
     goalie->Tick(ellapsedTime, sensor);
     //potentialFields->Tick(ellapsedTime);
     headController->Tick(ellapsedTime, sensor);

@@ -35,6 +35,7 @@ void BallTracker::Tick(float ellapsedTime, const SensorValues &sensor)
     // O código principal deve estar aqui
     // Não devem haver loops infinitos neste método pois ele já roda em um loop infinito
     // Aqui é possível utilizar o SpellBook
+    // ellapsedTime é o tempo desde a ultima chamada deste método
 
     int ballX = spellBook->perception.vision.ball.ImageX;
     int ballY = spellBook->perception.vision.ball.ImageY;
