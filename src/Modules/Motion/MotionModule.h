@@ -13,6 +13,7 @@ using namespace std;
 class MotionModule : public Module
 {
     private:
+        bool saveData;
         rUNSWiftMotionAdapter *motion;
 
         float vx, vy, vth;

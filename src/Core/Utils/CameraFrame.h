@@ -30,7 +30,7 @@ class CameraFrame {
         void Update(uint32_t width, uint32_t height);
         void Update(uint32_t width, uint32_t height, timeval time);
 
-        void ReadFromYUV422(const uint8_t *yuvData, bool rgb, bool hsv, bool gray);
+        void ReadFromYUV422(const uint8_t *yuvData, bool rgb, bool hsv, bool gray, bool flip = false);
 
     private:
         uint32_t m_width;
@@ -38,6 +38,7 @@ class CameraFrame {
         size_t   m_length;
         uint8_t *m_data;
         timeval  m_time;
+        cv::Mat RAW_BGR;
 
         void Resize(uint32_t width, uint32_t height);
 };

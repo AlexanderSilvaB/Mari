@@ -30,7 +30,7 @@ struct AgentData {
    JointValues joints[3];
    ActionCommand::LED leds[3];
    float sonar[3];
-   //ActionCommand::Stiffen stiffen[3];
+   ActionCommand::Stiffen stiffen[3];
    char sayTexts[3][35];   //the longest say string for overheating is length 30
 
    volatile bool standing;

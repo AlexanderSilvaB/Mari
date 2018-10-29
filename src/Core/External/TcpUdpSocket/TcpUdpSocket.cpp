@@ -4,7 +4,7 @@
 typedef int socklen_t;
 #endif
 
-TcpUdpSocket::TcpUdpSocket(int port, char* address, bool udp, bool broadcast, bool reusesock)
+TcpUdpSocket::TcpUdpSocket(int port, char* address, bool udp, bool broadcast, bool reusesock, bool isServer = false)
 {
 	connected = false;
 #ifdef WIN32
@@ -17,52 +17,62 @@ TcpUdpSocket::TcpUdpSocket(int port, char* address, bool udp, bool broadcast, bo
 	else
 		sock = socket(AF_INET, SOCK_STREAM, 0);	
 
+	#ifdef WIN32
+	bool bOptVal = 1;
+	int bOptLen = sizeof(bool);
+	#else
+	int OptVal = 1;
+	#endif
+
+	if (reusesock)
+	#ifdef WIN32
+		retval = setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char*)&bOptVal, bOptLen);
+	#else
+		retval = setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &OptVal, sizeof(OptVal));
+	#endif
+
 	//set up bind address
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	addr.sin_port = htons(port);
 
-	//set up address to use for sending
-	memset(&outaddr, 0, sizeof(outaddr));
-	outaddr.sin_family = AF_INET;
-	outaddr.sin_addr.s_addr = inet_addr(address);
-	outaddr.sin_port = htons(port);
-
-#ifdef WIN32
-	bool bOptVal = 1;
-	int bOptLen = sizeof(bool);
-#else
-	int OptVal = 1;
-#endif
-
-	if (udp)
+	if(isServer)
 	{
-		if (broadcast)
-#ifdef WIN32
-			retval = setsockopt(sock, SOL_SOCKET, SO_BROADCAST, (char*)&bOptVal, bOptLen);
-#else
-			retval = setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &OptVal, sizeof(OptVal));
-#endif
-
-
-		if (reusesock)
-#ifdef WIN32
-			retval = setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char*)&bOptVal, bOptLen);
-#else
-			retval = setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &OptVal, sizeof(OptVal));
-#endif
-
+		client = -1;
 		retval = bind(sock, (struct sockaddr *)&addr, sizeof(addr));
+		retval = listen(sock, 1);
+		connected = false;
 	}
 	else
 	{
-		retval = connect(sock, (struct sockaddr *)&outaddr, sizeof(outaddr));
+		client = -1;
+		//set up address to use for sending
+		memset(&outaddr, 0, sizeof(outaddr));
+		outaddr.sin_family = AF_INET;
+		outaddr.sin_addr.s_addr = inet_addr(address);
+		outaddr.sin_port = htons(port);
+
+		if (udp)
+		{
+			if (broadcast)
+		#ifdef WIN32
+				retval = setsockopt(sock, SOL_SOCKET, SO_BROADCAST, (char*)&bOptVal, bOptLen);
+		#else
+				retval = setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &OptVal, sizeof(OptVal));
+		#endif
+
+			retval = bind(sock, (struct sockaddr *)&addr, sizeof(addr));
+		}
+		else
+		{
+			retval = connect(sock, (struct sockaddr *)&outaddr, sizeof(outaddr));
+		}
+		if(udp)
+			connected = retval != 0;
+		else
+			connected = retval == 0;
 	}
-	if(udp)
-		connected = retval != 0;
-	else
-		connected = retval == 0;
 }
 
 TcpUdpSocket::~TcpUdpSocket()
@@ -85,6 +95,24 @@ bool TcpUdpSocket::isConnected()
 	return connected;
 }
 
+bool TcpUdpSocket::wait()
+{
+	if(client != -1)
+		return true;
+	int clientlen = sizeof(outaddr);
+	client = accept(sock, (struct sockaddr *) &outaddr, &clientlen);
+	return client >= 0;
+}
+
+void TcpUdpSocket::disconnect()
+{
+	if(client != -1)
+	{
+		close(client);
+	}	
+	client = -1;
+}
+
 int TcpUdpSocket::getAddress(const char * name, char * addr)
 {
 	struct hostent *hp;
@@ -95,19 +123,39 @@ int TcpUdpSocket::getAddress(const char * name, char * addr)
 
 const char* TcpUdpSocket::getAddress(const char * name)
 {
-	struct hostent *hp;
-	if ((hp = gethostbyname(name)) == NULL) return (0);
-	strcpy(ip, inet_ntoa(*(struct in_addr*)(hp->h_addr)));
-	return ip;
+	if(client == -1)
+	{
+		struct hostent *hp;
+		if ((hp = gethostbyname(name)) == NULL) return (0);
+		strcpy(ip, inet_ntoa(*(struct in_addr*)(hp->h_addr)));
+		return ip;
+	}
+	else
+	{
+		struct hostent *hostp = gethostbyaddr((const char *)&outaddr.sin_addr.s_addr, sizeof(outaddr.sin_addr.s_addr), AF_INET);
+		if(hostp == NULL)
+			return 0;
+		strcpy(ip, inet_ntoa(outaddr.sin_addr));
+		strcpy(received, ip);
+		return ip;
+	}
 }
 
 long TcpUdpSocket::receive(char* msg, int msgsize)
 {
-	struct sockaddr_in sender;
-	socklen_t sendersize = sizeof(sender);
-	int retval = recvfrom(sock, msg, msgsize, 0, (struct sockaddr *)&sender, &sendersize);
-	strcpy(received, inet_ntoa(sender.sin_addr));
-	return retval;
+	if(client == -1)
+	{
+		struct sockaddr_in sender;
+		socklen_t sendersize = sizeof(sender);
+		int retval = recvfrom(sock, msg, msgsize, 0, (struct sockaddr *)&sender, &sendersize);
+		strcpy(received, inet_ntoa(sender.sin_addr));
+		return retval;
+	}
+	else
+	{
+		int retval = read(client, msg, msgsize);
+		return retval;
+	}
 }
 
 char* TcpUdpSocket::received_from()
@@ -117,7 +165,10 @@ char* TcpUdpSocket::received_from()
 
 long TcpUdpSocket::send(const char* msg, int msgsize)
 {
-	return sendto(sock, msg, msgsize, 0, (struct sockaddr *)&outaddr, sizeof(outaddr));
+	if(client == -1)
+		return sendto(sock, msg, msgsize, 0, (struct sockaddr *)&outaddr, sizeof(outaddr));
+	else
+		return write(client, msg, msgsize);
 }
 
 long TcpUdpSocket::sendTo(const char* msg, int msgsize, const char* addr)

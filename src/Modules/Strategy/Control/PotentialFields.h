@@ -7,7 +7,7 @@
 class PotentialFields : public InnerModule
 {
     private:
-        Eigen::Vector2f Xo, Xr, Fatt, Frep, Ftot;
+        Eigen::Vector3f Xo, Xr, Fatt, Frep, Ftot;
         float Katt, Krep, Eo, Kw;
         float Vmax, v, Wmax, w;
     public:

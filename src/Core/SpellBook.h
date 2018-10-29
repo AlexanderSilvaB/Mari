@@ -9,6 +9,11 @@
 #include "Core/InitManager.h"
 #include <pthread.h>
 
+namespace GC
+{
+    enum GameStates { INITIAL, READY, SET, PENALIZED, PLAYING, FINISHED };
+}
+
 class Spell
 {
     public:
@@ -43,6 +48,8 @@ class BallSpell : public Spell
         bool Enabled;
         std::string method;
         float ballWidth, ballHeight;
+        int ImageX, ImageY;
+        int BallLostCount;
 
         bool BallDetected;
         float BallAzimuth;
@@ -107,7 +114,7 @@ class MotionSpell : public Spell
         bool Stand, Stiff;
         float Vx, Vy, Vth;
         float HeadYaw, HeadPitch;
-        float HeadSpeed;
+        float HeadSpeedYaw, HeadSpeedPitch;
         bool HeadRelative;
         bool KickLeft, KickRight;
         bool LimpLeft, LimpRight;
@@ -122,9 +129,15 @@ class MotionSpell : public Spell
         bool GoalieStand;
         bool GoalieInitial;
         bool DefenderCentre;
+        bool ThrowIn;
+
+        bool Calibrate;
+        float AngleX, AngleY, GyroX, GyroY;
 
         MotionSpell();
         void CopyTo(Spell *spell);
+        void AddOptions(boost::program_options::options_description &description);
+        void Update(const boost::program_options::variables_map& config);
         void Load(Storage &storage);
         void Save(Storage &storage);
 };
@@ -144,11 +157,16 @@ class RemoteSpell : public Spell
 class StrategySpell : public Spell
 {
     public:
+        GC::GameStates GameState;
         bool WalkInCircle, WalkInSquare;
         bool Started;
         bool Penalized;
         bool FallenFront, FallenBack;
         bool Die, TurnOver;
+
+        bool WalkForward;
+        bool WalkAside;
+        float TargetX, TargetY, TargetTheta;
 
         StrategySpell();
         void CopyTo(Spell *spell);

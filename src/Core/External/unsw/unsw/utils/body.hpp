@@ -682,9 +682,9 @@ namespace Sensors {
 
       ChestBoard_Button,
 
-      //Head_Touch_Front,
-      //Head_Touch_Rear,
-      //Head_Touch_Middle,
+      Head_Touch_Front,
+      Head_Touch_Rear,
+      Head_Touch_Middle,
 
       Battery_Charge,
       Battery_Current,
@@ -724,9 +724,9 @@ namespace Sensors {
 
       ChestBoard_Button,
 
-      //Head_Touch_Front,
-      //Head_Touch_Rear,
-      //Head_Touch_Middle,
+      Head_Touch_Front,
+      Head_Touch_Rear,
+      Head_Touch_Middle,
 
       Battery_Charge,
       Battery_Current,
@@ -764,9 +764,9 @@ namespace Sensors {
 
       "ChestBoard/Button",
 
-      //"Head/Touch/Front",
-      //"Head/Touch/Rear",
-      //"Head/Touch/Middle",
+      "Head/Touch/Front",
+      "Head/Touch/Rear",
+      "Head/Touch/Middle",
 
       "Battery/Charge",
       "Battery/Current",

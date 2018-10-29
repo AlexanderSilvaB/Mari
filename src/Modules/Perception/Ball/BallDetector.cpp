@@ -2,7 +2,7 @@
 #include "BallDetector.h"
 #include "Core/InitManager.h"
 #include "Core/Utils/RobotDefs.h"
-#include "Core/Utils/RelativeCoords.h"
+#include "Core/Utils/RelativeCoord.h"
 
 #define R 2.0f
 #define PI_2 1.5707963267f
@@ -31,6 +31,9 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
     spellBook->perception.vision.HSV = true;
     spellBook->perception.vision.GRAY = true;
 
+    //if(!combinedImage.empty())
+    //    imwrite("img.jpg", combinedImage);
+
     bool detected = false;
     switch(method)
     {
@@ -46,6 +49,16 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
         default:
             break;
     }
+
+    spellBook->perception.vision.ball.ImageX = ball.x;
+    spellBook->perception.vision.ball.ImageY = ball.y;
+    spellBook->perception.vision.ball.BallDetected = detected;
+    if(detected)
+        spellBook->perception.vision.ball.BallLostCount = 0;
+    else
+        spellBook->perception.vision.ball.BallLostCount++;
+
+    /*
     if(!detected)
     {
         //cout << "Not found" << endl;
@@ -74,7 +87,7 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
         float currHeadYaw = sensor.joints.angles[Joints::HeadYaw];
         float currHeadPitch = sensor.joints.angles[Joints::HeadPitch];
 
-        RelativeCoords ballPosRR;
+        RelativeCoord ballPosRR;
         //ballPosRR.fromPixel(ball.x, ball.y, currHeadYaw, currHeadPitch);
         ballPosRR.fromPixel(ball.x, ball.y);
         targetYaw = ballPosRR.getYaw();
@@ -97,6 +110,7 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
         spellBook->perception.vision.ball.TimeSinceBallSeen = 0.0f;
         spellBook->perception.vision.ball.HeadSpeed = speed;
     }
+    */
 }
 
 bool BallDetector::CascadeMethod(CameraFrame &top, CameraFrame &bottom)

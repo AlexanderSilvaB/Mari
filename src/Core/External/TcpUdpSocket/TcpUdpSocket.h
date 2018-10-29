@@ -22,8 +22,10 @@ private:
 #ifdef WIN32
 	WSAData wsaData;
 	SOCKET sock;
+	SOCKET client;
 #else
 	int sock;
+	int client;
 #endif
 	bool connected;
 	long retval;
@@ -33,11 +35,14 @@ private:
 
 
 public:
-	TcpUdpSocket(int port, char* address, bool udp, bool Datagram = true, bool reusesock = true);
+	TcpUdpSocket(int port, char* address, bool udp, bool Datagram = true, bool reusesock = true, bool isServer = false);
 	~TcpUdpSocket();
 
 	int getRetVal();
 	bool isConnected();
+
+	bool wait();
+	void disconnect();
 
 	long receive(char* msg, int msgsize);
 	char* received_from();

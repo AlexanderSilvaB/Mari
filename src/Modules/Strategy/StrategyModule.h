@@ -11,6 +11,7 @@
 #include "Safety/SafetyMonitor.h"
 #include "Control/PotentialFields.h"
 #include "Control/HeadController.h"
+#include "Roles/GoalieRole.h"
 
 using namespace std;
 
@@ -21,6 +22,9 @@ class StrategyModule : public Module
         SafetyMonitor *safetyMonitor;
         PotentialFields *potentialFields;
         HeadController *headController;
+
+        // Roles
+        GoalieRole *goalie;
 
         int squareStep;
         float squareX, squareY;

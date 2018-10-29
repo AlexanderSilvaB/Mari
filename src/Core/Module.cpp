@@ -45,34 +45,49 @@ string Module::Name()
 
 void Module::Tick(float ellapsedTime)
 {
-    
+    // Este é o método principal do módulo, ele irá ser executado periodicamente
+    // O código principal deve estar aqui
+    // Não devem haver loops infinitos neste método pois ele já roda em um loop infinito
+    // Aqui é possível utilizar o SpellBook
 }
 
 void Module::OnStop()
 {
-
+    // Este método é chamado quando o módulo para de rodar
+    // Aqui é um bom lugar para para rodar o código que precisa rodar quando o módulo parar
+    // Aqui é possível utilizar o SpellBook
 }
 
 void Module::OnStart()
 {
-
+    // Este método é executado quando o módulo começa rodar
+    // Aqui é um bom lugar para definir o código que precisa rodar na inicialização do módulo
+    // aqui é possível utilizar o SpellBook
 }
 
 void Module::Load()
 {
-
+    // Este método é utilizado exclusivamente para carregar dados do SpellBook compartilhado
+    // O único código permitido aqui são chamadas para a função LOAD(module), onde module é o nome 
+    // do módulo do SpellBook que precisa ser carregado
+    // Ex: LOAD(perception)
 }
 
 void Module::Save()
 {
-
+    // Este método é utilizado exclusivamente para salvar dados no SpellBook compartilhado
+    // O único código permitido aqui são chamadas para a função SAVE(module), onde module é o nome 
+    // do módulo do SpellBook que precisa ser salvo
+    // Ex: SAVE(perception)
 }
 
 void Module::Start()
 {
     cout << "Starting " << name << endl;
     is_running = true;
+    Load();
     OnStart();
+    Save();
     int rc;
     if(!highPriority)
     {
@@ -106,7 +121,9 @@ void Module::Stop()
 void Module::Join()
 {
     pthread_join(thread, NULL);
+    Load();
     OnStop();
+    Save();
 }
 
 void *Module::Run(void *arg)
@@ -138,24 +155,36 @@ void *Module::Run(void *arg)
 InnerModule::InnerModule(SpellBook *spellBook)
 {
     this->spellBook = spellBook;
+    // Este é o contrutor e será executado quando o programa for aberto
+    // Aqui é um bom lugar para setar variáveis iniciais ou qualquer configuração básica inicial,
+    // como criar novos objetos ou definir parâmetros
+    // Não use o SpellBook nesse ponto pois ele não será salvo
 }
 
 InnerModule::~InnerModule()
 {
-    
+    // Este é o destrutor e será executado quando o programa for fechado
+    // Aqui é um bom lugar para destruir objetos criados no módulo
 }
 
 void InnerModule::Tick(float ellapsedTime)
 {
-    
+    // Este é o método principal do módulo, ele irá ser executado periodicamente
+    // O código principal deve estar aqui
+    // Não devem haver loops infinitos neste método pois ele já roda em um loop infinito
+    // Aqui é possível utilizar o SpellBook
 }
 
 void InnerModule::OnStop()
 {
-
+    // Este método é chamado quando o módulo para de rodar
+    // Aqui é um bom lugar para para rodar o código que precisa rodar quando o módulo parar
+    // Aqui é possível utilizar o SpellBook
 }
 
 void InnerModule::OnStart()
 {
-
+    // Este método é executado quando o módulo começa rodar
+    // Aqui é um bom lugar para definir o código que precisa rodar na inicialização do módulo
+    // aqui é possível utilizar o SpellBook
 }

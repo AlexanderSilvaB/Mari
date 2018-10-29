@@ -23,10 +23,10 @@
                 },
                 "Localization":
                 {
-                    "Enabled": true,
+                    "Enabled": false,
                     "Position": [
-                        0.0, 
-                        0.0,
+                        -2.0, 
+                        -3.0,
                         0.0
                     ]
                 }

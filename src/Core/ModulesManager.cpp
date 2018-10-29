@@ -11,6 +11,7 @@ vector<Module*> ModulesManager::modules;
 ModulesManager::ModulesManager()
 {
     signal (SIGINT, ModulesManager::SignalHandler);    
+    signal (SIGTERM, ModulesManager::SignalHandler);    
     system_cancel = false;
 }
 

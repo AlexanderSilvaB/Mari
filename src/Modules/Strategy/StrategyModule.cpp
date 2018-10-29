@@ -16,6 +16,8 @@ StrategyModule::StrategyModule(SpellBook *spellBook)
     squareL = 2.0f;
     squareTimer = 0;
     circleRadius = 2.0f;
+
+    goalie = new GoalieRole(this->spellBook);
 }
 
 StrategyModule::~StrategyModule()
@@ -24,6 +26,7 @@ StrategyModule::~StrategyModule()
     delete safetyMonitor;
     delete potentialFields;
     delete headController;
+    delete goalie;
 }
 
 void StrategyModule::OnStart()
@@ -63,8 +66,20 @@ void StrategyModule::Tick(float ellapsedTime)
     safetyMonitor->Tick(ellapsedTime, sensor);
     gameController->Tick(ellapsedTime, sensor);
 
-    cout << "Ball: " << spellBook->perception.vision.ball.BallDistance << ", " << Rad2Deg(spellBook->perception.vision.ball.BallAzimuth) << "º" << endl;
-    cout << "Localization: " << spellBook->perception.vision.localization.X << ", " << spellBook->perception.vision.localization.Y << ", " << Rad2Deg(spellBook->perception.vision.localization.Theta) << "º" << endl;
+    if(spellBook->motion.Calibrate)
+    {
+        spellBook->motion.Stiff = true;
+        spellBook->motion.Stand = true;
+        spellBook->motion.Walk = false;
+        cout << endl << endl << "Calibrate" << endl;
+        cout << "gyrXOffset=" << spellBook->motion.GyroX << endl;
+        cout << "gyrYOffset=" << spellBook->motion.GyroY << endl;
+        cout << "angleXOffset=" << spellBook->motion.AngleX << endl;
+        cout << "angleYOffset=" << spellBook->motion.AngleY << endl;
+        cout << "# Save this to /home/nao/data/configs/robotName.cfg" << endl;
+        cout << endl << endl;
+        return;
+    }
 
     if(!spellBook->strategy.Started)
     {
@@ -77,7 +92,7 @@ void StrategyModule::Tick(float ellapsedTime)
     if(spellBook->strategy.Penalized)
     {
         spellBook->motion.Stiff = true;
-        spellBook->motion.Stand = false;
+        spellBook->motion.Stand = true;
         spellBook->motion.Walk = false;
         return;
     }
@@ -158,26 +173,16 @@ void StrategyModule::Tick(float ellapsedTime)
                 squareTimer = 0;
             }
         }
+        return;
     }
     else if(spellBook->strategy.WalkInCircle)
     {
         spellBook->motion.Vx = 0.3f;
         spellBook->motion.Vth = spellBook->motion.Vx / circleRadius;
+        return;
     }
 
-    // Nossa estratégia
-    //spellBook->motion.HeadYaw = spellBook->perception.vision.ball.BallAzimuth;
-    //spellBook->motion.HeadPitch = spellBook->perception.vision.ball.BallElevation;
-    //spellBook->motion.HeadSpeed = spellBook->perception.vision.ball.HeadSpeed;
-    //spellBook->motion.HeadRelative = spellBook->perception.vision.ball.HeadRelative;
-    //spellBook->motion.Vx = 0.1f;
-    //spellBook->motion.Vth = 0;
-
-    spellBook->strategy.WalkForward = true;
-    spellBook->strategy.TargetX = 0.0f;
-    spellBook->strategy.TargetY = 0.0f;
-    spellBook->strategy.TargetTheta = 0;
-
-    potentialFields->Tick(ellapsedTime);
-    headController->Tick(ellapsedTime);
+    goalie->Tick(ellapsedTime, sensor);
+    //potentialFields->Tick(ellapsedTime);
+    headController->Tick(ellapsedTime, sensor);
 }

@@ -132,6 +132,7 @@ void Agent::doButtons(bool chest, bool left, bool right) {
             // See man pages for inittab, init for details
             ret = system("/usr/bin/killall rinobot");
             ret = system("sudo /sbin/init a");
+            //ret = system("sudo /etc/init.d/naoqi restart");
             // should not get here
          } else {
             if (skipped_frames > MAX_SKIPS) {
@@ -572,7 +573,7 @@ void Agent::postCallback() {
    doButtons(v[Sensors::ChestBoard_Button],
              v[Sensors::LFoot_Bumper_Left] || v[Sensors::LFoot_Bumper_Right],
              v[Sensors::RFoot_Bumper_Left] || v[Sensors::RFoot_Bumper_Right]);
-/*
+
     //TODO: Change this to a sequence on the head to prevent accidental taps.
     if (v[Sensors::Head_Touch_Front] != 0 || v[Sensors::Head_Touch_Rear] != 0 || v[Sensors::Head_Touch_Middle] != 0)
     {
@@ -580,13 +581,13 @@ void Agent::postCallback() {
                     v[Sensors::Head_Touch_Rear],
                     v[Sensors::Head_Touch_Middle]);
     }
-*/
+
    doTemps();
 
     // Get stiffen commands
-    //doStiffen(shared_data->stiffen[shared_data->actuators_read]);
+    doStiffen(shared_data->stiffen[shared_data->actuators_read]);
     // Stop stiffen command being processed more than once
-    //shared_data->stiffen[shared_data->actuators_read] = ActionCommand::NONE;
+    shared_data->stiffen[shared_data->actuators_read] = ActionCommand::NONE;
 
    shared_data->buttons[i] = buttons;
    buttons.clear();
@@ -881,8 +882,7 @@ SAY("NAO 01");
    ret = system("sudo ifconfig wlan0 netmask 255.255.0.0");
 
    // Play the 'oneg-nook' jingle
-   ret =
-      system("/usr/bin/aplay -q /usr/share/naoqi/wav/start_jingle.wav");
+   //ret = system("/usr/bin/aplay -q /usr/share/naoqi/wav/start_jingle.wav");
 
    // Start rinobot
    // Uncomment this to have rinobot start when you turn the robot on

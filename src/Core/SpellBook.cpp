@@ -156,6 +156,8 @@ BallSpell::BallSpell()
     BallDetected = false;
     BallDistance = 0;
     BallElevation = 0;
+    ImageX = ImageY = 0;
+    BallLostCount = 0;
 }
 
 void BallSpell::CopyTo(Spell *spell)
@@ -170,6 +172,9 @@ void BallSpell::CopyTo(Spell *spell)
     COPY(s, BallDetected)
     COPY(s, BallDistance)
     COPY(s, BallElevation)
+    COPY(s, ImageX)
+    COPY(s, ImageY)
+    COPY(s, BallLostCount)
 }
 
 void BallSpell::Load(Storage &storage)
@@ -192,8 +197,8 @@ LocalizationSpell::LocalizationSpell()
 {
     Enabled = true;
 
-    X = 0;
-    Y = 0;
+    X = -2;
+    Y = -3;
     Theta = 0;
 }
 
@@ -241,7 +246,7 @@ void VisionSpell::CopyTo(Spell *spell)
 
 void VisionSpell::Load(Storage &storage)
 {
-    Enabled = storage["Modules"]["Perception"]["Vision"]["Localization"]["Enabled"].Default(true);
+    Enabled = storage["Modules"]["Perception"]["Vision"]["Enabled"].Default(true);
     ball.Load(storage);
     localization.Load(storage);
 }
@@ -250,7 +255,7 @@ void VisionSpell::Save(Storage &storage)
 {
     ball.Save(storage);
     localization.Save(storage);
-    storage["Modules"]["Perception"]["Vision"]["Localization"]["Enabled"] = Enabled;
+    storage["Modules"]["Perception"]["Vision"]["Enabled"] = Enabled;
 }
 
 PerceptionSpell::PerceptionSpell()
@@ -280,7 +285,7 @@ MotionSpell::MotionSpell()
     Stand = Stiff = false;
     Vx = Vy = Vth = 0;
     HeadYaw = HeadPitch = 0;
-    HeadSpeed = 0.2f;
+    HeadSpeedYaw = HeadSpeedPitch = 0.2f;
     HeadRelative = false;
     KickLeft = KickRight = false;
     LimpLeft = LimpRight = false;
@@ -295,6 +300,10 @@ MotionSpell::MotionSpell()
     GoalieStand = false;
     GoalieInitial = false;
     DefenderCentre = false;
+    ThrowIn = false;
+
+    Calibrate = false;
+    AngleX = AngleY = GyroX = GyroY = false;
 }
 
 void MotionSpell::CopyTo(Spell *spell)
@@ -308,7 +317,8 @@ void MotionSpell::CopyTo(Spell *spell)
     COPY(s, Vth)
     COPY(s, HeadYaw)
     COPY(s, HeadPitch)
-    COPY(s, HeadSpeed)
+    COPY(s, HeadSpeedYaw)
+    COPY(s, HeadSpeedPitch)
     COPY(s, HeadRelative)
     COPY(s, KickLeft)
     COPY(s, KickRight)
@@ -327,6 +337,24 @@ void MotionSpell::CopyTo(Spell *spell)
     COPY(s, GoalieStand)
     COPY(s, GoalieInitial)
     COPY(s, DefenderCentre)
+    COPY(s, ThrowIn)
+
+    COPY(s, Calibrate)
+    COPY(s, AngleX)
+    COPY(s, AngleY)
+    COPY(s, GyroX)
+    COPY(s, GyroY)
+}
+
+void MotionSpell::AddOptions(po::options_description &description)
+{
+    description.add_options()
+            ("motion.calibrate", po::value<bool>()->default_value(false), "Calibrates the robot");
+}
+
+void MotionSpell::Update(const po::variables_map &config)
+{
+    Calibrate = config["motion.calibrate"].as<bool>();
 }
 
 void MotionSpell::Load(Storage &storage)
@@ -366,6 +394,7 @@ void RemoteSpell::Save(Storage &storage)
 
 StrategySpell::StrategySpell()
 {
+    GameState = GC::INITIAL;
     WalkInCircle = WalkInSquare = false;
     Started = false;
     Penalized = false;
@@ -373,11 +402,17 @@ StrategySpell::StrategySpell()
     FallenFront = false;
     Die = false;
     TurnOver = false;
+    WalkAside = false;
+    WalkForward = false;
+    TargetX = 0;
+    TargetY = 0;
+    TargetTheta = 0;
 }
 
 void StrategySpell::CopyTo(Spell *spell)
 {
     StrategySpell *s = (StrategySpell*)spell;
+    COPY(s, GameState)
     COPY(s, WalkInCircle)
     COPY(s, WalkInSquare)
     COPY(s, Started)
@@ -386,6 +421,11 @@ void StrategySpell::CopyTo(Spell *spell)
     COPY(s, FallenFront)
     COPY(s, Die)
     COPY(s, TurnOver)
+    COPY(s, WalkAside)
+    COPY(s, WalkForward)
+    COPY(s, TargetX)
+    COPY(s, TargetY)
+    COPY(s, TargetTheta)
 }
 
 void StrategySpell::Load(Storage &storage)

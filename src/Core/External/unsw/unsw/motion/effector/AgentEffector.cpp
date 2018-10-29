@@ -52,7 +52,7 @@ void AgentEffector::actuate(JointValues joints, ActionCommand::LED leds,
    shared_data->leds[i] = leds;
    shared_data->joints[i] = joints;
    shared_data->sonar[i] = sonar;
-   //shared_data->stiffen[i] = stiffen;
+   shared_data->stiffen[i] = stiffen;
    std::string sayText = GET_SAYTEXT();
    int size = sizeof(shared_data->sayTexts[i]);
    strncpy(shared_data->sayTexts[i], sayText.c_str(), size);

@@ -103,7 +103,7 @@ if [ $ssh == true ]; then
     fi
 
     #cat ~/.ssh/id_rsa.pub | $SSH_CMD -l nao $robot "mkdir -p .ssh; sh -c 'cat >> .ssh/authorized_keys'; chmod 700 ~/.ssh; chmod 600 ~/.ssh/authorized_keys ; chmod g-w,o-w /home/nao"
-    ssh-copy-id $user@$robot
+    #ssh-copy-id $user@$robot
 fi
 
 if [ $sudo == true ]; then

@@ -131,12 +131,13 @@ void CameraFrame::Resize(uint32_t width, uint32_t height)
 	m_width  = width;
 	m_height = height;
 	BGR.create(m_height, m_width, CV_8UC3);
+	RAW_BGR.create(m_height, m_width, CV_8UC3);
 	HSV.create(m_height, m_width, CV_8UC3);
 	YUV.create(m_height, m_width, CV_8UC2);
 	GRAY.create(m_height, m_width, CV_8UC1);
 }
 
-void CameraFrame::ReadFromYUV422(const uint8_t *yuvData, bool rgb, bool hsv, bool gray)
+void CameraFrame::ReadFromYUV422(const uint8_t *yuvData, bool rgb, bool hsv, bool gray, bool flip)
 {
 	YUV.data = (uchar*)yuvData;
 	if(rgb)
@@ -155,7 +156,13 @@ void CameraFrame::ReadFromYUV422(const uint8_t *yuvData, bool rgb, bool hsv, boo
 				yuv422_to_rgb(src, dst);
 			}
 		}
-		BGR.data = GetDataBGR();
+		if(flip)
+		{
+			RAW_BGR.data = GetDataBGR();
+			cv::flip(RAW_BGR, BGR, -1);
+		}
+		else
+			BGR.data = GetDataBGR();
 	}
 	if(hsv && rgb)
 	{

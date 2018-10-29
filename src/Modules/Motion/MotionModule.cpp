@@ -12,6 +12,7 @@ MotionModule::MotionModule(SpellBook *spellBook) : Module(spellBook, "Motion", 0
     InitManager::GetBlackboard()->thread.configCallbacks["motion"];
     motion = new rUNSWiftMotionAdapter();
     vx = vy = vth = 0;
+    saveData = false;
 }
 
 MotionModule::~MotionModule()
@@ -26,6 +27,14 @@ void MotionModule::OnStart()
 
 void MotionModule::OnStop()
 {
+    ActionCommand::All request;
+    request.leds.leftEye.red = true;
+    request.leds.leftEye.green = true;
+    request.leds.leftEye.blue = true;
+    request.leds.rightEye.red = true;
+    request.leds.rightEye.green = true;
+    request.leds.rightEye.blue = true;
+    motion->Tick(request);
     motion->Stop();
 }
 
@@ -37,12 +46,26 @@ void MotionModule::Load()
 
 void MotionModule::Save()
 {
-    
+    if(saveData)
+    {
+        SAVE(motion)      
+        saveData = false;
+    }
 }
 
 void MotionModule::Tick(float ellapsedTime)
 {
-    cout << "Motion: " << spellBook->motion.Vx << ", " << Rad2Deg(spellBook->motion.Vth) << "º" << endl;
+    if(spellBook->motion.Calibrate)
+    {
+        SensorValues sensors = motion->GetRawSensors();
+        spellBook->motion.AngleX = -RAD2DEG(sensors.sensors[Sensors::InertialSensor_AngleX]);
+        spellBook->motion.AngleY = -RAD2DEG(sensors.sensors[Sensors::InertialSensor_AngleY]);
+        spellBook->motion.GyroX = -sensors.sensors[Sensors::InertialSensor_GyrX];
+        spellBook->motion.GyroY = -sensors.sensors[Sensors::InertialSensor_GyrY];
+        saveData = true;
+    }
+
+    //cout << "Motion: " << spellBook->motion.Vx << ", " << Rad2Deg(spellBook->motion.Vth) << "º" << endl;
     ActionCommand::All request;
     if(stiff != spellBook->motion.Stiff)
     {
@@ -96,6 +119,10 @@ void MotionModule::Tick(float ellapsedTime)
     {
         request.body = ActionCommand::Body(ActionCommand::Body::DEFENDER_CENTRE);
     }
+    else if(spellBook->motion.ThrowIn)
+    {
+        request.body = ActionCommand::Body(ActionCommand::Body::THROW_IN);
+    }
     else if(spellBook->motion.KickLeft)
     {
         request.body = ActionCommand::Body(ActionCommand::Body::KICK);
@@ -112,7 +139,7 @@ void MotionModule::Tick(float ellapsedTime)
     }
     else if(spellBook->motion.Walk)
     {
-        request.head = ActionCommand::Head(spellBook->motion.HeadYaw, spellBook->motion.HeadPitch, spellBook->motion.HeadRelative, spellBook->motion.HeadSpeed, 0.2f);
+        request.head = ActionCommand::Head(spellBook->motion.HeadYaw, spellBook->motion.HeadPitch, spellBook->motion.HeadRelative, spellBook->motion.HeadSpeedYaw, spellBook->motion.HeadSpeedPitch);
         vx = spellBook->motion.Vx * 1000.0f;
         vy = spellBook->motion.Vy * 1000.0f;
         vth = spellBook->motion.Vth;
