@@ -10,6 +10,8 @@
 #include "Ball/BallDetector.h"
 #include "Localization/Localizer.h"
 
+#include "Core/Utils/FrameWriter.h"
+
 using namespace std;
 
 class VisionModule : public InnerModule
@@ -19,6 +21,8 @@ class VisionModule : public InnerModule
 
         CameraFrame top;
         CameraFrame bottom;
+
+        FrameWriter *frameWriter;
 
         BallDetector *ballDetector;
         Localizer *localizer;

@@ -11,6 +11,7 @@
             "Vision":
             {
                 "Enabled": true,
+                "Record" : false,
                 "BallDetector": {
                     "Enabled": true,
                     "Method": "Cascade",
@@ -23,7 +24,7 @@
                 },
                 "Localization":
                 {
-                    "Enabled": false,
+                    "Enabled": true,
                     "Position": [
                         -2.0, 
                         -3.0,

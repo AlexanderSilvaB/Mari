@@ -83,6 +83,8 @@ class VisionSpell : public Spell
 {
     public:
         bool Enabled;
+        bool Record;
+        std::string VideoName;
         bool BGR, HSV, GRAY;
 
         BallSpell ball;

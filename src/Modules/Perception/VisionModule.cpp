@@ -11,10 +11,12 @@ VisionModule::VisionModule(SpellBook *spellBook)
     capture = new CombinedCamera();
     top.Update(CAM_W, CAM_H);
     bottom.Update(CAM_W, CAM_H);
+    frameWriter = NULL;
 }
 
 VisionModule::~VisionModule()
 {
+    delete frameWriter;
     delete ballDetector;
     delete localizer;
 }
@@ -27,10 +29,21 @@ void VisionModule::Tick(float ellapsedTime)
     {
         if(combinedImage.empty())
         {
-            combinedImage.create(top.BGR.rows+bottom.BGR.rows, bottom.BGR.cols, CV_8UC3);
+            combinedImage.create(top.BGR.rows+bottom.BGR.rows+40, bottom.BGR.cols, CV_8UC3);
         }
         top.BGR.copyTo(combinedImage(Rect(0, 0, top.BGR.cols, top.BGR.rows)));
-        bottom.BGR.copyTo(combinedImage(Rect(0, top.BGR.rows, bottom.BGR.cols, bottom.BGR.rows)));
+        bottom.BGR.copyTo(combinedImage(Rect(0, top.BGR.rows+40, bottom.BGR.cols, bottom.BGR.rows)));
+
+        if(spellBook->perception.vision.Record)
+        {
+            if(frameWriter == NULL)
+            {
+                SAY("Recording Video");
+                frameWriter = new FrameWriter("video.avi", 30, combinedImage.size());
+            }
+
+            frameWriter->write(combinedImage);
+        }
     }
 
     if(spellBook->perception.vision.ball.Enabled)

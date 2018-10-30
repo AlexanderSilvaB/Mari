@@ -228,6 +228,8 @@ void LocalizationSpell::Save(Storage &storage)
 VisionSpell::VisionSpell()
 {
     Enabled = true;
+    Record = false;
+    VideoName = "video.avi";
     BGR = false;
     HSV = false;
     GRAY = false;  
@@ -239,6 +241,8 @@ void VisionSpell::CopyTo(Spell *spell)
     ball.CopyTo(&(s->ball));
     localization.CopyTo(&(s->localization));
     COPY(s, Enabled)
+    COPY(s, Record)
+    COPY(s, VideoName)
     COPY(s, BGR)
     COPY(s, HSV)
     COPY(s, GRAY)
@@ -247,6 +251,8 @@ void VisionSpell::CopyTo(Spell *spell)
 void VisionSpell::Load(Storage &storage)
 {
     Enabled = storage["Modules"]["Perception"]["Vision"]["Enabled"].Default(true);
+    Record = storage["Modules"]["Perception"]["Vision"]["Record"].Default(false);
+    VideoName = (string)storage["Modules"]["Perception"]["Vision"]["VideoName"].Default("video.avi");
     ball.Load(storage);
     localization.Load(storage);
 }
