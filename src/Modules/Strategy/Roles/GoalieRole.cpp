@@ -47,7 +47,7 @@ void GoalieRole::Tick(float ellapsedTime, const SensorValues &sensor)
             rr.fromPixel(spellBook->perception.vision.ball.ImageX, spellBook->perception.vision.ball.ImageY, sensor.joints.angles[Joints::HeadYaw], -sensor.joints.angles[Joints::HeadPitch]);
             CartesianCoord coord;
             rr.toCartesian(coord, sensor.joints.angles[Joints::HeadYaw], sensor.joints.angles[Joints::HeadPitch]);
-            cout << "X: " << coord.getY() << endl;
+            cout << "X: " << coord.getX() << endl;
             cout << "Y: " << coord.getY() << endl;
 
             if(spellBook->perception.vision.localization.Enabled)

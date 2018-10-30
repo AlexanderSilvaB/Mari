@@ -189,7 +189,7 @@ void StrategyModule::Tick(float ellapsedTime)
     }
 
     ballTracker->Tick(ellapsedTime, sensor);
-    goalie->Tick(ellapsedTime, sensor);
+    //goalie->Tick(ellapsedTime, sensor);
     //potentialFields->Tick(ellapsedTime);
     headController->Tick(ellapsedTime, sensor);
 }

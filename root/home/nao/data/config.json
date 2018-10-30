@@ -24,7 +24,7 @@
                 },
                 "Localization":
                 {
-                    "Enabled": true,
+                    "Enabled": false,
                     "Position": [
                         -2.0, 
                         -3.0,
