@@ -13,6 +13,7 @@
 #include "Control/HeadController.h"
 #include "Trackers/BallTracker.h"
 #include "Roles/GoalieRole.h"
+#include "Roles/DefenderRole.h"
 
 using namespace std;
 
@@ -28,6 +29,7 @@ class StrategyModule : public Module
 
         // Roles
         GoalieRole *goalie;
+        DefenderRole *defender;
 
         int squareStep;
         float squareX, squareY;
