@@ -16,6 +16,10 @@ GoalieRole::~GoalieRole()
 
 void GoalieRole::Tick(float ellapsedTime, const SensorValues &sensor)
 {
+    spellBook->strategy.HeadYawRange = Deg2Rad(30.0f);
+    spellBook->strategy.HeadPitchRange = Deg2Rad(20.0f);
+    spellBook->strategy.HeadSearchSpeed = 0.05f;
+    
     if((spellBook->strategy.GameState == GC::READY || spellBook->strategy.GameState == GC::PLAYING) &&
         !onGoal)
     {
@@ -47,6 +51,10 @@ void GoalieRole::Tick(float ellapsedTime, const SensorValues &sensor)
             rr.fromPixel(spellBook->perception.vision.ball.ImageX, spellBook->perception.vision.ball.ImageY, sensor.joints.angles[Joints::HeadYaw], -sensor.joints.angles[Joints::HeadPitch]);
             CartesianCoord coord;
             rr.toCartesian(coord, sensor.joints.angles[Joints::HeadYaw], sensor.joints.angles[Joints::HeadPitch]);
+
+            cout << "Ball Y: " << coord.getY() << endl;
+            cout << "Ball D: " << rr.getDistance() << endl;
+            cout << "Ball Yaw: " << rr.getYaw() << endl;
 
             if(spellBook->perception.vision.localization.Enabled)
             {

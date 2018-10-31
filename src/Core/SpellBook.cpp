@@ -1,9 +1,11 @@
 #include "SpellBook.h"
 #include "InitManager.h"
+#include "Utils/RobotDefs.h"
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include "Utils/Math.h"
 
 using namespace std;
 namespace po = boost::program_options;
@@ -414,8 +416,8 @@ StrategySpell::StrategySpell()
     TargetY = 0;
     TargetTheta = 0;
 
-    HeadYawRange = H_DOF;
-    HeadPitchRange = V_DOF;
+    HeadYawRange = Deg2Rad(50.0f);
+    HeadPitchRange = Deg2Rad(20.0f);
     HeadSearchSpeed = 0.1f;
 }
 

@@ -34,7 +34,7 @@ void VisionModule::Tick(float ellapsedTime)
         {
             combinedImage.create(top.BGR.rows+bottom.BGR.rows+40, bottom.BGR.cols, CV_8UC3);
         }
-        top.BGR.copyTo(combinedImage(Rect(0, 0, top.BGR.cols, top.BGR.rows)));
+        //top.BGR.copyTo(combinedImage(Rect(0, 0, top.BGR.cols, top.BGR.rows)));
         bottom.BGR.copyTo(combinedImage(Rect(0, top.BGR.rows+40, bottom.BGR.cols, bottom.BGR.rows)));
 
         if(spellBook->perception.vision.Record)
@@ -48,9 +48,9 @@ void VisionModule::Tick(float ellapsedTime)
             frameWriter->write(combinedImage);
         }
 
-        uint8_t *msgData = message->getData();
-        memcpy(msgData, bottom.BGR.data, message->getDataSize());
-        NetworkModule::SendMessage(message);
+        //uint8_t *msgData = message->getData();
+        //memcpy(msgData, bottom.BGR.data, message->getDataSize());
+        //NetworkModule::SendMessage(message);
     }
 
     if(spellBook->perception.vision.ball.Enabled)

@@ -26,21 +26,21 @@ void HeadController::Tick(float ellapsedTime, const SensorValues &sensor)
 {
     numFramesTracked += 1;
 
-    float CONSTANT_X = (float)CAM_W / spellBook->strategy.HeadYawRange;
-    float xDiff = -(spellBook->perception.vision.ball.ImageX - (CAM_W / 2)) / CONSTANT_X;
+    float CONSTANT_X = (float)CAM_BALL_W / H_DOF;
+    float xDiff = -(spellBook->perception.vision.ball.ImageX - (CAM_BALL_W / 2)) / CONSTANT_X;
     spellBook->motion.HeadYaw = xDiff - sensor.joints.angles[Joints::HeadYaw];
 
-    float CONSTANT_Y = (float)CAM_H / spellBook->strategy.HeadPitchRange;
-    float yDiff = (spellBook->perception.vision.ball.ImageY - (CAM_H / 2)) / CONSTANT_Y;
+    float CONSTANT_Y = (float)CAM_BALL_H / V_DOF;
+    float yDiff = (spellBook->perception.vision.ball.ImageY - (CAM_BALL_H / 2)) / CONSTANT_Y;
     spellBook->motion.HeadPitch = yDiff - sensor.joints.angles[Joints::HeadPitch];
     
     if(spellBook->perception.vision.ball.BallLostCount < 5)
     {
-        float factor = abs(spellBook->motion.HeadYaw) / spellBook->strategy.HeadYawRange;
+        float factor = abs(spellBook->motion.HeadYaw) / H_DOF;
         float speed = 0.25 * factor;  // 10.0 * factor * factor
         spellBook->motion.HeadSpeedYaw = speed;
 
-        factor = abs(spellBook->motion.HeadPitch) / spellBook->strategy.HeadPitchRange;
+        factor = abs(spellBook->motion.HeadPitch) / V_DOF;
         speed = 0.25 * factor;  // 10.0 * factor * factor
         spellBook->motion.HeadSpeedPitch = speed;
 
@@ -49,29 +49,29 @@ void HeadController::Tick(float ellapsedTime, const SensorValues &sensor)
     else
     {
         //spellBook->motion.HeadYaw = calculateDesiredYaw(neckRelative);
-        spellBook->motion.HeadPitch = Deg2Rad(scanPitch);
+        spellBook->motion.HeadPitch = scanPitch;
         spellBook->motion.HeadSpeedYaw = spellBook->strategy.HeadSearchSpeed;
         spellBook->motion.HeadSpeedPitch = spellBook->strategy.HeadSearchSpeed;
         spellBook->motion.HeadRelative = false;
-        if(sensor.joints.angles[Joints::HeadYaw] < Deg2Rad(45.0f) && !flip)
+        if(sensor.joints.angles[Joints::HeadYaw] < (spellBook->strategy.HeadYawRange - Deg2Rad(5.0f)) && !flip)
         {
-            spellBook->motion.HeadYaw = Deg2Rad(50.0f);
+            spellBook->motion.HeadYaw = spellBook->strategy.HeadYawRange;
             flip = false;
         }
-        else if(sensor.joints.angles[Joints::HeadYaw] > Deg2Rad(45.0f) && !flip)
+        else if(sensor.joints.angles[Joints::HeadYaw] > (spellBook->strategy.HeadYawRange - Deg2Rad(5.0f)) && !flip)
         {
             flip = true;
         }
-        else if(sensor.joints.angles[Joints::HeadYaw] > Deg2Rad(-45.0f) && flip)
+        else if(sensor.joints.angles[Joints::HeadYaw] > -(spellBook->strategy.HeadYawRange - Deg2Rad(5.0f)) && flip)
         {
-            spellBook->motion.HeadYaw = Deg2Rad(-50.0f);
+            spellBook->motion.HeadYaw = -spellBook->strategy.HeadYawRange;
             flip = true;
         }
-        else if(sensor.joints.angles[Joints::HeadYaw] < Deg2Rad(-45.0f) && flip)
+        else if(sensor.joints.angles[Joints::HeadYaw] < -(spellBook->strategy.HeadYawRange - Deg2Rad(5.0f)) && flip)
         {
             flip = false;
-            scanPitch += 20;
-            if(scanPitch > 20)
+            scanPitch += Deg2Rad(20.0f);
+            if(scanPitch > spellBook->strategy.HeadPitchRange)
                 scanPitch = 0;
         }
     }

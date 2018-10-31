@@ -13,7 +13,16 @@
 
 #define CAM_OFSET_ANGLE Deg2Rad(39.7f)
 
-#define CAM_W 320
-#define CAM_H 240
+#define CAM_W 160
+#define CAM_H 120
+
+#define CAM_W_2 (CAM_W/2)
+#define CAM_H_2 (CAM_H/2)
+
+#define CAM_W_4 (CAM_W/4)
+#define CAM_H_4 (CAM_H/4)
+
+#define CAM_BALL_W CAM_W
+#define CAM_BALL_H CAM_H
 
 #endif
