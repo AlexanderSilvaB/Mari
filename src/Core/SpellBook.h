@@ -170,6 +170,9 @@ class StrategySpell : public Spell
         bool WalkAside;
         float TargetX, TargetY, TargetTheta;
 
+        float HeadYawRange, HeadPitchRange;
+        float HeadSearchSpeed;
+
         StrategySpell();
         void CopyTo(Spell *spell);
         void Load(Storage &storage);

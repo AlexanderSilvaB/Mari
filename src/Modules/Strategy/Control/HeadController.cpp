@@ -26,21 +26,21 @@ void HeadController::Tick(float ellapsedTime, const SensorValues &sensor)
 {
     numFramesTracked += 1;
 
-    float CONSTANT_X = (float)CAM_W / H_DOF;
+    float CONSTANT_X = (float)CAM_W / spellBook->strategy.HeadYawRange;
     float xDiff = -(spellBook->perception.vision.ball.ImageX - (CAM_W / 2)) / CONSTANT_X;
     spellBook->motion.HeadYaw = xDiff - sensor.joints.angles[Joints::HeadYaw];
 
-    float CONSTANT_Y = (float)CAM_H / V_DOF;
+    float CONSTANT_Y = (float)CAM_H / spellBook->strategy.HeadPitchRange;
     float yDiff = (spellBook->perception.vision.ball.ImageY - (CAM_H / 2)) / CONSTANT_Y;
     spellBook->motion.HeadPitch = yDiff - sensor.joints.angles[Joints::HeadPitch];
     
     if(spellBook->perception.vision.ball.BallLostCount < 5)
     {
-        float factor = abs(spellBook->motion.HeadYaw) / H_DOF;
+        float factor = abs(spellBook->motion.HeadYaw) / spellBook->strategy.HeadYawRange;
         float speed = 0.25 * factor;  // 10.0 * factor * factor
         spellBook->motion.HeadSpeedYaw = speed;
 
-        factor = abs(spellBook->motion.HeadPitch) / V_DOF;
+        factor = abs(spellBook->motion.HeadPitch) / spellBook->strategy.HeadPitchRange;
         speed = 0.25 * factor;  // 10.0 * factor * factor
         spellBook->motion.HeadSpeedPitch = speed;
 
@@ -50,8 +50,8 @@ void HeadController::Tick(float ellapsedTime, const SensorValues &sensor)
     {
         //spellBook->motion.HeadYaw = calculateDesiredYaw(neckRelative);
         spellBook->motion.HeadPitch = Deg2Rad(scanPitch);
-        spellBook->motion.HeadSpeedYaw = 0.1f;
-        spellBook->motion.HeadSpeedPitch = 0.1f;
+        spellBook->motion.HeadSpeedYaw = spellBook->strategy.HeadSearchSpeed;
+        spellBook->motion.HeadSpeedPitch = spellBook->strategy.HeadSearchSpeed;
         spellBook->motion.HeadRelative = false;
         if(sensor.joints.angles[Joints::HeadYaw] < Deg2Rad(45.0f) && !flip)
         {

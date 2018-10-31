@@ -413,6 +413,10 @@ StrategySpell::StrategySpell()
     TargetX = 0;
     TargetY = 0;
     TargetTheta = 0;
+
+    HeadYawRange = H_DOF;
+    HeadPitchRange = V_DOF;
+    HeadSearchSpeed = 0.1f;
 }
 
 void StrategySpell::CopyTo(Spell *spell)
@@ -432,6 +436,10 @@ void StrategySpell::CopyTo(Spell *spell)
     COPY(s, TargetX)
     COPY(s, TargetY)
     COPY(s, TargetTheta)
+
+    COPY(s, HeadYawRange)
+    COPY(s, HeadPitchRange)
+    COPY(s, HeadSearchSpeed)
 }
 
 void StrategySpell::Load(Storage &storage)
