@@ -11,7 +11,7 @@
             "Vision":
             {
                 "Enabled": true,
-                "Record" : true,
+                "Record" : false,
                 "BallDetector": {
                     "Enabled": true,
                     "Method": "Cascade",
@@ -47,7 +47,7 @@
         },
         "Behaviour": {
             "Enabled": true,
-            "Number" : 1,
+            "Number" : 2,
             "Name" : "Lucy"
         }
     }

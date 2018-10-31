@@ -34,8 +34,8 @@ void VisionModule::Tick(float ellapsedTime)
         {
             combinedImage.create(top.BGR.rows+bottom.BGR.rows+40, bottom.BGR.cols, CV_8UC3);
         }
-        //top.BGR.copyTo(combinedImage(Rect(0, 0, top.BGR.cols, top.BGR.rows)));
-        bottom.BGR.copyTo(combinedImage(Rect(0, top.BGR.rows+40, bottom.BGR.cols, bottom.BGR.rows)));
+        top.BGR.copyTo(combinedImage(Rect(0, 0, top.BGR.cols, top.BGR.rows)));
+        bottom.BGR.copyTo(combinedImage(Rect(0, bottom.BGR.rows+40, bottom.BGR.cols, bottom.BGR.rows)));
 
         if(spellBook->perception.vision.Record)
         {
@@ -44,7 +44,6 @@ void VisionModule::Tick(float ellapsedTime)
                 SAY("Recording Video");
                 frameWriter = new FrameWriter("video.avi", 15, combinedImage.size());
             }
-
             frameWriter->write(combinedImage);
         }
 

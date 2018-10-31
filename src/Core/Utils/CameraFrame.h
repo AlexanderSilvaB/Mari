@@ -33,7 +33,6 @@ class CameraFrame {
         void ReadFromYUV422(const uint8_t *yuvData, bool rgb, bool hsv, bool gray, bool flip = false);
 
     private:
-        cv::Mat BGR_BIG;
         uint32_t m_width;
         uint32_t m_height;
         size_t   m_length;

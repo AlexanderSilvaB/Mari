@@ -135,7 +135,6 @@ void CameraFrame::Resize(uint32_t width, uint32_t height)
 	HSV.create(m_height, m_width, CV_8UC3);
 	YUV.create(m_height, m_width, CV_8UC2);
 	GRAY.create(m_height, m_width, CV_8UC1);
-	BGR_BIG.create(m_height*2, m_width*2, CV_8UC3);
 }
 
 void CameraFrame::ReadFromYUV422(const uint8_t *yuvData, bool rgb, bool hsv, bool gray, bool flip)
@@ -159,9 +158,7 @@ void CameraFrame::ReadFromYUV422(const uint8_t *yuvData, bool rgb, bool hsv, boo
 		}
 		if(flip)
 		{
-			BGR_BIG.data = GetDataBGR();
-			cv::resize(BGR_BIG, RAW_BGR, Size(160, 120));
-			//RAW_BGR.data = GetDataBGR();
+			RAW_BGR.data = GetDataBGR();
 			cv::flip(RAW_BGR, BGR, -1);
 		}
 		else

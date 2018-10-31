@@ -191,8 +191,15 @@ void StrategyModule::Tick(float ellapsedTime)
 
     ballTracker->Tick(ellapsedTime, sensor);
 
-    if(spellBook->behaviour.Number == 1)
-        goalie->Tick(ellapsedTime, sensor);
+    switch(spellBook->behaviour.Number)
+    {
+        case 1:
+            goalie->Tick(ellapsedTime, sensor);
+            break;
+        default:
+            break;
+    }
+        
 
     potentialFields->Tick(ellapsedTime);
     headController->Tick(ellapsedTime, sensor);
