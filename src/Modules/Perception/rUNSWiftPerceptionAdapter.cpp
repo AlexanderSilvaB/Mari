@@ -104,7 +104,6 @@ void rUNSWiftPerceptionAdapter::ReadOptions(const boost::program_options::variab
 
 void rUNSWiftPerceptionAdapter::Tick()
 {
-    cout << "rUNSWiftPerceptionAdapter" << endl;
    llog(DEBUG1) << "Perception.. ticking away" << endl;
    Timer t1;
    Timer t;

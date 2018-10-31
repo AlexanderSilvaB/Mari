@@ -31,9 +31,6 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
     spellBook->perception.vision.HSV = true;
     spellBook->perception.vision.GRAY = true;
 
-    //if(!combinedImage.empty())
-    //    imwrite("img.jpg", combinedImage);
-
     bool detected = false;
     switch(method)
     {
@@ -57,7 +54,7 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
         spellBook->perception.vision.ball.BallLostCount = 0;
     else
         spellBook->perception.vision.ball.BallLostCount++;
-
+    cout << "Encontrado: " << detected << endl;
     /*
     if(!detected)
     {
@@ -116,11 +113,12 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
 bool BallDetector::CascadeMethod(CameraFrame &top, CameraFrame &bottom)
 {
     vector<Rect> balls;
-    cv::Mat hist;
+    //cv::Mat hist;
     cv::Mat mask;
-    cv::equalizeHist(bottom.GRAY, hist);
+    //cv::equalizeHist(bottom.GRAY, hist);
     inRange(bottom.HSV, Scalar(56, 102, 25), Scalar(116, 255, 255), mask);
-    cascade.detectMultiScale(hist, balls, 1.3, 5, 8, Size(16, 16));
+    cascade.detectMultiScale(bottom.GRAY, balls, 2, 1, 0, Size(32, 32), Size(80, 160));
+    //cascade.detectMultiScale(hist, balls, 1.3, 5, 8, Size(16, 16));
     //cascade.detectMultiScale(gray, balls, 1.1, 5, 8, cv::Size(16, 16));
     if (balls.size() == 0)
         return false;
@@ -166,10 +164,10 @@ bool BallDetector::CascadeMethod(CameraFrame &top, CameraFrame &bottom)
     }
     if (melhorConfidence <= 0)
     {
-        cout << "seria uma bola?" << "\t" << melhorConfidence << endl;
+        //cout << "seria uma bola?" << "\t" << melhorConfidence << endl;
         return false;
     }
-    cout << "Encontrado: " << melhorPt << " [ " << melhorRaio << " ] " << "\t" << (melhorConfidence * 100) << "%" << endl;
+    //cout << "Encontrado: " << melhorPt << " [ " << melhorRaio << " ] " << "\t" << (melhorConfidence * 100) << "%" << endl;
 
 
     ball.radius = melhorRaio;

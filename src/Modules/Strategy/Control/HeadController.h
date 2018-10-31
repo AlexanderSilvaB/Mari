@@ -11,6 +11,7 @@ class HeadController : public InnerModule
         bool flip;
         float closeInPitch;
         float farPitch;
+        float scanPitch;
 
         bool ballCloseIn;
         float ballCloseInDistance;

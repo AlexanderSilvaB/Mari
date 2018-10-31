@@ -11,6 +11,7 @@
 #include "Localization/Localizer.h"
 
 #include "Core/Utils/FrameWriter.h"
+#include "Core/Utils/ImageMessage.h"
 
 using namespace std;
 
@@ -26,6 +27,8 @@ class VisionModule : public InnerModule
 
         BallDetector *ballDetector;
         Localizer *localizer;
+
+        ImageMessage *message;
 
         cv::Mat combinedImage;
 

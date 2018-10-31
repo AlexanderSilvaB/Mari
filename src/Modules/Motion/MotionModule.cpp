@@ -66,10 +66,6 @@ void MotionModule::Tick(float ellapsedTime)
     }
 
     //cout << "Motion: " << spellBook->motion.Vx << ", " << Rad2Deg(spellBook->motion.Vth) << "º" << endl;
-    cout << "Motion Walk: " << spellBook->motion.Walk << endl;
-    cout << "Motion Stand: " << spellBook->motion.Stand << endl;
-    cout << "Motion GoalieStand: " << spellBook->motion.GoalieStand << endl;
-    cout << "Motion ThrowIn: " << spellBook->motion.ThrowIn << endl;
     ActionCommand::All request;
     if(stiff != spellBook->motion.Stiff)
     {
@@ -159,11 +155,6 @@ void MotionModule::Tick(float ellapsedTime)
             request.body = ActionCommand::Body(ActionCommand::Body::WALK, 0, 0, 0, 0.4f, 1.0f);
         request.body.caughtRight = spellBook->motion.LimpRight;
         request.body.caughtLeft = spellBook->motion.LimpLeft;
-    }
-    else
-    {
-        request.body = ActionCommand::Body(ActionCommand::Body::NONE);
-        cout << "Não devia chegar aqui! Conserta isso!" << endl;
     }
     request.leds.leftEye.red = ((spellBook->behaviour.LeftEye & 0xFF0000) >> 16) > 128;
     request.leds.leftEye.green = ((spellBook->behaviour.LeftEye & 0x00FF00) >> 8) > 128;

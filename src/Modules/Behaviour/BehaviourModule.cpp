@@ -46,7 +46,7 @@ void BehaviourModule::Tick(float ellapsedTime)
         timeSinceAct = 0;
         spellBook->behaviour.LeftEye = BLUE;
         spellBook->behaviour.RightEye = BLUE;
-        SAY("The bakery fell");
+        SAY("Ai, o forninho caiu");
     }
     else if(spellBook->behaviour.Started && timeSinceAct > 2.0f)
     {
@@ -54,14 +54,15 @@ void BehaviourModule::Tick(float ellapsedTime)
         timeSinceAct = 0;
         spellBook->behaviour.LeftEye = RED;
         spellBook->behaviour.RightEye = RED;
-        SAY("Can wait to kill some players");
+        string text = "Oi, eu sou o "+spellBook->behaviour.Name+"! É hora de jogar!";
+        SAY(text);
     }
     else if(spellBook->behaviour.Penalized && timeSinceAct > 10.0f)
     {
         timeSinceAct = 0;
         spellBook->behaviour.LeftEye = RED;
         spellBook->behaviour.RightEye = BLACK;
-        SAY("Let me play, now");
+        SAY("Ai papai, quero jogar");
     }
     else if(spellBook->behaviour.Die && timeSinceAct > 2.0f)
     {
@@ -69,7 +70,7 @@ void BehaviourModule::Tick(float ellapsedTime)
         timeSinceAct = 0;
         spellBook->behaviour.LeftEye = BLACK;
         spellBook->behaviour.RightEye = BLACK;
-        SAY("I am dead");
+        SAY("Morri!");
     }
     else
     {

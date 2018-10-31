@@ -26,7 +26,6 @@ void PotentialFields::Tick(float ellapsedTime)
 {
     if(spellBook->strategy.WalkForward || spellBook->strategy.WalkAside)
     {
-        cout << "Controlling" << endl;
         Xo(0) = spellBook->strategy.TargetX;
         Xo(1) = spellBook->strategy.TargetY;
         Xo(2) = spellBook->strategy.TargetTheta;
@@ -64,7 +63,6 @@ void PotentialFields::Tick(float ellapsedTime)
         Fatt = (Xo - Xr);
         v = min(Fatt.norm()*kp, Vmax);
         w = ka*a + kb*b;
-        cout << v << ", " << Rad2Deg(w) << endl;
 
         if(spellBook->strategy.WalkForward)
             spellBook->motion.Vx = v;

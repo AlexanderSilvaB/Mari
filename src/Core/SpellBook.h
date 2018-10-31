@@ -187,6 +187,8 @@ class BehaviourSpell : public Spell
         bool Die;
         int LeftEye;
         int RightEye;
+        std::string Name;
+        int Number;
 
         BehaviourSpell();
         void CopyTo(Spell *spell);

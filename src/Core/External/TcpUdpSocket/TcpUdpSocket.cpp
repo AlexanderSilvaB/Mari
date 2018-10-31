@@ -4,7 +4,7 @@
 typedef int socklen_t;
 #endif
 
-TcpUdpSocket::TcpUdpSocket(int port, char* address, bool udp, bool broadcast, bool reusesock, bool isServer = false)
+TcpUdpSocket::TcpUdpSocket(int port, char* address, bool udp, bool broadcast, bool reusesock, bool isServer, int timeout)
 {
 	connected = false;
 #ifdef WIN32
@@ -30,6 +30,14 @@ TcpUdpSocket::TcpUdpSocket(int port, char* address, bool udp, bool broadcast, bo
 	#else
 		retval = setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &OptVal, sizeof(OptVal));
 	#endif
+
+	if(timeout > 0)
+	{
+		struct timeval tv;
+		tv.tv_sec = 0;
+		tv.tv_usec = timeout*1000;
+		setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+	}
 
 	//set up bind address
 	memset(&addr, 0, sizeof(addr));

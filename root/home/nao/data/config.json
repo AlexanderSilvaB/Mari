@@ -4,14 +4,14 @@
             "Enabled": true
         },
         "Network": {
-            "Enabled": false
+            "Enabled": true
         },
         "Perception": {
             "Enabled": true,
             "Vision":
             {
                 "Enabled": true,
-                "Record" : false,
+                "Record" : true,
                 "BallDetector": {
                     "Enabled": true,
                     "Method": "Cascade",
@@ -46,7 +46,9 @@
             "Enabled": true
         },
         "Behaviour": {
-            "Enabled": true
+            "Enabled": true,
+            "Number" : 1,
+            "Name" : "Lucy"
         }
     }
 }

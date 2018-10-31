@@ -46,6 +46,10 @@ void BallTracker::Tick(float ellapsedTime, const SensorValues &sensor)
     CartesianCoord cc;
     rc.toCartesian(cc);
 
+    cout << "Ball" << endl;
+    cout << rc.getDistance() << ", " << Rad2Deg(rc.getYaw()) << "º, " << Rad2Deg(rc.getPitch()) << "º" << endl;
+    cout << cc.getX() << ", " << cc.getY() << endl;
+
     // Distancia e ângulo
     // rc.getDistance() e rc.getYaw()
 

@@ -14,6 +14,7 @@ HeadController::HeadController(SpellBook *spellBook)
     ballCloseInDistance = 0.8f;
 
     numFramesTracked = 0;
+    scanPitch = 0;
 }
 
 HeadController::~HeadController()
@@ -25,22 +26,22 @@ void HeadController::Tick(float ellapsedTime, const SensorValues &sensor)
 {
     numFramesTracked += 1;
 
-    float CONSTANT_X = (float)CAM_W / H_FOV;
+    float CONSTANT_X = (float)CAM_W / H_DOF;
     float xDiff = -(spellBook->perception.vision.ball.ImageX - (CAM_W / 2)) / CONSTANT_X;
     spellBook->motion.HeadYaw = xDiff - sensor.joints.angles[Joints::HeadYaw];
 
-    float CONSTANT_Y = (float)CAM_H / V_FOV;
+    float CONSTANT_Y = (float)CAM_H / V_DOF;
     float yDiff = (spellBook->perception.vision.ball.ImageY - (CAM_H / 2)) / CONSTANT_Y;
     spellBook->motion.HeadPitch = yDiff - sensor.joints.angles[Joints::HeadPitch];
     
     if(spellBook->perception.vision.ball.BallLostCount < 5)
     {
-        float factor = abs(spellBook->motion.HeadYaw) / H_FOV;
-        float speed = 0.75 * factor;  // 10.0 * factor * factor
+        float factor = abs(spellBook->motion.HeadYaw) / H_DOF;
+        float speed = 0.25 * factor;  // 10.0 * factor * factor
         spellBook->motion.HeadSpeedYaw = speed;
 
-        factor = abs(spellBook->motion.HeadPitch) / V_FOV;
-        speed = 0.75 * factor;  // 10.0 * factor * factor
+        factor = abs(spellBook->motion.HeadPitch) / V_DOF;
+        speed = 0.25 * factor;  // 10.0 * factor * factor
         spellBook->motion.HeadSpeedPitch = speed;
 
         spellBook->motion.HeadRelative = true;
@@ -48,7 +49,7 @@ void HeadController::Tick(float ellapsedTime, const SensorValues &sensor)
     else
     {
         //spellBook->motion.HeadYaw = calculateDesiredYaw(neckRelative);
-        spellBook->motion.HeadPitch = Deg2Rad(7.0f);
+        spellBook->motion.HeadPitch = Deg2Rad(scanPitch);
         spellBook->motion.HeadSpeedYaw = 0.1f;
         spellBook->motion.HeadSpeedPitch = 0.1f;
         spellBook->motion.HeadRelative = false;
@@ -69,6 +70,9 @@ void HeadController::Tick(float ellapsedTime, const SensorValues &sensor)
         else if(sensor.joints.angles[Joints::HeadYaw] < Deg2Rad(-45.0f) && flip)
         {
             flip = false;
+            scanPitch += 20;
+            if(scanPitch > 20)
+                scanPitch = 0;
         }
     }
 }

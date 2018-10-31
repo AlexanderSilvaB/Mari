@@ -49,7 +49,7 @@ bool NaoCamera::setControl(const uint32_t controlId,
       CLEAR(current);
       current.id = control.id;
       ioctl (fd, VIDIOC_G_CTRL, &current);
-      cout << "1setting id " << control.id << "to " << controlValue << std::endl;
+      cout << "setting id " << control.id << " to " << controlValue << std::endl;
       while (current.value != controlValue) {
 //         CLEAR(current);
 //         current.id = control.id;
@@ -205,7 +205,7 @@ void NaoCamera::setCameraSettings(const WhichCamera camera) {
     setControl(V4L2_CID_HUE, settings.hue);
     setControl(V4L2_CID_SHARPNESS, settings.sharpness);
     setControl(V4L2_CID_AUTO_WHITE_BALANCE, 0);
-    setControl(V4L2_CID_BACKLIGHT_COMPENSATION, settings.backlightCompensation);
+    //setControl(V4L2_CID_BACKLIGHT_COMPENSATION, settings.backlightCompensation);
     setControl(V4L2_CID_EXPOSURE_AUTO, 0);
     setControl(V4L2_CID_EXPOSURE, settings.exposure);
     setControl(V4L2_CID_GAIN, settings.gain);

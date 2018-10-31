@@ -66,6 +66,7 @@ void StrategyModule::Save()
 
 void StrategyModule::Tick(float ellapsedTime)
 {
+    //cout << "Strategy" << endl;
     Blackboard *blackboard = InitManager::GetBlackboard();
     const SensorValues &sensor = readFrom(motion, sensors);
 
@@ -98,7 +99,7 @@ void StrategyModule::Tick(float ellapsedTime)
     if(spellBook->strategy.Penalized)
     {
         spellBook->motion.Stiff = true;
-        spellBook->motion.Stand = true;
+        spellBook->motion.Stand = false;
         spellBook->motion.Walk = false;
         return;
     }
@@ -189,7 +190,10 @@ void StrategyModule::Tick(float ellapsedTime)
     }
 
     ballTracker->Tick(ellapsedTime, sensor);
-    //goalie->Tick(ellapsedTime, sensor);
-    //potentialFields->Tick(ellapsedTime);
+
+    if(spellBook->behaviour.Number == 1)
+        goalie->Tick(ellapsedTime, sensor);
+
+    potentialFields->Tick(ellapsedTime);
     headController->Tick(ellapsedTime, sensor);
 }

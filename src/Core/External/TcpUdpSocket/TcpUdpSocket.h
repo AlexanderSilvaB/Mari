@@ -35,7 +35,7 @@ private:
 
 
 public:
-	TcpUdpSocket(int port, char* address, bool udp, bool Datagram = true, bool reusesock = true, bool isServer = false);
+	TcpUdpSocket(int port, char* address, bool udp, bool Datagram = true, bool reusesock = true, bool isServer = false, int timeout = 0);
 	~TcpUdpSocket();
 
 	int getRetVal();

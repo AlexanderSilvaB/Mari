@@ -1,5 +1,6 @@
 #include "motion/generator/NullGenerator.hpp"
 #include "utils/Logger.hpp"
+#include <iostream>
 
 NullGenerator::NullGenerator() {
    llog(INFO) << "NullGenerator created" << std::endl;

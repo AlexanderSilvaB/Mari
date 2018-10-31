@@ -1,5 +1,6 @@
 #include "VisionModule.h"
 #include "Core/Utils/RobotDefs.h"
+#include "Modules/Network/NetworkModule.h"
 
 using namespace cv;
 
@@ -11,6 +12,7 @@ VisionModule::VisionModule(SpellBook *spellBook)
     capture = new CombinedCamera();
     top.Update(CAM_W, CAM_H);
     bottom.Update(CAM_W, CAM_H);
+    message = new ImageMessage("Bottom", CAM_W, CAM_H, IMAGE_TYPE_BGR);
     frameWriter = NULL;
 }
 
@@ -19,6 +21,7 @@ VisionModule::~VisionModule()
     delete frameWriter;
     delete ballDetector;
     delete localizer;
+    delete message;
 }
 
 void VisionModule::Tick(float ellapsedTime)
@@ -39,11 +42,15 @@ void VisionModule::Tick(float ellapsedTime)
             if(frameWriter == NULL)
             {
                 SAY("Recording Video");
-                frameWriter = new FrameWriter("video.avi", 30, combinedImage.size());
+                frameWriter = new FrameWriter("video.avi", 15, combinedImage.size());
             }
 
             frameWriter->write(combinedImage);
         }
+
+        uint8_t *msgData = message->getData();
+        memcpy(msgData, bottom.BGR.data, message->getDataSize());
+        NetworkModule::SendMessage(message);
     }
 
     if(spellBook->perception.vision.ball.Enabled)
