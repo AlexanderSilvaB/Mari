@@ -11,7 +11,7 @@
             "Vision":
             {
                 "Enabled": true,
-                "Record" : true,
+                "Record" : false,
                 "BallDetector": {
                     "Enabled": true,
                     "Method": "Cascade",
