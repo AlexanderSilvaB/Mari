@@ -14,9 +14,12 @@ DefenderRole::~DefenderRole()
 }
 void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
 {
+    CartesianCoord coord;
+    RelativeCoord rr;
     if ((spellBook->strategy.GameState == GC::READY || spellBook->strategy.GameState == GC::PLAYING) &&
         !onPosition)
     {
+
 
         if (spellBook->perception.vision.localization.Enabled)
         {
@@ -41,22 +44,23 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
     if (spellBook->strategy.GameState == GC::PLAYING)
     {
         spellBook->motion.KickRight = false;
-        CartesianCoord coord;
-        RelativeCoord rr;
+        spellBook->motion.Vth = 0;
+        spellBook->motion.Vx = 0;
+        spellBook->motion.Vy = 0;
         if (spellBook->perception.vision.ball.BallDetected)
         {
-
+            cout << "Valor atual do GetX: " << coord.getX() << endl;
             rr.fromPixel(spellBook->perception.vision.ball.ImageX, spellBook->perception.vision.ball.ImageY, sensor.joints.angles[Joints::HeadYaw], -sensor.joints.angles[Joints::HeadPitch]);
             rr.toCartesian(coord, sensor.joints.angles[Joints::HeadYaw], sensor.joints.angles[Joints::HeadPitch]);
             cout << "X: " << coord.getX() << endl;
             cout << "Y: " << coord.getY() << endl;
-            if (rr.getDistance() > 0.5f || !spellBook->perception.vision.ball.BallDetected)
+            if (rr.getDistance() > 0.8f)
             {
-                spellBook->motion.Vx = (coord.getX() * 0.1);
-                spellBook->motion.Vy = (coord.getY() * 0.1);
-                if (abs(rr.getYaw()) > Deg2Rad(4))
+                if (rr.getYaw() > Deg2Rad(5) || rr.getYaw() < Deg2Rad(-5))
                 {
-                    spellBook->motion.Vth = rr.getYaw() * -0.5f;
+                    spellBook->motion.Vth = min(rr.getYaw() * rr.getDistance(), Deg2Rad(0.5f));
+                    spellBook->motion.Vx = abs(min(coord.getX(), 0.1f));
+                    spellBook->motion.Vy = (coord.getY(), 0.05f);
                 }
                 else
                 {
@@ -65,27 +69,39 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
                     spellBook->motion.Vy = 0;
                 }
             }
-            if (rr.getDistance() < 0.3f)
+            else if(rr.getDistance() > 0.5f && rr.getDistance() < 0.8f)
+            {
+                if (rr.getYaw() > Deg2Rad(8) || rr.getYaw() < Deg2Rad(-8))
+                {
+                    spellBook->motion.Vth = min(rr.getYaw() * rr.getDistance(), Deg2Rad(0.5f));
+                    spellBook->motion.Vx = abs(min(coord.getX(), 0.15f));
+                    spellBook->motion.Vy = coord.getY()*0.05f;
+                }
+                else
+                {
+                    spellBook->motion.Vth = 0;
+                    spellBook->motion.Vx = abs((coord.getX() * 0.03));
+                    spellBook->motion.Vy = 0;
+                }
+            }
+            else{
+                spellBook->motion.Vx = 0.0f;
+            }
+            /*if (rr.getDistance() < 0.4f)
             {
                 cout << "ENTROU NA MERDA DO IF E A DISTANCIA É: " << rr.getDistance();
-                spellBook->motion.KickRight = true;
                 spellBook->motion.Vth = 0;
                 spellBook->motion.Vx = 0;
                 spellBook->motion.Vy = 0;
-            }
-            cout << "NÃO ENTROU NA MERDA DO IF E A DISTANCIA É: " << rr.getDistance() << endl;
+                spellBook->motion.KickRight = true;
+                
+            } */
         }
-        cout << "NÃO ENTROU NA MERDA DO IF E A DISTANCIA É: " << rr.getDistance() << endl;
-    }
-    /*else if (rr.getDistance() < 0.4f)
-            {
-
-                spellBook->strategy.WalkForward = false;
-                onBall = true;
-            }*/
-    else
-    {
-        //spellBook->motion.KickLeft=false;
-        //spellBook->motion.KickRight=false;
+        else
+        {
+            cout << "se perdeu: "<< endl;
+            spellBook->motion.Vx = 0.01f;
+            spellBook->motion.Vy = 0.15f;
+        }
     }
 }
