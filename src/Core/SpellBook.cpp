@@ -154,12 +154,13 @@ BallSpell::BallSpell()
     method = "CASCADE";
     ballWidth = ballHeight = 0.1f;
 
-    BallAzimuth = 0;
+    BallYaw = 0;
     BallDetected = false;
     BallDistance = 0;
-    BallElevation = 0;
+    BallPitch = 0;
     ImageX = ImageY = 0;
     BallLostCount = 0;
+    HeadYaw = HeadPitch = 0;
 }
 
 void BallSpell::CopyTo(Spell *spell)
@@ -169,14 +170,16 @@ void BallSpell::CopyTo(Spell *spell)
     COPY(s, method)
     COPY(s, ballWidth)
     COPY(s, ballHeight)
-    COPY(s, BallAzimuth)
+    COPY(s, BallYaw)
     COPY(s, HeadSpeed)
     COPY(s, BallDetected)
     COPY(s, BallDistance)
-    COPY(s, BallElevation)
+    COPY(s, BallPitch)
     COPY(s, ImageX)
     COPY(s, ImageY)
     COPY(s, BallLostCount)
+    COPY(s, HeadYaw)
+    COPY(s, HeadPitch)
 }
 
 void BallSpell::Load(Storage &storage)

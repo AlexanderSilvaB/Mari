@@ -26,7 +26,7 @@ VisionModule::~VisionModule()
 
 void VisionModule::Tick(float ellapsedTime)
 {
-    top.ReadFromYUV422(capture->getFrameTop(), spellBook->perception.vision.BGR, spellBook->perception.vision.HSV, spellBook->perception.vision.GRAY, true);
+    //top.ReadFromYUV422(capture->getFrameTop(), spellBook->perception.vision.BGR, spellBook->perception.vision.HSV, spellBook->perception.vision.GRAY, true);
     bottom.ReadFromYUV422(capture->getFrameBottom(), spellBook->perception.vision.BGR, spellBook->perception.vision.HSV, spellBook->perception.vision.GRAY, false);
     if(spellBook->perception.vision.BGR)
     {
@@ -34,7 +34,7 @@ void VisionModule::Tick(float ellapsedTime)
         {
             combinedImage.create(top.BGR.rows+bottom.BGR.rows+40, bottom.BGR.cols, CV_8UC3);
         }
-        top.BGR.copyTo(combinedImage(Rect(0, 0, top.BGR.cols, top.BGR.rows)));
+        //top.BGR.copyTo(combinedImage(Rect(0, 0, top.BGR.cols, top.BGR.rows)));
         bottom.BGR.copyTo(combinedImage(Rect(0, bottom.BGR.rows+40, bottom.BGR.cols, bottom.BGR.rows)));
 
         if(spellBook->perception.vision.Record)

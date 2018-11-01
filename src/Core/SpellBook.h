@@ -52,9 +52,11 @@ class BallSpell : public Spell
         int BallLostCount;
 
         bool BallDetected;
-        float BallAzimuth;
-        float BallElevation;
+        float BallYaw;
+        float BallPitch;
         float BallDistance;
+        float HeadYaw;
+        float HeadPitch;
         float HeadSpeed;
         bool HeadRelative;
         float TimeSinceBallSeen;
