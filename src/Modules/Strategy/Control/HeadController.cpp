@@ -35,12 +35,12 @@ void HeadController::Tick(float ellapsedTime, const SensorValues &sensor)
     //float yDiff = (spellBook->perception.vision.ball.ImageY - (CAM_BALL_H / 2)) / CONSTANT_Y;
     //spellBook->motion.HeadPitch = yDiff - sensor.joints.angles[Joints::HeadPitch];
     
-    spellBook->motion.HeadPitch = Deg2Rad(25);
+    spellBook->motion.HeadPitch = Deg2Rad(20.0f);
 
     if(spellBook->perception.vision.ball.BallLostCount < 5)
     {
         float factor = abs(spellBook->motion.HeadYaw) / H_DOF;
-        float speed = 0.4 * factor;  // 10.0 * factor * factor
+        float speed = 0.25 * factor;  // 10.0 * factor * factor
         spellBook->motion.HeadSpeedYaw = speed;
 
         factor = abs(spellBook->motion.HeadPitch) / V_DOF;

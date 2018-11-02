@@ -12,6 +12,8 @@ private:
 
     bool onBall;
     bool onPosition;
+    int contPerdido;
+    float scanPitch;
 
 public:
 
