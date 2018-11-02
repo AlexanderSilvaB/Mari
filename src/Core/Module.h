@@ -5,6 +5,7 @@
 #include <string>
 #include <unistd.h>
 #include "SpellBook.h"
+#include "Utils/TCPLogger.h"
 
 using namespace std;
 

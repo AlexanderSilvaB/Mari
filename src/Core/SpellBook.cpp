@@ -29,6 +29,7 @@ void SpellBook::Load(string fileName)
     remote.Load(storage);
     strategy.Load(storage);
     behaviour.Load(storage);
+    network.Load(storage);
 }
 
 void SpellBook::Save(string fileName)
@@ -40,6 +41,7 @@ void SpellBook::Save(string fileName)
     remote.Save(storage);
     strategy.Save(storage);
     behaviour.Save(storage);
+    network.Save(storage);
 
     storage.Save();
 }
@@ -52,6 +54,7 @@ void SpellBook::AddOptions(po::options_description &description)
     remote.AddOptions(description);
     strategy.AddOptions(description);
     behaviour.AddOptions(description);    
+    network.AddOptions(description);
 }
 
 void SpellBook::Update()
@@ -63,6 +66,7 @@ void SpellBook::Update()
     remote.Update(config);
     strategy.Update(config);
     behaviour.Update(config);
+    network.Update(config);
 }
 
 void SpellBook::Lock()
@@ -401,6 +405,52 @@ void RemoteSpell::Save(Storage &storage)
 {
     storage["Modules"]["Remote"]["Joystick"]["Enabled"] = EnableJoystick;
     storage["Modules"]["Remote"]["Network"]["Enabled"] = EnableNetwork;
+}
+
+NetworkSpell::NetworkSpell()
+{
+    TCPConnected = false;
+    SelectedCamera = 0;
+    topSettings.brightnessChanged = botSettings.brightnessChanged = false;
+    topSettings.saturationChanged = botSettings.saturationChanged = false;
+    topSettings.contrastChanged = botSettings.contrastChanged = false;
+    topSettings.sharpnessChanged = botSettings.sharpnessChanged = false;
+}
+
+void NetworkSpell::CopyTo(Spell *spell)
+{
+    NetworkSpell *s = (NetworkSpell*)spell;
+    COPY(s, TCPConnected)
+    COPY(s, SelectedCamera)
+
+
+    COPY(s, topSettings.brightnessChanged)
+    COPY(s, topSettings.saturationChanged)
+    COPY(s, topSettings.contrastChanged)
+    COPY(s, topSettings.sharpnessChanged)
+    COPY(s, topSettings.brightness)
+    COPY(s, topSettings.saturation)
+    COPY(s, topSettings.contrast)
+    COPY(s, topSettings.sharpness)
+
+    COPY(s, botSettings.brightnessChanged)
+    COPY(s, botSettings.saturationChanged)
+    COPY(s, botSettings.contrastChanged)
+    COPY(s, botSettings.sharpnessChanged)
+    COPY(s, botSettings.brightness)
+    COPY(s, botSettings.saturation)
+    COPY(s, botSettings.contrast)
+    COPY(s, botSettings.sharpness)
+}
+
+void NetworkSpell::Load(Storage &storage)
+{
+    
+}
+
+void NetworkSpell::Save(Storage &storage)
+{
+    
 }
 
 StrategySpell::StrategySpell()

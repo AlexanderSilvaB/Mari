@@ -1,5 +1,6 @@
 #include "Message.h"
 #include <cstring>
+#include <iostream>
 
 using namespace std;
 
@@ -109,12 +110,11 @@ int Message::decode(vector<char> &data)
     if(!(ptr[0] == 'R' && ptr[1] == 'I' && ptr[2] == 'N' && ptr[3] == 'O'))
         return sz;
     sz += 4;
-    
-    type = ((int*)ptr + sz)[0];
+    type = ((int*)(ptr + sz))[0];
     sz += sizeof (type);
-    level = ((int*)ptr + sz)[0];
+    level = ((int*)(ptr + sz))[0];
     sz += sizeof (level);
-    int msgLen = ((int*)ptr + sz)[0];
+    int msgLen = ((int*)(ptr + sz))[0];
     sz += sizeof (msgLen);
     char *str = new char[msgLen+1];
     memcpy(str, ptr + sz, msgLen);
@@ -140,6 +140,7 @@ int Message::encode(vector<char> &data)
     memcpy(buff + sz, (char*)(&len), sizeof(len));
     sz += 4;
     memcpy(buff + sz, message.c_str(), len);
+    sz += len;
     for(int i = 0; i < sz; i++)
         data.push_back(buff[i]);
     return data.size();
