@@ -54,12 +54,12 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
 
         if (!spellBook->perception.vision.ball.BallDetected)
         {
-            if (time < 2)
+            if (time < 60*ellapsedTime)
             {
                 spellBook->motion.Vy = -0.05;
                 time += ellapsedTime;
             }
-            else if(time>4)
+            else if(time>60*ellapsedTime && time< 240*ellapsedTime)
             {
                 spellBook>motion.Vy = 0.05;
             }
@@ -67,6 +67,5 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
             {
                 time = 0;
             }
-            time += ellapsedTime;
         }
     }

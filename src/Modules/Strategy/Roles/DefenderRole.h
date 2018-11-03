@@ -14,6 +14,7 @@ private:
     bool onPosition;
     int contador;
     float scanPitch;
+    float time;
 
 public:
 
