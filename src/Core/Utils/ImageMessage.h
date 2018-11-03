@@ -3,6 +3,7 @@
 
 #include "Message.h"
 #include <cstdio>
+#include <opencv2/opencv.hpp>
 
 #define TYPE_IMAGE TYPE('I'+'M'+'A'+'G'+'E')
 
@@ -21,6 +22,7 @@ class ImageMessage : public Message
         int imageType;
         int step;
         int dataSize;
+        void update(int width, int height, int imageType);
     public:
         ImageMessage();
         ImageMessage(const ImageMessage &imageMessage);
@@ -35,6 +37,8 @@ class ImageMessage : public Message
         int getImageType();
         int getStep();
         int getDataSize();
+
+        bool fromCV(std::string name, cv::Mat &img);
 
         std::string toString();
         int decode(std::vector<char> &data);

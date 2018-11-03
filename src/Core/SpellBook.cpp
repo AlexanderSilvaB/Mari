@@ -29,6 +29,7 @@ void SpellBook::Load(string fileName)
     remote.Load(storage);
     strategy.Load(storage);
     behaviour.Load(storage);
+    network.Load(storage);
 }
 
 void SpellBook::Save(string fileName)
@@ -40,6 +41,7 @@ void SpellBook::Save(string fileName)
     remote.Save(storage);
     strategy.Save(storage);
     behaviour.Save(storage);
+    network.Save(storage);
 
     storage.Save();
 }
@@ -52,6 +54,7 @@ void SpellBook::AddOptions(po::options_description &description)
     remote.AddOptions(description);
     strategy.AddOptions(description);
     behaviour.AddOptions(description);    
+    network.AddOptions(description);
 }
 
 void SpellBook::Update()
@@ -63,6 +66,7 @@ void SpellBook::Update()
     remote.Update(config);
     strategy.Update(config);
     behaviour.Update(config);
+    network.Update(config);
 }
 
 void SpellBook::Lock()
@@ -154,12 +158,13 @@ BallSpell::BallSpell()
     method = "CASCADE";
     ballWidth = ballHeight = 0.1f;
 
-    BallAzimuth = 0;
+    BallYaw = 0;
     BallDetected = false;
     BallDistance = 0;
-    BallElevation = 0;
+    BallPitch = 0;
     ImageX = ImageY = 0;
     BallLostCount = 0;
+    HeadYaw = HeadPitch = 0;
 }
 
 void BallSpell::CopyTo(Spell *spell)
@@ -169,14 +174,16 @@ void BallSpell::CopyTo(Spell *spell)
     COPY(s, method)
     COPY(s, ballWidth)
     COPY(s, ballHeight)
-    COPY(s, BallAzimuth)
+    COPY(s, BallYaw)
     COPY(s, HeadSpeed)
     COPY(s, BallDetected)
     COPY(s, BallDistance)
-    COPY(s, BallElevation)
+    COPY(s, BallPitch)
     COPY(s, ImageX)
     COPY(s, ImageY)
     COPY(s, BallLostCount)
+    COPY(s, HeadYaw)
+    COPY(s, HeadPitch)
 }
 
 void BallSpell::Load(Storage &storage)
@@ -400,6 +407,52 @@ void RemoteSpell::Save(Storage &storage)
     storage["Modules"]["Remote"]["Network"]["Enabled"] = EnableNetwork;
 }
 
+NetworkSpell::NetworkSpell()
+{
+    TCPConnected = false;
+    SelectedCamera = 0;
+    topSettings.brightnessChanged = botSettings.brightnessChanged = false;
+    topSettings.saturationChanged = botSettings.saturationChanged = false;
+    topSettings.contrastChanged = botSettings.contrastChanged = false;
+    topSettings.sharpnessChanged = botSettings.sharpnessChanged = false;
+}
+
+void NetworkSpell::CopyTo(Spell *spell)
+{
+    NetworkSpell *s = (NetworkSpell*)spell;
+    COPY(s, TCPConnected)
+    COPY(s, SelectedCamera)
+
+
+    COPY(s, topSettings.brightnessChanged)
+    COPY(s, topSettings.saturationChanged)
+    COPY(s, topSettings.contrastChanged)
+    COPY(s, topSettings.sharpnessChanged)
+    COPY(s, topSettings.brightness)
+    COPY(s, topSettings.saturation)
+    COPY(s, topSettings.contrast)
+    COPY(s, topSettings.sharpness)
+
+    COPY(s, botSettings.brightnessChanged)
+    COPY(s, botSettings.saturationChanged)
+    COPY(s, botSettings.contrastChanged)
+    COPY(s, botSettings.sharpnessChanged)
+    COPY(s, botSettings.brightness)
+    COPY(s, botSettings.saturation)
+    COPY(s, botSettings.contrast)
+    COPY(s, botSettings.sharpness)
+}
+
+void NetworkSpell::Load(Storage &storage)
+{
+    
+}
+
+void NetworkSpell::Save(Storage &storage)
+{
+    
+}
+
 StrategySpell::StrategySpell()
 {
     GameState = GC::INITIAL;
@@ -419,6 +472,7 @@ StrategySpell::StrategySpell()
     HeadYawRange = Deg2Rad(45.0f);
     HeadPitchRange = Deg2Rad(20.0f);
     HeadSearchSpeed = 0.1f;
+    HeadScanCount = 0;
 }
 
 void StrategySpell::CopyTo(Spell *spell)
@@ -442,6 +496,7 @@ void StrategySpell::CopyTo(Spell *spell)
     COPY(s, HeadYawRange)
     COPY(s, HeadPitchRange)
     COPY(s, HeadSearchSpeed)
+    COPY(s, HeadScanCount)
 }
 
 void StrategySpell::Load(Storage &storage)
@@ -495,7 +550,7 @@ void BehaviourSpell::CopyTo(Spell *spell)
 void BehaviourSpell::Load(Storage &storage)
 {
     Number = storage["Modules"]["Behaviour"]["Number"].Default(2);
-    Name = (string)storage["Modules"]["Behaviour"]["Name"].Default("NAO");
+    Name = (string)storage["Modules"]["Behaviour"]["Names"][Number].Default("NAO");
 }
 
 void BehaviourSpell::Save(Storage &storage)

@@ -23,6 +23,8 @@
 
 #include "SpellBook.h"
 
+#include "Utils/TCPLogger.h"
+
 #include "InitManager.h"
 
 namespace po = boost::program_options;
@@ -60,6 +62,7 @@ void InitManager::Init(int argc, char *argv[], SpellBook &spellBook)
         // this is the first instance
         set_cloexec_flag(pid_file);
     }
+    TCPLogger::Start();
     ParseArgs(argc, argv, spellBook);
 
     InitManager::InitCameras();
@@ -146,6 +149,7 @@ Blackboard *InitManager::GetBlackboard()
 
 void InitManager::Destroy()
 {
+    TCPLogger::Stop();
     delete blackboard;
 
     delete topCamera;

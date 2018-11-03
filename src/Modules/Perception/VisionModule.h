@@ -28,10 +28,10 @@ class VisionModule : public InnerModule
         BallDetector *ballDetector;
         Localizer *localizer;
 
-        ImageMessage *message;
+        ImageMessage message;
 
-        cv::Mat combinedImage;
-
+        cv::Mat combinedImage, messageImage;
+        void setControl(Camera *camera, const uint32_t controlId, const int32_t controlValue);
     public:
         VisionModule(SpellBook *spellBook);
         ~VisionModule();

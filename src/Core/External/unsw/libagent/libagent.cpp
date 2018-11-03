@@ -55,7 +55,7 @@ inline unsigned int timeNow() {
 }
 
 void Agent::doNetworking() {
-   SAY("fixing networking");
+   SAY("Consertando a rede");
    int ret = system("sudo ifconfig wlan0 netmask 255.255.0.0");
    ret++; // removes compiler warnings lol
    //string command = "/bin/su -c '/etc/init.d/connman restart'";
@@ -64,7 +64,7 @@ void Agent::doNetworking() {
 }
 
 void Agent::doAvahi() {
-   SAY("fixing avahi");
+   SAY("Consertando o tal do avahi");
    ret = system("/bin/su -c '/etc/init.d/avahi-daemon restart'");
 }
 
@@ -74,17 +74,17 @@ void Agent::doBattery(float charge, float current, int status) {
    int battery = charge * 33;
    // if battery decreasing & <= 30%
    if (old_battery > battery && battery <= 10) {
-      SAY("battery " + boost::lexical_cast<string>(battery * 3) +
-          " percent");
+      SAY("bateria " + boost::lexical_cast<string>(battery * 3) +
+          " porcento");
    }
    old_battery = battery;
    std::bitset<16> b = status;
    if (!old_battery_status[5] && b[5]) {
-      log->info(name, "Discharging");
+      log->info(name, "Descarregando");
    } else if (!old_battery_status[6] && b[6]) {
-      log->info(name, "Fully Charged");
+      log->info(name, "Carregado");
    } else if (!old_battery_status[7] && b[7]) {
-      log->info(name, "Charging");
+      log->info(name, "Carregando");
    }
    old_battery_status = b;
 }
@@ -95,7 +95,7 @@ void Agent::doTemps() {
        *temperature_pointers[t / 100] > 70 &&
        !limp && !shared_data->standing &&
        shared_data->joints[shared_data->actuators_read].stiffnesses[t / 100] > 0)
-      SAY("OVERHEATING: " + Joints::fliteJointNames[t / 100]);
+      SAY("Estou quentinho: " + Joints::fliteJointNames[t / 100]);
    t = (t + 1) % (Joints::NUMBER_OF_JOINTS * 100);
 }
 
@@ -108,8 +108,8 @@ void Agent::doButtons(bool chest, bool left, bool right) {
       if (buttons.pop(2)) {
          if (left || right) {
             head_limp = !head_limp;
-            SAY(std::string("head ") +
-                (head_limp ? "limp" : "stiff"));
+            SAY(std::string("cabeça ") +
+                (head_limp ? "mole" : "dura"));
          } else {
             if (limp) {
                limp = false;
@@ -120,12 +120,12 @@ void Agent::doButtons(bool chest, bool left, bool right) {
                shared_data->standing = false;
                motion->killAll();
             }
-            SAY(std::string("body ") +
-                (limp ? "limp" : "stiff"));
+            SAY(std::string("corpo ") +
+                (limp ? "mole" : "duro"));
          }
       } else if (buttons.pop(3)) {
          if (left || right) {
-            SAY("Restarting now key");  // yay transliteration
+            SAY("Reiniciando a NAO Qi");  // yay transliteration
             // Runlevel a is set up to run nao restart on demand.
             // This avoids the problem where killall naoqi kills us and
             // therefore our children (including /etc/init.d/naoqi).
@@ -136,7 +136,7 @@ void Agent::doButtons(bool chest, bool left, bool right) {
             // should not get here
          } else {
             if (skipped_frames > MAX_SKIPS) {
-               SAY("loaded rinobot");
+               SAY("Carregando rinobot");
                if (!fork()) {
                   struct sched_param s;
                   s.sched_priority = 0;
@@ -146,7 +146,7 @@ void Agent::doButtons(bool chest, bool left, bool right) {
                                (char*)NULL);
                }
             } else {
-               SAY("killed rinobot");
+               SAY("Parando rinobot");
                ret = system("/usr/bin/killall rinobot");
                while (waitpid(-1, NULL, WNOHANG) > 0) ;
             }
@@ -175,7 +175,7 @@ void Agent::doButtons(bool chest, bool left, bool right) {
          limp = true;
          chest_down = std::numeric_limits<int>::min();
       } else {
-         SAY("Shutting down");
+         SAY("Desligando");
          ret = system("sudo '/usr/bin/killall rinobot'");
          ret = system("sudo /sbin/halt");
          limp = true;
@@ -257,7 +257,7 @@ void Agent::doHeadTouch(float headTouchFront,
                 if (last_press == HEAD_FRONT)
                 {
                     //kill runswift
-                    SAY("kill all rinobot");
+                    SAY("Parando rinobot");
                     ret = system("/usr/bin/killall rinobot");
                 }
                 else
@@ -265,7 +265,7 @@ void Agent::doHeadTouch(float headTouchFront,
                     //start runswift
                     if (skipped_frames > MAX_SKIPS)
                     {
-                        SAY("loaded rinobot");
+                        SAY("Carregando rinobot");
                         if (!fork())
                         {
                             struct sched_param s;
@@ -407,7 +407,7 @@ void Agent::preCallback() {
          sit_step = 0.0f;
          for (uint8_t i = 0; i < Joints::NUMBER_OF_JOINTS; ++i)
             sit_joints.angles[i] = sensors.joints.angles[i];
-         SAY("lost contact");
+         SAY("desconectado");
          motion->killAll();
       }
       /*
@@ -675,6 +675,7 @@ Agent::Agent(boost::shared_ptr<AL::ALBroker> pBroker, const std::string& pName)
    speech = new ALTextToSpeechProxy("localhost", 9559);
    if (speech == NULL)
       throw ALERROR(name, "constructor", "speech == NULL");
+   //speech->setLanguage("Brazilian");
 
    log->info(name, "Contructed speech");
 
