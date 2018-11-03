@@ -254,13 +254,13 @@ void GameControllerBlackboard::readOptions(const program_options::variables_map&
       data.state = STATE_INVALID;
    }
    data.firstHalf = config["gamecontroller.firsthalf"].as<bool>();
-   data.kickOffTeam = (int)(config["gamecontroller.kickoffteam"].as<string>()
-                            == "red");
+   /*data.kickOffTeam = (int)(config["gamecontroller.kickoffteam"].as<string>()
+                            == "red");*/
    map<string, int> gcSecStateMap;
    gcSecStateMap["NORMAL"] = STATE2_NORMAL;
    gcSecStateMap["PENALTYSHOOT"] = STATE2_PENALTYSHOOT;
-   data.secondaryState = gcSecStateMap[
-      config["gamecontroller.secondarystate"].as<string>()];
+   /*data.secondaryState = gcSecStateMap[
+      config["gamecontroller.secondarystate"].as<string>()];*/
    data.secsRemaining = config["gamecontroller.secsremaining"].as<int>();
    data.teams[our_team.teamColour] = our_team;
    data.teams[their_team.teamColour] = their_team;

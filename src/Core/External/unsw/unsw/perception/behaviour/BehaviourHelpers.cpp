@@ -10,7 +10,7 @@
 
 namespace BehaviourHelpers {
    bool ourKickOff(Blackboard *blackboard) {
-      return (readFrom(gameController, our_team.teamColour) == readFrom(gameController, data.kickOffTeam));
+      return (readFrom(gameController, our_team.teamColour) == readFrom(gameController, data.kickingTeam));
    }
 
    const ActionCommand::rgb LED_OFF(false, false, false);
