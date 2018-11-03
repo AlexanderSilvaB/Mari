@@ -16,7 +16,8 @@ class NetworkModule : public Module
 {
     private:
         TcpUdpSocket *sock;
-        TcpUdpSocket *gcsock;
+        TcpUdpSocket *gcsock, *gcsockReturn;
+
         char inData[MAX_SIZE];
         static char outData[MAX_SIZE];
         static int outSize;
@@ -24,8 +25,11 @@ class NetworkModule : public Module
         char outDataGC[MAX_GC_MSG];
         char inDataGC[MAX_GC_MSG];
         int outSizeGC;
+        float timeSinceLastGCData;
 
         struct RoboCupGameControlData gcData;
+        struct RoboCupGameControlReturnData gcReturnData;
+
     public:
         NetworkModule(SpellBook *spellBook);
         ~NetworkModule();
@@ -33,6 +37,8 @@ class NetworkModule : public Module
         void OnStop();
         void Tick(float ellapsedTime);
         static bool SendMessage(Message *message);
+        void Load();
+        void Save();
 };
 
 #endif

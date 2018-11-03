@@ -47,7 +47,8 @@
         },
         "Behaviour": {
             "Enabled": true,
-            "Number" : 2,
+            "Number" : 1,
+            "TeamNumber" : 47,
             "Names" : ["NAO 1", "NAO 2", "NAO 3", "NAO 4", "NAO 5", "NAO 6"]
         }
     }

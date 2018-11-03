@@ -221,6 +221,7 @@ class BehaviourSpell : public Spell
         int RightEye;
         std::string Name;
         int Number;
+        int TeamNumber;
 
         BehaviourSpell();
         void CopyTo(Spell *spell);

@@ -49,7 +49,7 @@ void GoalieRole::Tick(float ellapsedTime, const SensorValues &sensor)
         {
             if(abs(spellBook->perception.vision.ball.HeadYaw) > Deg2Rad(5.0f))
             {
-                spellBook->motion.Vy = 0.05f * SIG(spellBook->perception.vision.ball.HeadYaw);
+                spellBook->motion.Vy = 0.01f * SIG(spellBook->perception.vision.ball.HeadYaw);
                 spellBook->motion.DefenderCentre = false;
             }
             else
