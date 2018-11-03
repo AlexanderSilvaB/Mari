@@ -3,6 +3,10 @@
 #include "Core/InitManager.h"
 #include "Core/Utils/RobotDefs.h"
 #include "Core/Utils/RelativeCoord.h"
+#include "Core/Utils/CombinedCamera.hpp"
+
+#include "perception/vision/CameraToRR.hpp"
+#include "perception/vision/WhichCamera.hpp"
 
 #define R 2.0f
 #define PI_2 1.5707963267f
@@ -31,6 +35,9 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
     spellBook->perception.vision.HSV = true;
     spellBook->perception.vision.GRAY = true;
 
+    Blackboard *blackboard = InitManager::GetBlackboard();
+    SensorValues sensor = readFrom(motion, sensors);
+
     bool detected = false;
     switch(method)
     {
@@ -51,7 +58,29 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
     spellBook->perception.vision.ball.ImageY = ball.y;
     spellBook->perception.vision.ball.BallDetected = detected;
     if(detected)
+    {
         spellBook->perception.vision.ball.BallLostCount = 0;
+        
+        float currHeadYaw = sensor.joints.angles[Joints::HeadYaw];
+        float currHeadPitch = sensor.joints.angles[Joints::HeadPitch];
+
+        RelativeCoord rr;
+        rr.fromPixel(ball.x, ball.y, currHeadYaw, currHeadPitch);
+        spellBook->perception.vision.ball.BallYaw = rr.getYaw();
+        spellBook->perception.vision.ball.BallDistance = rr.getDistance();
+        spellBook->perception.vision.ball.BallPitch = rr.getPitch();
+
+        float CONSTANT_X = (float)CAM_BALL_W / H_DOF;
+        float xDiff = -(ball.x - (CAM_BALL_W / 2)) / CONSTANT_X;
+        spellBook->perception.vision.ball.HeadYaw = xDiff - currHeadYaw;
+
+        float CONSTANT_Y = (float)CAM_BALL_H / V_DOF;
+        float yDiff = (ball.y - (CAM_BALL_H / 2)) / CONSTANT_Y;
+        spellBook->perception.vision.ball.HeadPitch = yDiff - currHeadPitch;
+
+        cout << rr.getDistance() << "m, " << Rad2Deg(rr.getYaw()) << "º" << endl;
+
+    }
     else
         spellBook->perception.vision.ball.BallLostCount++;
     cout << "Encontrado: " << detected << endl;
@@ -75,8 +104,8 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
         spellBook->perception.vision.ball.BallDetected = false;
         spellBook->perception.vision.ball.TimeSinceBallSeen += ellapsedTime;
         spellBook->perception.vision.ball.HeadRelative = true;
-        spellBook->perception.vision.ball.BallAzimuth = 0;
-        spellBook->perception.vision.ball.BallElevation = 0;
+        spellBook->perception.vision.ball.BallYaw = 0;
+        spellBook->perception.vision.ball.BallPitch = 0;
         if(spellBook->perception.vision.ball.TimeSinceBallSeen > 1.0f)
         {
             targetPitch = 0.0f;
@@ -84,8 +113,8 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
             speed = 0.25f;
 
             spellBook->perception.vision.ball.HeadRelative = false;
-            spellBook->perception.vision.ball.BallAzimuth = 0;
-            spellBook->perception.vision.ball.BallElevation = 0;
+            spellBook->perception.vision.ball.BallYaw = 0;
+            spellBook->perception.vision.ball.BallPitch = 0;
             spellBook->perception.vision.ball.BallDistance = 0.0f;
             spellBook->perception.vision.ball.HeadSpeed = speed;
         }
@@ -114,8 +143,8 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
 
         spellBook->perception.vision.ball.BallDetected = true;
         spellBook->perception.vision.ball.HeadRelative = true;
-        spellBook->perception.vision.ball.BallAzimuth = -targetYaw;
-        spellBook->perception.vision.ball.BallElevation = targetPitch;
+        spellBook->perception.vision.ball.BallYaw = -targetYaw;
+        spellBook->perception.vision.ball.BallPitch = targetPitch;
         spellBook->perception.vision.ball.BallDistance = distance;
         spellBook->perception.vision.ball.TimeSinceBallSeen = 0.0f;
         spellBook->perception.vision.ball.HeadSpeed = speed;
