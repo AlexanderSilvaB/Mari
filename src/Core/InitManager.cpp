@@ -62,7 +62,7 @@ void InitManager::Init(int argc, char *argv[], SpellBook &spellBook)
         // this is the first instance
         set_cloexec_flag(pid_file);
     }
-    TCPLogger::Start();
+    
     ParseArgs(argc, argv, spellBook);
 
     InitManager::InitCameras();
@@ -80,7 +80,7 @@ void InitManager::ParseArgs(int argc, char *argv[], SpellBook &spellBook)
 
 
         generic.add(rinobot);
-        po::options_description cmdline_options = store_and_notify(argc, argv, vm, &rinobot);
+        po::options_description cmdline_options = store_and_notify(argc, argv, vm, &generic);
 
         if (vm.count("help"))
         {
@@ -149,7 +149,6 @@ Blackboard *InitManager::GetBlackboard()
 
 void InitManager::Destroy()
 {
-    TCPLogger::Stop();
     delete blackboard;
 
     delete topCamera;

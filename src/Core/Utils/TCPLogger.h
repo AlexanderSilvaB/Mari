@@ -3,18 +3,36 @@
 
 #include "Message.h"
 #include <semaphore.h> 
+#include <sstream>
+
+class TCPLogger;
+
+class TCPLogStream : public std::ostringstream
+{
+    public:
+	    TCPLogStream(TCPLogger& logger, int level);
+	    TCPLogStream(const TCPLogStream& ls);
+	    ~TCPLogStream();
+
+private:
+	TCPLogger& _logger;
+	int _level;
+};
 
 class TCPLogger
 {
     private:
-        static sem_t mutex; 
-        static Message message;
+        sem_t mutex; 
+        Message message;
     public:
-        static void Start();
-        static void Stop();
-        static void Log(std::string text, int level = LEVEL_INFO);
+        TCPLogger();
+        ~TCPLogger();
+        void Log(std::string text, int level = LEVEL_INFO);
+
+        TCPLogStream operator()();
+	    TCPLogStream operator()(int level);
 };
 
-#define LL TCPLogger
+extern TCPLogger nlog;
 
 #endif

@@ -5,6 +5,7 @@
 int NetworkModule::outSize = 0;
 char NetworkModule::outData[MAX_SIZE];
 sem_t NetworkModule::mutex; 
+bool NetworkModule::connected = false;
 
 NetworkModule::NetworkModule(SpellBook *spellBook) : Module(spellBook, "Network", 100)
 {
@@ -100,6 +101,7 @@ void NetworkModule::Tick(float ellapsedTime)
     {
         spellBook->network.TCPConnected = false;
     }
+    connected = spellBook->network.TCPConnected;
 }
 
 void NetworkModule::Process(int inSize)
@@ -239,6 +241,8 @@ void NetworkModule::ProcessCameraSetting(CameraSettingMessage &setting)
 
 bool NetworkModule::SendMessage(Message *message)
 {
+    if(!connected)
+        return false;
     sem_wait(&mutex);
     if(outSize > 0)
     {
@@ -252,4 +256,9 @@ bool NetworkModule::SendMessage(Message *message)
     outSize = data.size();
     sem_post(&mutex);
     return true;
+}
+
+bool NetworkModule::IsConnected()
+{
+    return connected;
 }

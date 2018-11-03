@@ -17,6 +17,7 @@ class NetworkModule : public Module
 {
     private:
         static sem_t mutex; 
+        static bool connected;
         TcpUdpSocket *sock;
         char inData[MAX_SIZE];
         char data[MAX_SIZE];
@@ -36,6 +37,7 @@ class NetworkModule : public Module
         void Save();
         void Tick(float ellapsedTime);
         static bool SendMessage(Message *message);
+        static bool IsConnected();
 };
 
 #endif

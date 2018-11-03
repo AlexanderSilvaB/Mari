@@ -8,9 +8,14 @@ StrategyModule::StrategyModule(SpellBook *spellBook)
 {
     gameController = new GameController(this->spellBook);   
     safetyMonitor = new SafetyMonitor(this->spellBook);
+
     potentialFields = new PotentialFields(this->spellBook);
+    pControl = new PControl(this->spellBook);
+
     headController = new HeadController(this->spellBook);
+
     ballTracker = new BallTracker(this->spellBook);
+    robotTracker = new RobotTracker(this->spellBook);
 
     squareStep = 1;
     squareX = squareY = 0;
@@ -20,37 +25,66 @@ StrategyModule::StrategyModule(SpellBook *spellBook)
 
     goalie = new GoalieRole(this->spellBook);
     defender = new DefenderRole(this->spellBook);
+    kicker = new KickerRole(this->spellBook);
 }
 
 StrategyModule::~StrategyModule()
 {
     delete gameController;
     delete safetyMonitor;
+
     delete potentialFields;
+    delete pControl;
+
     delete headController;
 
     delete ballTracker;
+    delete robotTracker;
 
     delete goalie;
+    delete defender;
+    delete kicker;
 }
 
 void StrategyModule::OnStart()
 {
     gameController->OnStart();
     safetyMonitor->OnStart();
+
+    potentialFields->OnStart();
+    pControl->OnStart();
+
+    headController->OnStart();
+
     ballTracker->OnStart();
+    robotTracker->OnStart();
+
+    goalie->OnStart();
+    defender->OnStart();
+    kicker->OnStart();
 }
 
 void StrategyModule::OnStop()
 {
     gameController->OnStop();
     safetyMonitor->OnStop();
+
+    potentialFields->OnStop();
+    pControl->OnStop();
+
+    headController->OnStop();
+
     ballTracker->OnStop();
+    robotTracker->OnStop();
+
+    goalie->OnStop();
+    defender->OnStop();
+    kicker->OnStop();
 }
 
 void StrategyModule::Load()
 {
-    //LOAD(motion)
+    LOAD(motion)
     LOAD(perception)
     LOAD(strategy)
     LOAD(behaviour)
@@ -59,7 +93,7 @@ void StrategyModule::Load()
 void StrategyModule::Save()
 {
     SAVE(motion)
-    //SAVE(perception)
+    SAVE(perception)
     SAVE(strategy)
     SAVE(behaviour) 
 }
@@ -67,7 +101,6 @@ void StrategyModule::Save()
 
 void StrategyModule::Tick(float ellapsedTime)
 {
-    //cout << "Strategy" << endl;
     Blackboard *blackboard = InitManager::GetBlackboard();
     const SensorValues &sensor = readFrom(motion, sensors);
 
@@ -130,6 +163,7 @@ void StrategyModule::Tick(float ellapsedTime)
     spellBook->motion.Stand = true;
     spellBook->motion.Walk = true;
 
+    // Makes the robot move some predefined paths
     if(spellBook->strategy.WalkInSquare)
     {
         if(squareStep == 0)
@@ -191,6 +225,7 @@ void StrategyModule::Tick(float ellapsedTime)
     }
 
     ballTracker->Tick(ellapsedTime, sensor);
+    robotTracker->Tick(ellapsedTime);
 
     switch(spellBook->behaviour.Number)
     {
@@ -199,11 +234,16 @@ void StrategyModule::Tick(float ellapsedTime)
             break;
         case 2:
             defender->Tick(ellapsedTime, sensor);
+            break;
+        case 3:
+            kicker->Tick(ellapsedTime, sensor);
+            break;
         default:
             break;
     }
         
 
     //potentialFields->Tick(ellapsedTime);
+    //pControl->Tick(ellapsedTime);
     headController->Tick(ellapsedTime, sensor);
 }

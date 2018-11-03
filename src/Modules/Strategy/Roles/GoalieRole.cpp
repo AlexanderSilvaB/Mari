@@ -16,9 +16,9 @@ GoalieRole::~GoalieRole()
 
 void GoalieRole::Tick(float ellapsedTime, const SensorValues &sensor)
 {
-    spellBook->strategy.HeadYawRange = Deg2Rad(30.0f);
+    spellBook->strategy.HeadYawRange = Deg2Rad(20.0f);
     spellBook->strategy.HeadPitchRange = Deg2Rad(20.0f);
-    spellBook->strategy.HeadSearchSpeed = 0.05f;
+    spellBook->strategy.HeadSearchSpeed = 0.1f;
     
     if((spellBook->strategy.GameState == GC::READY || spellBook->strategy.GameState == GC::PLAYING) &&
         !onGoal)
@@ -47,9 +47,9 @@ void GoalieRole::Tick(float ellapsedTime, const SensorValues &sensor)
     {
         if(spellBook->perception.vision.ball.BallDetected)
         {
-            if(abs(spellBook->perception.vision.ball.HeadYaw) > Deg2Rad(5.0f))
+            if(abs(spellBook->perception.vision.ball.BallYaw) > Deg2Rad(5.0f))
             {
-                spellBook->motion.Vy = 0.05f * SIG(spellBook->perception.vision.ball.HeadYaw);
+                spellBook->motion.Vy = 0.1f * SIG(spellBook->perception.vision.ball.BallYaw);
                 spellBook->motion.DefenderCentre = false;
             }
             else
@@ -64,7 +64,6 @@ void GoalieRole::Tick(float ellapsedTime, const SensorValues &sensor)
                     spellBook->motion.DefenderCentre = false;
                 }
             }
-            cout << "Vy: " << spellBook->motion.Vy << endl;
         }
         else
         {

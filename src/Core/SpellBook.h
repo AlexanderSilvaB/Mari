@@ -200,6 +200,8 @@ class StrategySpell : public Spell
         float HeadYawRange, HeadPitchRange;
         float HeadSearchSpeed;
         int HeadScanCount;
+        bool MoveHead;
+        bool FakeKick;
 
 
         StrategySpell();
