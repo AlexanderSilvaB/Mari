@@ -11,7 +11,7 @@
             "Vision":
             {
                 "Enabled": true,
-                "Record" : true,
+                "Record" : false,
                 "BallDetector": {
                     "Enabled": true,
                     "Method": "Cascade",
@@ -47,7 +47,7 @@
         },
         "Behaviour": {
             "Enabled": true,
-            "Number" : 3,
+            "Number" : 2,
             "Names" : ["NAO 1", "NAO 2", "NAO 3", "NAO 4", "NAO 5", "NAO 6"]
         }
     }

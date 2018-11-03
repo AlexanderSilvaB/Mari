@@ -13,7 +13,7 @@
 #include "Control/HeadController.h"
 #include "Trackers/BallTracker.h"
 #include "Roles/GoalieRole.h"
-#include "Roles/DefenderRole.h"
+//#include "Roles/DefenderRole.h"
 #include "Roles/RinoPlayer.h"
 
 using namespace std;
@@ -30,7 +30,7 @@ class StrategyModule : public Module
 
         // Roles
         GoalieRole *goalie;
-        DefenderRole *defender;
+        //DefenderRole *defender;
         RinoPlayer *rinoplayer;
 
         int squareStep;

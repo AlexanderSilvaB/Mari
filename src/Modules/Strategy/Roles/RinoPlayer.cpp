@@ -17,6 +17,7 @@ RinoPlayer::~RinoPlayer()
 }
 void RinoPlayer::Tick(float ellapsedTime, const SensorValues &sensor)
 {
+    float YawHead;
     CartesianCoord coord;
     RelativeCoord rr;
     if ((spellBook->strategy.GameState == GC::READY || spellBook->strategy.GameState == GC::PLAYING) &&
@@ -44,29 +45,55 @@ void RinoPlayer::Tick(float ellapsedTime, const SensorValues &sensor)
             onPosition = true;
         }
     }
+
     if (spellBook->strategy.GameState == GC::PLAYING)
     {
+        cout << "entrei em nada" << endl;
         spellBook->motion.KickRight = false;
         spellBook->motion.Vth = 0;
         spellBook->motion.Vx = 0;
         spellBook->motion.Vy = 0;
+        
         if (!spellBook->perception.vision.ball.BallDetected)
         {
-            if(time <= 60 * ellapsedTime)
+            spellBook->strategy.MoveHead = true;            
+            spellBook->motion.Vx = 0;
+            spellBook->motion.Vy = 0;
+            spellBook->motion.Vth = 0;
+            spellBook->strategy.HeadYawRange = Deg2Rad(55.0f);
+            spellBook->motion.HeadSpeedYaw = 0.02;
+            time+=ellapsedTime;
+            cout << " Não Detectando " << endl;
+            
+            if (time > 240 * ellapsedTime && time< 320*ellapsedTime)            
             {
-                spellBook->motion.Vy = 0.05f;
-                time+= ellapsedTime;
+                spellBook->strategy.MoveHead = false;
+                cout << "Time" << time << endl;
+                spellBook->motion.Vth = Deg2Rad(5.0f);
             }
-            else if(time > 60 * ellapsedTime && time < 240 * ellapsedTime)
+        }
+        else if(spellBook->perception.vision.ball.BallDetected)
+        {
+            time = 0;
+            
+            if(spellBook->perception.vision.ball.BallYaw > Deg2Rad(5.0f))
             {
-                spellBook->motion.Vy = -0.05f;
-                time+= ellapsedTime;
-
+                cout<<"ballY 5>"<<endl;
+                spellBook->strategy.MoveHead = false;
+                spellBook->motion.Vth = -0.25 * (spellBook->perception.vision.ball.BallYaw);
+                spellBook->motion.Vx = 0;
+                spellBook->motion.Vy = 0;
             }
             else
             {
-                time = 0;                
-            }   
+                cout<<"alinhado"<<endl;
+                spellBook->strategy.MoveHead = false;
+                spellBook->motion.Vth = 0.0f;
+                spellBook->motion.Vx = 0.25*coord.getX() + 0.1;
+                spellBook->motion.Vy = 0;
+                //spellBook->motion.HeadYaw = 0;
+                //spellBook->motion.HeadPitch = Deg2Rad(20.0f);
+            }
         }
     }
 }

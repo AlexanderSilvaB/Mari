@@ -473,6 +473,7 @@ StrategySpell::StrategySpell()
     HeadPitchRange = Deg2Rad(20.0f);
     HeadSearchSpeed = 0.1f;
     HeadScanCount = 0;
+    MoveHead = true;
 }
 
 void StrategySpell::CopyTo(Spell *spell)
@@ -497,6 +498,7 @@ void StrategySpell::CopyTo(Spell *spell)
     COPY(s, HeadPitchRange)
     COPY(s, HeadSearchSpeed)
     COPY(s, HeadScanCount)
+    COPY(s, MoveHead)
 }
 
 void StrategySpell::Load(Storage &storage)
