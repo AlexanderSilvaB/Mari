@@ -20,6 +20,7 @@ StrategyModule::StrategyModule(SpellBook *spellBook)
 
     goalie = new GoalieRole(this->spellBook);
     defender = new DefenderRole(this->spellBook);
+    rinoplayer = new RinoPlayer(this->spellBook);
 }
 
 StrategyModule::~StrategyModule()
@@ -199,6 +200,10 @@ void StrategyModule::Tick(float ellapsedTime)
             break;
         case 2:
             defender->Tick(ellapsedTime, sensor);
+            break;
+        case 3:
+            rinoplayer->Tick(ellapsedTime, sensor);
+            break;
         default:
             break;
     }
