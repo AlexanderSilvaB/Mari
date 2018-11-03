@@ -473,6 +473,8 @@ StrategySpell::StrategySpell()
     HeadPitchRange = Deg2Rad(20.0f);
     HeadSearchSpeed = 0.1f;
     HeadScanCount = 0;
+    MoveHead = true;
+    FakeKick = true;
 }
 
 void StrategySpell::CopyTo(Spell *spell)
@@ -497,6 +499,8 @@ void StrategySpell::CopyTo(Spell *spell)
     COPY(s, HeadPitchRange)
     COPY(s, HeadSearchSpeed)
     COPY(s, HeadScanCount)
+    COPY(s, MoveHead)
+    COPY(s, FakeKick)
 }
 
 void StrategySpell::Load(Storage &storage)
@@ -513,13 +517,15 @@ void StrategySpell::AddOptions(po::options_description &description)
 {
     description.add_options()
             ("walk.circle", po::value<bool>()->default_value(false), "walks in circle")
-            ("walk.square", po::value<bool>()->default_value(false), "walks in square");
+            ("walk.square", po::value<bool>()->default_value(false), "walks in square")
+            ("kick.fake", po::value<bool>()->default_value(true), "Use a fast walk as a kick");
 }
 
 void StrategySpell::Update(const po::variables_map &config)
 {
     WalkInCircle = config["walk.circle"].as<bool>();
     WalkInSquare = config["walk.square"].as<bool>();
+    FakeKick = config["kick.fake"].as<bool>();
 }
 
 BehaviourSpell::BehaviourSpell()

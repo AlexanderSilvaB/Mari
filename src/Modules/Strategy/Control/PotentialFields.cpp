@@ -43,26 +43,12 @@ void PotentialFields::Tick(float ellapsedTime)
             Xr(2) = 0;
         }
 
-        /*
         Fatt = (Xo - Xr)*Katt;
         // Frep = 
         Ftot = Fatt + Frep;
 
         v = min(Ftot.norm(), Vmax);
         w = Kw * atan2(Ftot(1), Ftot(0)) - spellBook->perception.vision.localization.Theta;
-        */
-
-        float g = FixAngle(atan2(Xo(1), Xo(0)));
-        float a = FixAngle(g - Xr(2));
-        float b = FixAngle(Xo(1) - g);
-
-        float kp = 2.0f/11.0f;
-        float ka = 345.0f/823.0f;
-        float kb = -kp;
-
-        Fatt = (Xo - Xr);
-        v = min(Fatt.norm()*kp, Vmax);
-        w = ka*a + kb*b;
 
         if(spellBook->strategy.WalkForward)
             spellBook->motion.Vx = v;

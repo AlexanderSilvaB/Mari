@@ -9,11 +9,17 @@
 #include "motion/touch/AgentTouch.hpp"
 #include "GameController/GameController.h"
 #include "Safety/SafetyMonitor.h"
+
+#include "Control/PControl.h"
 #include "Control/PotentialFields.h"
 #include "Control/HeadController.h"
+
 #include "Trackers/BallTracker.h"
+#include "Trackers/RobotTracker.h"
+
 #include "Roles/GoalieRole.h"
 #include "Roles/DefenderRole.h"
+#include "Roles/KickerRole.h"
 
 using namespace std;
 
@@ -22,14 +28,19 @@ class StrategyModule : public Module
     private:
         GameController *gameController;
         SafetyMonitor *safetyMonitor;
+
         PotentialFields *potentialFields;
+        PControl *pControl;
+
         HeadController *headController;
 
         BallTracker *ballTracker;
+        RobotTracker *robotTracker;
 
         // Roles
         GoalieRole *goalie;
         DefenderRole *defender;
+        KickerRole *kicker;
 
         int squareStep;
         float squareX, squareY;
