@@ -6,6 +6,7 @@ using namespace std;
 ImageMessage::ImageMessage() : Message ()
 {
     setType(TYPE_IMAGE);
+    data = NULL;
 }
 
 ImageMessage::ImageMessage(string name, int width, int height, int imageType) : Message ()
@@ -121,25 +122,78 @@ string ImageMessage::toString()
     return "Image message: "+name;
 }
 
+void ImageMessage::update(int width, int height, int imageType)
+{
+    if(width != this->width || height != this->height || imageType != this->imageType)
+    {
+        if(data != NULL)
+            delete data;
+        this->width = width;
+        this->height = height;
+        this->imageType = imageType;
+        dataSize = width*height;
+        step = width;
+        switch (imageType)
+        {
+            case IMAGE_TYPE_GRAY:
+                break;
+            case IMAGE_TYPE_BGR:
+            case IMAGE_TYPE_RGB:
+            case IMAGE_TYPE_HSV:
+                dataSize *= 3;
+                step *= 3;
+                break;
+            case IMAGE_TYPE_YUV:
+                dataSize *= 2;
+                step *= 2;
+                break;
+        }
+        data = new char[dataSize];
+    }
+}
+
+bool ImageMessage::fromCV(std::string name, cv::Mat &img)
+{
+    this->name = name;
+    int type = img.type();
+    switch(type)
+    {
+        case CV_8UC1:
+            type = IMAGE_TYPE_GRAY;
+            break;
+        case CV_8UC3:
+            type = IMAGE_TYPE_RGB;
+            break;
+        case CV_8UC2:
+            type = IMAGE_TYPE_YUV;
+            break;
+        default:
+            return false;
+    }
+    update(img.cols, img.rows, type);
+    memcpy(data, img.data, dataSize);
+    return true;
+}
+
 int ImageMessage::decode(std::vector<char> &data)
 {
     int sz = Message::decode(data);
     char *ptr = data.data();
 
     int nameLen;
-    nameLen = ((int*)ptr + sz)[0];
+    nameLen = ((int*)(ptr + sz))[0];
     sz += sizeof (nameLen);
     char *str = new char[nameLen+1];
-    memcpy(str, ptr + sz, nameLen);
+    memcpy(str, (ptr + sz), nameLen);
     str[nameLen] = '\0';
     sz += nameLen;
     name = string(str);
 
-    width = ((int*)ptr + sz)[0];
+    width = ((int*)(ptr + sz))[0];
     sz += sizeof (width);
-    height = ((int*)ptr + sz)[0];
+    height = ((int*)(ptr + sz))[0];
     sz += sizeof (height);
-    imageType = ((int*)ptr + sz)[0];
+    imageType = ((int*)(ptr + sz))[0];
     sz += sizeof (imageType);
     dataSize = width*height;
     step = width;
@@ -159,7 +213,7 @@ int ImageMessage::decode(std::vector<char> &data)
             break;
     }
     this->data = new char[dataSize];
-    memcpy(this->data, ptr + sz, dataSize);
+    memcpy(this->data, (ptr + sz), dataSize);
     sz += dataSize;
     return sz;
 }
@@ -175,7 +229,7 @@ int ImageMessage::encode(std::vector<char> &data)
     memcpy(buff + sz, (char*)(&len), sizeof(len));
     sz += 4;
     memcpy(buff + sz, name.c_str(), len);
-
+    sz += len;
     memcpy(buff + sz, (char*)(&width), sizeof(width));
     sz += 4;
     memcpy(buff + sz, (char*)(&height), sizeof(height));

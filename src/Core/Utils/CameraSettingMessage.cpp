@@ -71,9 +71,9 @@ int CameraSettingMessage::decode(std::vector<char> &data)
     int sz = Message::decode(data);
     char *ptr = data.data();
 
-    setting = ((int*)ptr + sz)[0];
+    setting = ((int*)(ptr + sz))[0];
     sz += sizeof (setting);
-    value = ((int*)ptr + sz)[0];
+    value = ((int*)(ptr + sz))[0];
     sz += sizeof (value);
     return sz;
 }

@@ -30,11 +30,13 @@ void PerceptionModule::OnStop()
 void PerceptionModule::Load()
 {
     LOAD(perception);
+    LOAD(network);
 }
 
 void PerceptionModule::Save()
 {
     SAVE(perception);
+    SAVE(network);
 }
 
 void PerceptionModule::Tick(float ellapsedTime)

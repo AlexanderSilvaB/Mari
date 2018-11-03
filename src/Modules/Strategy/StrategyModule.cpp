@@ -50,7 +50,7 @@ void StrategyModule::OnStop()
 
 void StrategyModule::Load()
 {
-    LOAD(motion)
+    //LOAD(motion)
     LOAD(perception)
     LOAD(strategy)
     LOAD(behaviour)
@@ -59,7 +59,7 @@ void StrategyModule::Load()
 void StrategyModule::Save()
 {
     SAVE(motion)
-    SAVE(perception)
+    //SAVE(perception)
     SAVE(strategy)
     SAVE(behaviour) 
 }

@@ -52,9 +52,11 @@ class BallSpell : public Spell
         int BallLostCount;
 
         bool BallDetected;
-        float BallAzimuth;
-        float BallElevation;
+        float BallYaw;
+        float BallPitch;
         float BallDistance;
+        float HeadYaw;
+        float HeadPitch;
         float HeadSpeed;
         bool HeadRelative;
         float TimeSinceBallSeen;
@@ -156,6 +158,31 @@ class RemoteSpell : public Spell
         void Save(Storage &storage);
 };
 
+class NetworkSpell : public Spell
+{
+    public:
+        struct CameraSettings 
+        {
+            bool brightnessChanged;
+            unsigned int brightness;
+            bool saturationChanged;
+            unsigned int saturation;
+            bool contrastChanged;
+            unsigned int contrast;
+            bool sharpnessChanged;
+            unsigned int sharpness;
+        };
+
+        bool TCPConnected;
+        int SelectedCamera;
+        CameraSettings topSettings, botSettings;
+
+        NetworkSpell();
+        void CopyTo(Spell *spell);
+        void Load(Storage &storage);
+        void Save(Storage &storage);
+};
+
 class StrategySpell : public Spell
 {
     public:
@@ -172,6 +199,8 @@ class StrategySpell : public Spell
 
         float HeadYawRange, HeadPitchRange;
         float HeadSearchSpeed;
+        int HeadScanCount;
+
 
         StrategySpell();
         void CopyTo(Spell *spell);
@@ -201,6 +230,7 @@ class BehaviourSpell : public Spell
 };
 
 #define COPY(s, var) s->var = var;
+#define COPYMEM(s, var) memcpy(&(s->var), &var, sizeof(var));
 #define LOAD(module)    spellBookBase->Lock(); \
                         spellBookBase->module.CopyTo(&(spellBook->module)); \
                         spellBookBase->Unlock();
@@ -222,6 +252,7 @@ class SpellBook
         RemoteSpell remote;
         StrategySpell strategy;
         BehaviourSpell behaviour;
+        NetworkSpell network;
 
         SpellBook();
         ~SpellBook();

@@ -47,42 +47,24 @@ void GoalieRole::Tick(float ellapsedTime, const SensorValues &sensor)
     {
         if(spellBook->perception.vision.ball.BallDetected)
         {
-            RelativeCoord rr;
-            rr.fromPixel(spellBook->perception.vision.ball.ImageX, spellBook->perception.vision.ball.ImageY, sensor.joints.angles[Joints::HeadYaw], -sensor.joints.angles[Joints::HeadPitch]);
-            CartesianCoord coord;
-            rr.toCartesian(coord, sensor.joints.angles[Joints::HeadYaw], sensor.joints.angles[Joints::HeadPitch]);
-
-            cout << "Ball Y: " << coord.getY() << endl;
-            cout << "Ball D: " << rr.getDistance() << endl;
-            cout << "Ball Yaw: " << rr.getYaw() << endl;
-
-            if(spellBook->perception.vision.localization.Enabled)
+            if(abs(spellBook->perception.vision.ball.HeadYaw) > Deg2Rad(5.0f))
             {
-                spellBook->strategy.WalkAside = true;
-                spellBook->strategy.TargetX = spellBook->perception.vision.localization.X;
-                spellBook->strategy.TargetY = spellBook->perception.vision.localization.Y + coord.getY();
-                spellBook->strategy.TargetTheta = spellBook->perception.vision.localization.Theta;
-            }
-            else if(abs(coord.getY()) > 0.1f)
-            {
-                if(coord.getY() > 0)
-                    spellBook->motion.Vy = min(coord.getY()*0.5f, 0.5f);
-                else
-                    spellBook->motion.Vy = max(coord.getY()*0.5f, -0.5f);
-                //spellBook->motion.Vy = 0;
+                spellBook->motion.Vy = 0.05f * SIG(spellBook->perception.vision.ball.HeadYaw);
+                spellBook->motion.DefenderCentre = false;
             }
             else
             {
                 spellBook->motion.Vy = 0.0f;
+                if(spellBook->perception.vision.ball.BallDistance < 1.0f)
+                {
+                    spellBook->motion.DefenderCentre = true;
+                }
+                else
+                {
+                    spellBook->motion.DefenderCentre = false;
+                }
             }
-            if(abs(rr.getYaw()) < Deg2Rad(5.0f) && rr.getDistance() < 0.7f)
-            {
-                spellBook->motion.DefenderCentre = true;
-            }
-            else
-            {
-                spellBook->motion.DefenderCentre = false;
-            }
+            cout << "Vy: " << spellBook->motion.Vy << endl;
         }
         else
         {
