@@ -1,0 +1,66 @@
+#include "tcpserver.h"
+#include <QDebug>
+#include "../supervisorio/message.h"
+#include "../supervisorio/imagemessage.h"
+
+TCPServer::TCPServer()
+{
+    running = true;
+    port = 9572;
+    server = new QTcpServer(this);
+    start();
+}
+
+TCPServer::~TCPServer()
+{
+    stop();
+    running = false;
+    quit();
+    wait();
+    delete server;
+}
+
+void TCPServer::setPort(int port)
+{
+    this->port = port;
+    disconnect = true;
+}
+
+void TCPServer::stop()
+{
+    disconnect = true;
+}
+
+void TCPServer::run()
+{
+    while(running)
+    {
+        if(!server->isListening())
+            server->listen(QHostAddress::Any, port);
+        if(server->waitForNewConnection(1000))
+        {
+            QTcpSocket *client = server->nextPendingConnection();
+            disconnect = false;
+            while (!disconnect)
+            {
+                int msgType = rand() % 2;
+
+                switch (msgType)
+                {
+                    case TYPE_BASIC:
+                    {
+                        QString str("Random number: ");
+                        str += QString::number(rand());
+                        Message message(str);
+                    }
+                        break;
+                }
+
+                QThread::msleep(30);
+                if(client->isOpen())
+                    disconnect = true;
+            }
+            client->disconnectFromHost();
+        }
+    }
+}
