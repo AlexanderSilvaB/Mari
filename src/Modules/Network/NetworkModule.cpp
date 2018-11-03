@@ -1,255 +1,81 @@
 #include "NetworkModule.h"
-#include "Core/Utils/ImageMessage.h"
-#include "Core/Utils/CameraSettingMessage.h"
+#include "Core/External/unsw/unsw/gamecontroller/RoboCupGameControlData.hpp"
+#include "SPLStandardMessage.h"
+#include <cstring>
 
 int NetworkModule::outSize = 0;
 char NetworkModule::outData[MAX_SIZE];
-sem_t NetworkModule::mutex; 
 
 NetworkModule::NetworkModule(SpellBook *spellBook) : Module(spellBook, "Network", 100)
 {
-    sem_init(&mutex, 0, 1); 
-    infoData[0] = 'R';
-    infoData[1] = 'I';
-    infoData[2] = 'N';
-    infoData[3] = 'O';
-    inSize = 0;
-
+    
 }
 
 NetworkModule::~NetworkModule()
 {
-    sem_destroy(&mutex); 
+    
 }
 
 void NetworkModule::OnStart()
 {
     sock = new TcpUdpSocket(SERVER_PORT, "", false, false, true, true, 200);
+    gcsock = new TcpUdpSocket(GAMECONTROLLER_DATA_PORT, "255.255.255.255", true, true, true, false, 200);
 }
 
 void NetworkModule::OnStop()
 {
     delete sock;
-}
-
-void NetworkModule::Load()
-{
-    LOAD(network)
-}
-
-void NetworkModule::Save()
-{
-    SAVE(network)
+    delete gcsock;
 }
 
 void NetworkModule::Tick(float ellapsedTime)
 {
     if(sock->wait())
     {
-        spellBook->network.TCPConnected = true;
-        sem_wait(&mutex);
+        cout << "TCP Connected" << endl;
         if(outSize > 0)
         {
-            ((int*)(infoData + 4))[0] = outSize;
-            int n = sock->send(infoData, 8);
-            usleep(1000*10);
-            n = sock->send(outData, outSize);
+            int n = sock->send(outData, outSize);
             if(n < outSize)
                 sock->disconnect();
             outSize = 0;
         }
-        sem_post(&mutex);
-        int sz = sock->receive(data, MAX_SIZE);
-        if(sz == 0)
+        int inSize = sock->receive(inData, MAX_SIZE);
+        if(inSize == 0)
             sock->disconnect();
-        else if(sz > 0)
+        else if(inSize > 0)
         {
-            process:
-            if(inSize == 0)
-            {
-                if(data[0] == 'R' && data[1] == 'I' && data[2] == 'N' && data[3] == 'O')
-                {
-                    inSize = ((int*)(data + 4))[0];
-                    sz -= 8;
-                    memcpy(data, data+8, sz);
-                    dataSize = 0;
-                }
-            }
-            if(dataSize < inSize && sz > 0)
-            {
-                int rm = 0;
-                for(int i = 0; i < sz && dataSize < inSize; i++)
-                {
-                    inData[dataSize] = data[i];
-                    rm++;
-                    dataSize++;
-                }
-                sz -= rm;
-                memcpy(data, data+rm, sz);
-            }
-            if(dataSize == inSize)
-            {
-                Process(inSize);
-                inSize = 0;
-            }
-            if(sz > 0)
-                goto process;
+
         }
     }
-    else
+    //if(gcsock->wait())
     {
-        spellBook->network.TCPConnected = false;
-    }
-}
-
-void NetworkModule::Process(int inSize)
-{
-    vector<char> data(inSize);
-    memcpy(data.data(), inData, inSize);
-
-    Message message;
-    int sz = message.decode(data);
-    if(sz == 0)
-        cout << "Invalid message received" << endl;
-    else
-    {
-        switch (message.getType())
+        cout << "GC Connected" << endl;
+        if(outSizeGC > 0)
         {
-            case TYPE_CAM_SETTING:
-            {
-                CameraSettingMessage camMessage;
-                camMessage.decode(data);
-                ProcessCameraSetting(camMessage);
-            }
-                break;
-            default:
-                break;
+            gcsock->send(outDataGC, outSizeGC);
+            outSizeGC = 0;
         }
-    }
-}
-
-void NetworkModule::ProcessCameraSetting(CameraSettingMessage &setting)
-{
-    //cout << "Cam setting: " << setting.getSetting() << " = " << setting.getValue() << endl;
-    switch(setting.getSetting())
-    {
-        case SETTING_BRIGHTNESS:
+        int inSizeGC = gcsock->receive(inDataGC, MAX_GC_MSG);
+        cout << inSizeGC << endl;
+        if(inSizeGC > 0)
         {
-            switch(spellBook->network.SelectedCamera)
-            {
-                case 0:
-                   spellBook->network.botSettings.brightness = setting.getValue();
-                   spellBook->network.botSettings.brightnessChanged = true;
-                   break;
-                case 1:
-                   spellBook->network.topSettings.brightness = setting.getValue();
-                   spellBook->network.topSettings.brightnessChanged = true;
-                   break;
-                default:
-                    spellBook->network.botSettings.brightness = setting.getValue();
-                    spellBook->network.botSettings.brightnessChanged = true;
-                    spellBook->network.topSettings.brightness = setting.getValue();
-                    spellBook->network.topSettings.brightnessChanged = true;
-                    break;
-            }
+            cout << "Before memcpy" << endl;
+            //Tratar a mensagem do GC aqui
+            memcpy (&gcData, inDataGC, inSizeGC);
+            cout << "Packet Number: " << (int)gcData.state << endl;
         }
-        break;
-        case SETTING_SATURATION:
-        {
-            switch(spellBook->network.SelectedCamera)
-            {
-                case 0:
-                   spellBook->network.botSettings.saturation = setting.getValue();
-                   spellBook->network.botSettings.saturationChanged = true;
-                   break;
-                case 1:
-                   spellBook->network.topSettings.saturation = setting.getValue();
-                   spellBook->network.topSettings.saturationChanged = true;
-                   break;
-                default:
-                    spellBook->network.botSettings.saturation = setting.getValue();
-                    spellBook->network.botSettings.saturationChanged = true;
-                    spellBook->network.topSettings.saturation = setting.getValue();
-                    spellBook->network.topSettings.saturationChanged = true;
-                    break;
-            }
-        }
-        break;
-        case SETTING_CONTRAST:
-        {
-            switch(spellBook->network.SelectedCamera)
-            {
-                case 0:
-                   spellBook->network.botSettings.contrast = setting.getValue();
-                   spellBook->network.botSettings.contrastChanged = true;
-                   break;
-                case 1:
-                   spellBook->network.topSettings.contrast = setting.getValue();
-                   spellBook->network.topSettings.contrastChanged = true;
-                   break;
-                default:
-                    spellBook->network.botSettings.contrast = setting.getValue();
-                    spellBook->network.botSettings.contrastChanged = true;
-                    spellBook->network.topSettings.contrast = setting.getValue();
-                    spellBook->network.topSettings.contrastChanged = true;
-                    break;
-            }
-        }
-        break;
-        case SETTING_SHARPNESS:
-        {
-            switch(spellBook->network.SelectedCamera)
-            {
-                case 0:
-                   spellBook->network.botSettings.sharpness = setting.getValue();
-                   spellBook->network.botSettings.sharpnessChanged = true;
-                   break;
-                case 1:
-                   spellBook->network.topSettings.sharpness = setting.getValue();
-                   spellBook->network.topSettings.sharpnessChanged = true;
-                   break;
-                default:
-                    spellBook->network.botSettings.sharpness = setting.getValue();
-                    spellBook->network.botSettings.sharpnessChanged = true;
-                    spellBook->network.topSettings.sharpness = setting.getValue();
-                    spellBook->network.topSettings.sharpnessChanged = true;
-                    break;
-            }
-        }
-        break;
-        case SETTING_NUMBER:
-        {
-            spellBook->network.SelectedCamera = setting.getValue();
-        }
-        break;
-        case SETTING_SAVE:
-        {
-            cout << "Save" << endl;
-        }
-        break;
-        case SETTING_DISCARD:
-        {
-            cout << "Discard" << endl;
-        }
-        break;
-        default:
-        break;
     }
 }
 
 bool NetworkModule::SendMessage(Message *message)
 {
-    sem_wait(&mutex);
     if(outSize > 0)
-    {
-        sem_post(&mutex);
         return false;
-    }
     vector<char> data;
     message->encode(data);
     char *ptr = data.data();
     memcpy(outData, ptr, data.size());
     outSize = data.size();
-    sem_post(&mutex);
     return true;
 }
