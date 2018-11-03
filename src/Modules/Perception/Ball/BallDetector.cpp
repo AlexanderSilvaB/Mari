@@ -84,6 +84,19 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
     else
         spellBook->perception.vision.ball.BallLostCount++;
     cout << "Encontrado: " << detected << endl;
+
+    Blackboard *blackboard = InitManager::GetBlackboard();
+    SensorValues sensor = readFrom(kinematics, sensorsLagged);
+    float currHeadYaw = sensor.joints.angles[Joints::HeadYaw];
+    float currHeadPitch = sensor.joints.angles[Joints::HeadPitch];
+
+    RelativeCoord ballPosRR;
+    ballPosRR.fromPixel(ball.x, ball.y, currHeadYaw, currHeadPitch);
+    ballPosRR.fromPixel(ball.x, ball.y);
+    targetYaw = ballPosRR.getYaw();
+    distance = ballPosRR.getDistance();
+    cout << "Distancia " << distance << " "
+         << "Angulo " << targetYaw << endl;
     /*
     if(!detected)
     {

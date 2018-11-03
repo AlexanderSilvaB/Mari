@@ -19,6 +19,7 @@ StrategyModule::StrategyModule(SpellBook *spellBook)
     circleRadius = 2.0f;
 
     goalie = new GoalieRole(this->spellBook);
+    defender = new DefenderRole(this->spellBook);
 }
 
 StrategyModule::~StrategyModule()
@@ -196,11 +197,13 @@ void StrategyModule::Tick(float ellapsedTime)
         case 1:
             goalie->Tick(ellapsedTime, sensor);
             break;
+        case 2:
+            defender->Tick(ellapsedTime, sensor);
         default:
             break;
     }
         
 
-    potentialFields->Tick(ellapsedTime);
+    //potentialFields->Tick(ellapsedTime);
     headController->Tick(ellapsedTime, sensor);
 }

@@ -469,7 +469,7 @@ StrategySpell::StrategySpell()
     TargetY = 0;
     TargetTheta = 0;
 
-    HeadYawRange = Deg2Rad(50.0f);
+    HeadYawRange = Deg2Rad(45.0f);
     HeadPitchRange = Deg2Rad(20.0f);
     HeadSearchSpeed = 0.1f;
     HeadScanCount = 0;
