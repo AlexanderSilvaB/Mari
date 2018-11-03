@@ -9,7 +9,6 @@ DefenderRole::DefenderRole(SpellBook *spellBook) : InnerModule(spellBook)
 
     onBall = false;
     onPosition = false;
-    contPerdido = 0;
     scanPitch = 0;
     time = 0;
 }
@@ -61,7 +60,7 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
             }
             else if(time>60*ellapsedTime && time< 240*ellapsedTime)
             {
-                spellBook>motion.Vy = 0.05;
+                spellBook->motion.Vy = 0.05;
             }
             else
             {
@@ -69,3 +68,4 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
             }
         }
     }
+}
