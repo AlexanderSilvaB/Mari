@@ -14,6 +14,7 @@
 #include "Trackers/BallTracker.h"
 #include "Roles/GoalieRole.h"
 #include "Roles/DefenderRole.h"
+#include "Roles/RinoPlayer.h"
 
 using namespace std;
 
@@ -30,6 +31,7 @@ class StrategyModule : public Module
         // Roles
         GoalieRole *goalie;
         DefenderRole *defender;
+        RinoPlayer *rinoplayer;
 
         int squareStep;
         float squareX, squareY;
