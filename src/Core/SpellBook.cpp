@@ -538,6 +538,7 @@ BehaviourSpell::BehaviourSpell()
     RightEye = WHITE;
     Number = 2;
     Name = "NAO";
+    TeamNumber = 1;
 }
 
 void BehaviourSpell::CopyTo(Spell *spell)
@@ -551,16 +552,19 @@ void BehaviourSpell::CopyTo(Spell *spell)
     COPY(s, RightEye)
     COPY(s, Number)
     COPY(s, Name)
+    COPY(s, TeamNumber)
 }
 
 void BehaviourSpell::Load(Storage &storage)
 {
     Number = storage["Modules"]["Behaviour"]["Number"].Default(2);
     Name = (string)storage["Modules"]["Behaviour"]["Names"][Number].Default("NAO");
+    TeamNumber = storage["Modules"]["Behaviour"]["TeamNumber"].Default(1);
 }
 
 void BehaviourSpell::Save(Storage &storage)
 {
     storage["Modules"]["Behaviour"]["Number"] = Number;
     storage["Modules"]["Behaviour"]["Name"] = Name;
+    storage["Modules"]["Behaviour"]["TeamNumber"] = TeamNumber;
 }

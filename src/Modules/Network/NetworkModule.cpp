@@ -45,6 +45,7 @@ void NetworkModule::Save()
 
 void NetworkModule::Tick(float ellapsedTime)
 {
+    // Supervisório
     if(sock->wait())
     {
         spellBook->network.TCPConnected = true;
@@ -102,6 +103,9 @@ void NetworkModule::Tick(float ellapsedTime)
         spellBook->network.TCPConnected = false;
     }
     connected = spellBook->network.TCPConnected;
+
+    // GameController
+    
 }
 
 void NetworkModule::Process(int inSize)
