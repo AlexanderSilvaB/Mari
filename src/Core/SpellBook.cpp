@@ -472,6 +472,7 @@ StrategySpell::StrategySpell()
     HeadYawRange = Deg2Rad(50.0f);
     HeadPitchRange = Deg2Rad(20.0f);
     HeadSearchSpeed = 0.1f;
+    HeadScanCount = 0;
 }
 
 void StrategySpell::CopyTo(Spell *spell)
@@ -495,6 +496,7 @@ void StrategySpell::CopyTo(Spell *spell)
     COPY(s, HeadYawRange)
     COPY(s, HeadPitchRange)
     COPY(s, HeadSearchSpeed)
+    COPY(s, HeadScanCount)
 }
 
 void StrategySpell::Load(Storage &storage)
@@ -548,7 +550,7 @@ void BehaviourSpell::CopyTo(Spell *spell)
 void BehaviourSpell::Load(Storage &storage)
 {
     Number = storage["Modules"]["Behaviour"]["Number"].Default(2);
-    Name = (string)storage["Modules"]["Behaviour"]["Name"].Default("NAO");
+    Name = (string)storage["Modules"]["Behaviour"]["Names"][Number].Default("NAO");
 }
 
 void BehaviourSpell::Save(Storage &storage)

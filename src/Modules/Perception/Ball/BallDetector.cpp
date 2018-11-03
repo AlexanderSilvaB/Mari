@@ -35,6 +35,9 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
     spellBook->perception.vision.HSV = true;
     spellBook->perception.vision.GRAY = true;
 
+    Blackboard *blackboard = InitManager::GetBlackboard();
+    SensorValues sensor = readFrom(motion, sensors);
+
     bool detected = false;
     switch(method)
     {
@@ -58,8 +61,6 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
     {
         spellBook->perception.vision.ball.BallLostCount = 0;
         
-        Blackboard *blackboard = InitManager::GetBlackboard();
-        SensorValues sensor = readFrom(motion, sensors);
         float currHeadYaw = sensor.joints.angles[Joints::HeadYaw];
         float currHeadPitch = sensor.joints.angles[Joints::HeadPitch];
 

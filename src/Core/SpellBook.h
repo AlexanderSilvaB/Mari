@@ -199,6 +199,8 @@ class StrategySpell : public Spell
 
         float HeadYawRange, HeadPitchRange;
         float HeadSearchSpeed;
+        int HeadScanCount;
+
 
         StrategySpell();
         void CopyTo(Spell *spell);
