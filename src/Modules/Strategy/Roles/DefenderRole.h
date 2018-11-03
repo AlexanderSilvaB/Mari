@@ -12,7 +12,7 @@ private:
 
     bool onBall;
     bool onPosition;
-    int contPerdido;
+    int contador;
     float scanPitch;
 
 public:

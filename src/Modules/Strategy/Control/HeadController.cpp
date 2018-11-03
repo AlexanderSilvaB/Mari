@@ -26,26 +26,26 @@ void HeadController::Tick(float ellapsedTime, const SensorValues &sensor)
 {
     numFramesTracked += 1;
 
-    //float CONSTANT_X = (float)CAM_BALL_W / H_DOF;
-    //float xDiff = -(spellBook->perception.vision.ball.ImageX - (CAM_BALL_W / 2)) / CONSTANT_X;
-    //spellBook->motion.HeadYaw = xDiff - sensor.joints.angles[Joints::HeadYaw];
-    spellBook->motion.HeadYaw = Deg2Rad(0);
+    //float currHeadYaw = sensor.joints.angles[Joints::HeadYaw];
+    //float currHeadPitch = sensor.joints.angles[Joints::HeadPitch];
 
-    //float CONSTANT_Y = (float)CAM_BALL_H / V_DOF;
-    //float yDiff = (spellBook->perception.vision.ball.ImageY - (CAM_BALL_H / 2)) / CONSTANT_Y;
-    //spellBook->motion.HeadPitch = yDiff - sensor.joints.angles[Joints::HeadPitch];
+    spellBook->motion.HeadYaw = spellBook->perception.vision.ball.HeadYaw;
+    //spellBook->motion.HeadPitch = spellBook->perception.vision.ball.HeadPitch;
     
-    spellBook->motion.HeadPitch = Deg2Rad(20.0f);
-
     if(spellBook->perception.vision.ball.BallLostCount < 5)
     {
+        if(spellBook->perception.vision.ball.BallDistance > 0.50f)
+            spellBook->motion.HeadPitch = 0.0f;
+        else
+            spellBook->motion.HeadPitch = Deg2Rad(17.0f);
+
         float factor = abs(spellBook->motion.HeadYaw) / H_DOF;
         float speed = 0.25 * factor;  // 10.0 * factor * factor
         spellBook->motion.HeadSpeedYaw = speed;
 
-        factor = abs(spellBook->motion.HeadPitch) / V_DOF;
-        speed = 0.25 * factor;  // 10.0 * factor * factor
-        spellBook->motion.HeadSpeedPitch = speed;
+        //factor = abs(spellBook->motion.HeadPitch) / V_DOF;
+        //speed = 0.25 * factor;  // 10.0 * factor * factor
+        spellBook->motion.HeadSpeedPitch = 0.2;
 
         spellBook->motion.HeadRelative = true;
     }
@@ -76,6 +76,7 @@ void HeadController::Tick(float ellapsedTime, const SensorValues &sensor)
             scanPitch += Deg2Rad(20.0f);
             if(scanPitch > spellBook->strategy.HeadPitchRange)
                 scanPitch = 0;
+            spellBook->strategy.HeadScanCount++;
         }
     }
 }
