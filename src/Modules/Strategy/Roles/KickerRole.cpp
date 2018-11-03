@@ -20,6 +20,8 @@ KickerRole::~KickerRole()
 void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
 {
     spellBook->strategy.MoveHead = false;
+    spellBook->motion.HeadSpeedYaw = 0.2f;
+    spellBook->motion.HeadSpeedPitch = 0.2f;
     
     if((spellBook->strategy.GameState == GC::READY || spellBook->strategy.GameState == GC::PLAYING) && !onStart)
     {
@@ -237,9 +239,9 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
                     spellBook->motion.Vx = 0;
 
                 if(lookingDown)
-                    spellBook->motion.HeadPitch = 0.0f;
-                else
                     spellBook->motion.HeadPitch = Deg2Rad(24.0f);
+                else
+                    spellBook->motion.HeadPitch = 0.0f;
             }
         }
     }

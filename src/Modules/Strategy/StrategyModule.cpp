@@ -106,7 +106,7 @@ void StrategyModule::Tick(float ellapsedTime)
 
     safetyMonitor->Tick(ellapsedTime, sensor);
     gameController->Tick(ellapsedTime, sensor);
-
+    
     if(spellBook->motion.Calibrate)
     {
         spellBook->motion.Stiff = true;
