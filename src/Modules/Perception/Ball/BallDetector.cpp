@@ -78,7 +78,7 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
         float yDiff = (ball.y - (CAM_BALL_H / 2)) / CONSTANT_Y;
         spellBook->perception.vision.ball.HeadPitch = yDiff - currHeadPitch;
 
-        cout << rr.getDistance() << "m, " << Rad2Deg(rr.getYaw()) << "º" << endl;
+        //cout << rr.getDistance() << "m, " << Rad2Deg(rr.getYaw()) << "º" << endl;
 
     }
     else
