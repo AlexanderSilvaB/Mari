@@ -13,6 +13,9 @@ using namespace std;
 #define SERVER_PORT 9572
 #define MAX_SIZE 922624
 
+//Game Controller
+#define MAX_GC_MSG 1024
+
 class NetworkModule : public Module
 {
     private:
@@ -28,6 +31,19 @@ class NetworkModule : public Module
         void Process(int inSize);
         void ProcessCameraSetting(CameraSettingMessage &setting);
         void setControl(Camera *camera, const uint32_t controlId, const int32_t controlValue);
+
+        //Game Controller
+        TcpUdpSocket *gcsock, *gcsockReturn;
+        char outDataGC[MAX_GC_MSG];
+        char inDataGC[MAX_GC_MSG];
+        int outSizeGC;
+        float timeSinceLastGCData;
+        
+        struct RoboCupGameControlData gcData;
+        struct RoboCupGameControlReturnData gcReturnData;
+
+
+
     public:
         NetworkModule(SpellBook *spellBook);
         ~NetworkModule();

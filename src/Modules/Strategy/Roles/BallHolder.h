@@ -13,6 +13,7 @@ private:
     bool onBall;
     bool onPosition;
     float scanPitch;
+    int conta, conta2;
 
 public:
 

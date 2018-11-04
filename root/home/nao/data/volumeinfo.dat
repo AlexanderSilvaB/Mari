@@ -1,6 +1,10 @@
 set 'PCM' unmute
+<<<<<<< HEAD
 set 'PCM' 30000
+=======
+set 'PCM' 10000
+>>>>>>> a48b5929d38b680303efeea9e628ab059417cb2d
 set 'Master Mono' unmute
-set 'Master Mono' 65536
+set 'Master Mono' 10000
 set 'Master' unmute
-set 'Master' 65536
+set 'Master' 10000

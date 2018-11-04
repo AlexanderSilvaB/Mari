@@ -203,6 +203,9 @@ class StrategySpell : public Spell
         bool MoveHead;
         bool FakeKick;
 
+        float TimeSinceStarted;
+        float TimeSincePenalized;
+
 
         StrategySpell();
         void CopyTo(Spell *spell);
@@ -223,6 +226,7 @@ class BehaviourSpell : public Spell
         int RightEye;
         std::string Name;
         int Number;
+        int TeamNumber;
 
         BehaviourSpell();
         void CopyTo(Spell *spell);

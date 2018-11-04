@@ -74,7 +74,7 @@ for i in "$@" ; do
     fi
 done
 
-SSH_CMD="sshpass -p $pwd ssh -o ControlMaster=auto -o ControlPath=/tmp/control_%l_%h_%p_%r"
+SSH_CMD="sshpass -p $pwd ssh -o StrictHostKeyChecking=no -o ControlMaster=auto -o ControlPath=/tmp/control_%l_%h_%p_%r"
 
 if [ $clear == true ]; then
     echo "Cleaning $toolchain"
@@ -101,7 +101,7 @@ if [ $ssh == true ]; then
     if [ ! -f ~/.ssh/id_rsa ]; then
         ssh-keygen -t rsa -f ~/.ssh/id_rsa -q -P ""
     fi
-
+    ssh-keyscan $robot >> ~/.ssh/known_hosts
     #cat ~/.ssh/id_rsa.pub | $SSH_CMD -l nao $robot "mkdir -p .ssh; sh -c 'cat >> .ssh/authorized_keys'; chmod 700 ~/.ssh; chmod 600 ~/.ssh/authorized_keys ; chmod g-w,o-w /home/nao"
     #ssh-copy-id $user@$robot
 fi
@@ -114,6 +114,7 @@ fi
 echo "Placing files"
 cp src/build-$toolchain/sdk/bin/rinobot root/home/nao/
 cp src/build-$toolchain/sdk/lib/libagent.so root/home/nao/naoqi/preferences/libagent.so
+chmod +x root/home/nao/rinobot
 
 if [ $root == true ]; then
     echo "Sync root"
