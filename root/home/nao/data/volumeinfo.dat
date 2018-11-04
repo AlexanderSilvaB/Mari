@@ -1,5 +1,5 @@
 set 'PCM' unmute
-set 'PCM' 65536
+set 'PCM' 30000
 set 'Master Mono' unmute
 set 'Master Mono' 65536
 set 'Master' unmute

@@ -24,7 +24,7 @@ StrategyModule::StrategyModule(SpellBook *spellBook)
     circleRadius = 2.0f;
 
     goalie = new GoalieRole(this->spellBook);
-    defender = new DefenderRole(this->spellBook);
+    ballHolder = new BallHolder(this->spellBook);
     kicker = new KickerRole(this->spellBook);
 }
 
@@ -42,7 +42,7 @@ StrategyModule::~StrategyModule()
     delete robotTracker;
 
     delete goalie;
-    delete defender;
+    delete ballHolder;
     delete kicker;
 }
 
@@ -60,7 +60,7 @@ void StrategyModule::OnStart()
     robotTracker->OnStart();
 
     goalie->OnStart();
-    defender->OnStart();
+    ballHolder->OnStart();
     kicker->OnStart();
 }
 
@@ -78,7 +78,7 @@ void StrategyModule::OnStop()
     robotTracker->OnStop();
 
     goalie->OnStop();
-    defender->OnStop();
+    ballHolder->OnStop();
     kicker->OnStop();
 }
 
@@ -233,7 +233,7 @@ void StrategyModule::Tick(float ellapsedTime)
             goalie->Tick(ellapsedTime, sensor);
             break;
         case 2:
-            defender->Tick(ellapsedTime, sensor);
+            ballHolder->Tick(ellapsedTime, sensor);
             break;
         case 3:
             kicker->Tick(ellapsedTime, sensor);

@@ -18,7 +18,7 @@
 #include "Trackers/RobotTracker.h"
 
 #include "Roles/GoalieRole.h"
-#include "Roles/DefenderRole.h"
+#include "Roles/BallHolder.h"
 #include "Roles/KickerRole.h"
 
 using namespace std;
@@ -39,7 +39,7 @@ class StrategyModule : public Module
 
         // Roles
         GoalieRole *goalie;
-        DefenderRole *defender;
+        BallHolder *ballHolder;
         KickerRole *kicker;
 
         int squareStep;
