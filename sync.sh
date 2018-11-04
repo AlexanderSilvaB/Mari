@@ -114,6 +114,7 @@ fi
 echo "Placing files"
 cp src/build-$toolchain/sdk/bin/rinobot root/home/nao/
 cp src/build-$toolchain/sdk/lib/libagent.so root/home/nao/naoqi/preferences/libagent.so
+chmod +x root/home/nao/rinobot
 
 if [ $root == true ]; then
     echo "Sync root"
