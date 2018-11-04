@@ -26,6 +26,8 @@ StrategyModule::StrategyModule(SpellBook *spellBook)
     goalie = new GoalieRole(this->spellBook);
     defender = new DefenderRole(this->spellBook);
     kicker = new KickerRole(this->spellBook);
+    rPlayer = new RinoPlayer(this->spellBook);
+    ballHolder = new BallHolder(this->spellBook);
 }
 
 StrategyModule::~StrategyModule()
@@ -44,6 +46,8 @@ StrategyModule::~StrategyModule()
     delete goalie;
     delete defender;
     delete kicker;
+    delete rPlayer;
+    delete ballHolder;
 }
 
 void StrategyModule::OnStart()
@@ -62,6 +66,8 @@ void StrategyModule::OnStart()
     goalie->OnStart();
     defender->OnStart();
     kicker->OnStart();
+    rPlayer->OnStart();
+    ballHolder->OnStart();
 }
 
 void StrategyModule::OnStop()
@@ -80,6 +86,8 @@ void StrategyModule::OnStop()
     goalie->OnStop();
     defender->OnStop();
     kicker->OnStop();
+    rPlayer->OnStop();
+    ballHolder->OnStop();
 }
 
 void StrategyModule::Load()
@@ -88,6 +96,7 @@ void StrategyModule::Load()
     LOAD(perception)
     LOAD(strategy)
     LOAD(behaviour)
+    LOAD(network)
 }
 
 void StrategyModule::Save()
@@ -107,6 +116,12 @@ void StrategyModule::Tick(float ellapsedTime)
     safetyMonitor->Tick(ellapsedTime, sensor);
     gameController->Tick(ellapsedTime, sensor);
     
+    spellBook->motion.Dead = spellBook->strategy.Die;
+    if(spellBook->strategy.Die)
+    {
+        return;
+    }
+
     if(spellBook->motion.Calibrate)
     {
         spellBook->motion.Stiff = true;
@@ -143,11 +158,35 @@ void StrategyModule::Tick(float ellapsedTime)
     }
     spellBook->strategy.TimeSincePenalized += ellapsedTime;
 
-    spellBook->motion.Dead = spellBook->strategy.Die;
-    if(spellBook->strategy.Die)
+    if(spellBook->strategy.GameState == STATE_READY)
     {
+        spellBook->motion.Stiff = true;
+        spellBook->motion.Stand = false;
+        spellBook->motion.Walk = false;
         return;
     }
+
+    if(spellBook->strategy.GameState == STATE_SET)
+    {
+        spellBook->strategy.MoveHead = true;
+        spellBook->motion.Stiff = true;
+        spellBook->motion.Stand = true;
+        spellBook->motion.Walk = true;
+        spellBook->motion.Vx = 0;
+        spellBook->motion.Vy = 0;
+        spellBook->motion.Vth = 0;
+        headController->Tick(ellapsedTime, sensor);
+        return;
+    }
+
+    if(spellBook->strategy.GameState == STATE_FINISHED)
+    {
+        spellBook->motion.Stiff = true;
+        spellBook->motion.Stand = false;
+        spellBook->motion.Walk = false;
+        return;
+    }
+
     spellBook->motion.TipOver = spellBook->strategy.TurnOver;
     if(spellBook->strategy.TurnOver)
     {
@@ -232,19 +271,38 @@ void StrategyModule::Tick(float ellapsedTime)
     ballTracker->Tick(ellapsedTime, sensor);
     robotTracker->Tick(ellapsedTime);
 
-    switch(spellBook->behaviour.Number)
+    if(spellBook->network.gameController.PenaltyPhase)
     {
-        case 1:
+        if(spellBook->behaviour.Number == 1)
             goalie->Tick(ellapsedTime, sensor);
-            break;
-        case 2:
-            defender->Tick(ellapsedTime, sensor);
-            break;
-        case 3:
+        else
             kicker->Tick(ellapsedTime, sensor);
-            break;
-        default:
-            break;
+    }
+    else
+    {
+        switch(spellBook->behaviour.Number)
+        {
+            case 1:
+                goalie->Tick(ellapsedTime, sensor);
+                break;
+            case 2:
+                kicker->Tick(ellapsedTime, sensor);
+                break;
+            case 3:
+                defender->Tick(ellapsedTime, sensor);
+                break;
+            case 4:
+                rPlayer->Tick(ellapsedTime, sensor);
+                break;
+            case 5:
+                ballHolder->Tick(ellapsedTime, sensor);
+                break;
+            case 6:
+                kicker->Tick(ellapsedTime, sensor);
+                break;
+            default:
+                break;
+        }
     }
         
 

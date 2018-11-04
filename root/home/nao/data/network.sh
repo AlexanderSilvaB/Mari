@@ -50,7 +50,8 @@ if [ $ip == true ]; then
     ifconfig wlan0 "$IP" netmask 255.255.0.0
     sysctl -w net.ipv6.conf.all.disable_ipv6=1
 else
-    echo "iface wlan0 inet dhcp" >> /etc/network/interfaces
-    ifconfig wlan0 up
+    #echo "iface wlan0 inet dhcp" >> /etc/network/interfaces
+    #ifconfig wlan0 up
+    dhclient -r wlan0
     #ifconfig wlan0 0.0.0.0 0.0.0.0 && dhclient  
 fi

@@ -33,6 +33,7 @@ void VisionModule::setControl(Camera *camera, const uint32_t controlId, const in
 
 void VisionModule::Tick(float ellapsedTime)
 {
+    /*
     if(spellBook->network.SelectedCamera != 1)
     {
         //cout << "VisionModule" << endl;
@@ -80,6 +81,7 @@ void VisionModule::Tick(float ellapsedTime)
             spellBook->network.topSettings.sharpnessChanged = false;
         }
     }
+    */
 
     //top.ReadFromYUV422(capture->getFrameTop(), spellBook->perception.vision.BGR, spellBook->perception.vision.HSV, spellBook->perception.vision.GRAY, true);
     bottom.ReadFromYUV422(capture->getFrameBottom(), spellBook->perception.vision.BGR, spellBook->perception.vision.HSV, spellBook->perception.vision.GRAY, false);

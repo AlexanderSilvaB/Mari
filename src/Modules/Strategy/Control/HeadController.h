@@ -8,6 +8,7 @@
 class HeadController : public InnerModule
 {
     private:
+        bool stateSet;
         bool flip;
         float closeInPitch;
         float farPitch;

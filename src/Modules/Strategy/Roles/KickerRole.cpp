@@ -20,6 +20,7 @@ KickerRole::~KickerRole()
 void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
 {
     spellBook->strategy.MoveHead = false;
+    spellBook->motion.HeadYaw = 0;
     spellBook->motion.HeadSpeedYaw = 0.2f;
     spellBook->motion.HeadSpeedPitch = 0.2f;
     

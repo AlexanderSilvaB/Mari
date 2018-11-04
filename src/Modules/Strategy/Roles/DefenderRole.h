@@ -14,7 +14,8 @@ private:
     bool onPosition;
     int contPerdido;
     float scanPitch;
-    int conta, conta2;
+    int conta, conta2, kick;
+    bool kickLeft;
 
 public:
 

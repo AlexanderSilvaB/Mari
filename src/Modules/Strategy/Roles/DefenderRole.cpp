@@ -13,6 +13,8 @@ DefenderRole::DefenderRole(SpellBook *spellBook) : InnerModule(spellBook)
     scanPitch = 0;
     conta = 0;
     conta2 = 0;
+    kick = 0;
+    kickLeft = false;
 }
 DefenderRole::~DefenderRole()
 {
@@ -47,161 +49,118 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
             onPosition = true;
         }
     }
+
     if (spellBook->strategy.GameState == STATE_PLAYING)
     {
-        
-        spellBook->motion.KickRight = false;
-        spellBook->motion.Vth = 0;
-        spellBook->motion.Vx = 0;
-        //cout << "Não entrou no IF" << endl;
-
-        // Para -Y negativo, variar Vth=-1.6 e Vy=-0.1
-        
-        if(conta<550){
-            conta++;
-            spellBook->motion.Vy=0.1;
-            spellBook->motion.Vth=Deg2Rad(2.75);
-        } else if(conta<750){
-            conta++;
-            spellBook->motion.Vy=0;
-        } else if(conta<900 && conta2<2){
-            conta++;
-            spellBook->motion.Vth=Deg2Rad(5.8);
-        } else if(conta<1100){
-            conta++;
-            spellBook->motion.Vth=0;
-            if(conta == 1099){
-                conta2++;
-            }
-            if(conta2<2 && conta == 1099){
-                conta = 0;
-            }
-        } else if(conta <2350) {
-            spellBook->motion.Vy = -0.1;
-            spellBook->motion.Vth = -Deg2Rad(1.6); 
-            conta++;
-        } else {
-            conta = 0;
-            conta2 = 0;
-        }
-
-
-
-        /*if (conta < 250) 
+        if(kick > 60)
         {
-            spellBook->motion.Vy = 0.1;
-            spellBook->motion.Vth = Deg2Rad(7); //8.9
-
-            conta++;
-            cout << "Conta: " << conta << endl;
-
-        } else if(conta >=250 &&  conta <=500) {
-            spellBook->motion.Vy = -0.1;
-            spellBook->motion.Vth = -Deg2Rad(1.6); 
-            conta++;
-
-        } else {
-            conta = 0;
-        }*/
-        /*else if(conta>=500 && conta <1000)
-        {
-            spellBook->motion.Vy = -0.1;
-            spellBook->motion.Vth = Deg2Rad(-1.6);
-            conta++;
-        }
-        else
-        {
-            conta=0;
-        }*/
-            //conta = 0;
-            cout << "Parado" << endl;
-        
-        
-        
-        /*if (spellBook->perception.vision.ball.BallDetected)
-        {
-            cout << "Valor atual do GetX: " << coord.getX() << endl;
-            rr.fromPixel(spellBook->perception.vision.ball.ImageX, spellBook->perception.vision.ball.ImageY, sensor.joints.angles[Joints::HeadYaw], -sensor.joints.angles[Joints::HeadPitch]);
-            rr.toCartesian(coord, sensor.joints.angles[Joints::HeadYaw], sensor.joints.angles[Joints::HeadPitch]);
-            cout << "X: " << coord.getX() << endl;
-            cout << "Y: " << coord.getY() << endl;
-            cout << "tentativa numero: " << spellBook->perception.vision.ball.BallLostCount << endl;
-
-            if (rr.getDistance() > 0.8f)
+            spellBook->motion.Vth = 0;
+            spellBook->motion.Vx = 0;
+            spellBook->motion.HeadPitch = 0;
+            if(spellBook->strategy.FakeKick)
             {
-                if (rr.getYaw() > Deg2Rad(5) || rr.getYaw() < Deg2Rad(-5))
-                {
-                    spellBook->motion.Vth = 0; //min(rr.getYaw() * rr.getDistance(), Deg2Rad(0.3f));
-                    spellBook->motion.Vx = abs(min(coord.getX(), 0.1f));
-                    spellBook->motion.Vy = min(coord.getY(), 0.05f) * SIG(rr.getYaw());
-                }
-                else
-                {
-                    spellBook->motion.Vth = 0;
-                    spellBook->motion.Vx = (coord.getX() * 0.1);
-                    spellBook->motion.Vy = 0;
-                }
-            }
-            else if (rr.getDistance() > 0.5f && rr.getDistance() < 0.8f)
-            {
-                cout << "0.5<dist<0.8" << endl;
-                if (rr.getYaw() > Deg2Rad(8) || rr.getYaw() < Deg2Rad(-8))
-                {
-                    spellBook->motion.Vth = 0; //min(rr.getYaw() * rr.getDistance(), Deg2Rad(0.1f));
-                    spellBook->motion.Vx = abs(min(coord.getX(), 0.15f));
-                    spellBook->motion.Vy = (coord.getY() * 0.05f) * SIG(rr.getYaw());
-                }
-                else
-                {
-                    cout << "dist<0.5" << endl;
-                    spellBook->motion.Vth = 0;
-                    spellBook->motion.Vx = abs((coord.getX() * 0.03));
-                    spellBook->motion.Vy = 0;
-                }
+                spellBook->motion.Vx = 0.3f;
             }
             else
             {
-                if (rr.getYaw() > Deg2Rad(7))
+                spellBook->motion.KickLeft = kickLeft;
+                spellBook->motion.KickRight = !kickLeft;
+            }
+            kick++;
+            if(kick > 100)
+            {
+                kick = 0;
+                if(spellBook->strategy.FakeKick)
                 {
-                    spellBook->motion.Vth = rr.getYaw() * 0.02;
-                    spellBook->motion.Vy = 0;
                     spellBook->motion.Vx = 0;
                 }
                 else
                 {
-                    spellBook->motion.Vx = coord.getX() * 0.1;
-                    spellBook->motion.Vy = 0;
-                    spellBook->motion.Vth = 0;
+                    spellBook->motion.KickLeft = false;
+                    spellBook->motion.KickRight = false;
                 }
-            }                       
-        }
-        else if (rr.getDistance() < 0.5f && !spellBook->perception.vision.ball.BallDetected)
-        {
-            contPerdido++;
-            if(contPerdido < 10)
-                spellBook->motion.HeadPitch = Deg2Rad(25);
-            else
-            {
-                contPerdido = 0;
-                scanPitch += Deg2Rad(20);
-                if(scanPitch > spellBook->strategy.HeadPitchRange)
-                    scanPitch = 0;
             }
-            cout << "ScanPitch: " << scanPitch << endl;
-            cout << "Quantas iterações: " << contPerdido << endl;
-            spellBook->motion.Vx = 0.01f;
-            spellBook->motion.Vy = 0;
-            spellBook->motion.Vth = Deg2Rad(5) * SIG(rr.getYaw());
-            cout << "Else IF distancia < 0.5" << endl;
         }
         else
         {
-            cout << "se perdeu: " << endl;
-            spellBook->motion.Vx = 0.01f;
-            spellBook->motion.Vy = 0.02f;
-            spellBook->motion.Vth = Deg2Rad(1.0f) * SIG(rr.getYaw());
-        }
-        */
+            if(spellBook->perception.vision.ball.BallLostCount < 8)
+            {
+                spellBook->motion.Vy = 0;
+                if(abs(spellBook->perception.vision.ball.BallYaw) > Deg2Rad(10.0f))
+                {
+                    spellBook->motion.Vth = -spellBook->perception.vision.ball.BallYaw * 0.5f;
+                    spellBook->motion.Vx = 0;
+                    kick = 0;
+                }
+                else
+                {
+                    if(abs(spellBook->perception.vision.ball.BallYaw) > Deg2Rad(5.0f))
+                        spellBook->motion.Vth = -spellBook->perception.vision.ball.BallYaw * 0.4f;
+                    else
+                        spellBook->motion.Vth = 0;
 
+                    if(spellBook->perception.vision.ball.BallDistance < 0.45f)
+                        spellBook->motion.HeadPitch = Deg2Rad(24.0f);
+                    else if(spellBook->perception.vision.ball.BallDistance > 0.5f)
+                        spellBook->motion.HeadPitch = Deg2Rad(0.0f);
+                    if(spellBook->perception.vision.ball.BallDistance > 0.25f)
+                    {
+                        spellBook->motion.Vx = min(spellBook->perception.vision.ball.BallDistance * 0.25f, 0.25f);
+                        kick = 0;
+                    }
+                    else
+                    {
+                        spellBook->motion.Vx = 0;
+                        if(spellBook->motion.HeadPitch > 0)
+                        {
+                            kick++;
+                            kickLeft = spellBook->perception.vision.ball.BallYaw < 0;
+                        }
+                        else
+                        {
+                            kick = 0;
+                        }
+                    }
+                }
+            } else 
+            {
+                spellBook->motion.KickRight = false;
+                spellBook->motion.Vth = 0;
+                spellBook->motion.Vx = 0;
+                //cout << "Não entrou no IF" << endl;
+
+                // Para -Y negativo, variar Vth=-1.6 e Vy=-0.1
+                
+                if(conta<550){
+                    conta++;
+                    spellBook->motion.Vy=0.1;
+                    spellBook->motion.Vth=Deg2Rad(2.75);
+                } else if(conta<650){
+                    conta++;
+                    spellBook->motion.Vy=0;
+                } else if(conta<800 && conta2<2){
+                    conta++;
+                    spellBook->motion.Vth=Deg2Rad(5.8);
+                } else if(conta<900){
+                    conta++;
+                    spellBook->motion.Vth=0;
+                    if(conta == 899){
+                        conta2++;
+                    }
+                    if(conta2<2 && conta == 899){
+                    conta = 0;
+                    }   
+                } else if(conta <2050) {
+                    spellBook->motion.Vy = -0.1;
+                    spellBook->motion.Vth = -Deg2Rad(1.6); 
+                    conta++;
+                } else {
+                    conta = 0;
+                    conta2 = 0;
+                }
+
+                cout << "Parado" << endl;
+            }
+        }
     }
 }

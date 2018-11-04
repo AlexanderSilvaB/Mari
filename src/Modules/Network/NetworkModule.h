@@ -35,10 +35,10 @@ class NetworkModule : public Module
         void setControl(Camera *camera, const uint32_t controlId, const int32_t controlValue);
 
         //Game Controller   
-        TcpUdpSocket *gcsock, *gcsockRet;
-        char outDataGC[MAX_GC_MSG];
+        TcpUdpSocket *gcsock, *gcsockRet, *gcsockData;
+        char outDataGC[MAX_GC_MSG], outDataGCRet[MAX_GC_MSG];
         char inDataGC[MAX_GC_MSG];
-        int outSizeGC;
+        int outSizeGC, outSizeGCRet;
         float timeSinceLastGCReturn;
         float timeSinceLastGCPlayerData;
 

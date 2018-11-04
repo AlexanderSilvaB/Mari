@@ -1,6 +1,6 @@
 set 'PCM' unmute
-set 'PCM' 10000
+set 'PCM' 65000
 set 'Master Mono' unmute
-set 'Master Mono' 10000
+set 'Master Mono' 65000
 set 'Master' unmute
-set 'Master' 10000
+set 'Master' 65000

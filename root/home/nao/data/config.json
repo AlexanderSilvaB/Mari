@@ -4,14 +4,14 @@
             "Enabled": true
         },
         "Network": {
-            "Enabled": false
+            "Enabled": true
         },
         "Perception": {
             "Enabled": true,
             "Vision":
             {
                 "Enabled": true,
-                "Record" : true,
+                "Record" : false,
                 "BallDetector": {
                     "Enabled": true,
                     "Method": "Cascade",
@@ -47,9 +47,9 @@
         },
         "Behaviour": {
             "Enabled": true,
-            "Number" : 3,
+            "Number" : 1,
             "TeamNumber" : 47,
-            "Names" : ["NAO 1", "NAO 2", "NAO 3", "NAO 4", "NAO 5", "NAO 6"]
+            "Names" : ["Saruman", "Luci", "Dino", "Lilith", "Morgana", "Unknown"]
         }
     }
 }

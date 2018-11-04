@@ -157,11 +157,9 @@ class RemoteSpell : public Spell
 class GameControllerSpell : public Spell
 {
     public:
-        RoboCupGameControlData Data;
-        TeamInfo OurTeam;
-        bool TeamRed;
         bool Connected;
         uint8_t GameState;
+        bool PenaltyPhase;
 
         GameControllerSpell();
         void CopyTo(Spell *spell);

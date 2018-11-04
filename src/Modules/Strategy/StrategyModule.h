@@ -20,6 +20,8 @@
 #include "Roles/GoalieRole.h"
 #include "Roles/DefenderRole.h"
 #include "Roles/KickerRole.h"
+#include "Roles/RinoPlayer.h"
+#include "Roles/BallHolder.h"
 
 using namespace std;
 
@@ -41,6 +43,8 @@ class StrategyModule : public Module
         GoalieRole *goalie;
         DefenderRole *defender;
         KickerRole *kicker;
+        RinoPlayer *rPlayer;
+        BallHolder *ballHolder;
 
         int squareStep;
         float squareX, squareY;

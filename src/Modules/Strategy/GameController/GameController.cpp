@@ -39,6 +39,15 @@ void GameController::Tick(float ellapsedTime, const SensorValues &sensor)
         }
     }
 
+    if(spellBook->network.gameController.Connected)
+    {
+        if(spellBook->strategy.GameState != spellBook->network.gameController.GameState)
+        {
+            cout << "Game State = " <<  (int)spellBook->network.gameController.GameState << endl;
+            spellBook->strategy.GameState = spellBook->network.gameController.GameState;
+        }
+    }
+
     spellBook->strategy.Started = spellBook->strategy.GameState != STATE_INITIAL;
     spellBook->strategy.Penalized = spellBook->strategy.GameState == STATE_PENALISED;
     spellBook->behaviour.Penalized =  spellBook->strategy.GameState == STATE_PENALISED;

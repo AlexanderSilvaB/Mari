@@ -409,19 +409,17 @@ void RemoteSpell::Save(Storage &storage)
 
 GameControllerSpell::GameControllerSpell()
 {
-    TeamRed = false;
     Connected = false;
-    GameState = 0;
+    GameState = STATE_INITIAL;
+    PenaltyPhase = false;
 }
 
 void GameControllerSpell::CopyTo(Spell *spell)
 {
     GameControllerSpell *s = (GameControllerSpell*)spell;
-    COPY(s, TeamRed)
     COPY(s, Connected)
     COPY(s, GameState)
-    COPY(s, OurTeam)
-    COPY(s, Data)
+    COPY(s, PenaltyPhase)
 }
 
 void GameControllerSpell::Load(Storage &storage)

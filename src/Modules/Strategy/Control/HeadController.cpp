@@ -90,6 +90,12 @@ void HeadController::Tick(float ellapsedTime, const SensorValues &sensor)
         spellBook->motion.HeadSpeedPitch = 0.5f;
         spellBook->motion.HeadRelative = false;
     }
+    if(stateSet && spellBook->strategy.GameState != STATE_SET)
+    {
+        spellBook->motion.HeadYaw = 0;
+        spellBook->motion.HeadPitch = 0;
+    }
+    stateSet = spellBook->strategy.GameState == STATE_SET;
 }
 
 float HeadController::calculateDesiredPitch(CartesianCoord &neckRelative)
