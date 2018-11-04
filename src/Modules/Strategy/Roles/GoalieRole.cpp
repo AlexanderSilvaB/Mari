@@ -7,6 +7,8 @@ GoalieRole::GoalieRole(SpellBook *spellBook)
     : InnerModule(spellBook)
 {
     onGoal = false;
+    kick = 0;
+    kickLeft = false;
 }
 
 GoalieRole::~GoalieRole()
@@ -45,33 +47,78 @@ void GoalieRole::Tick(float ellapsedTime, const SensorValues &sensor)
     }
     if(spellBook->strategy.GameState == GC::PLAYING && onGoal)
     {
-        if(spellBook->perception.vision.ball.BallDetected)
+        if(kick > 60)
         {
-            if(abs(spellBook->perception.vision.ball.BallYaw) > Deg2Rad(5.0f))
+            spellBook->motion.Vth = 0;
+            spellBook->motion.Vx = 0;
+            if(spellBook->strategy.FakeKick)
             {
-                spellBook->motion.Vy = 0.1f * SIG(spellBook->perception.vision.ball.BallYaw);
-                spellBook->motion.DefenderCentre = false;
+                spellBook->motion.Vx = 0.3f;
             }
             else
             {
-                spellBook->motion.Vy = 0.0f;
-                if(spellBook->perception.vision.ball.BallDistance < 1.0f)
+                spellBook->motion.KickLeft = kickLeft;
+                spellBook->motion.KickRight = !kickLeft;
+            }
+            kick++;
+            if(kick > 100)
+            {
+                kick = 0;
+                if(spellBook->strategy.FakeKick)
                 {
-                    spellBook->motion.DefenderCentre = true;
+                    spellBook->motion.Vx = 0;
                 }
                 else
                 {
-                    spellBook->motion.DefenderCentre = false;
+                    spellBook->motion.KickLeft = false;
+                    spellBook->motion.KickRight = false;
                 }
             }
         }
         else
         {
-            if(spellBook->perception.vision.localization.Enabled)
-                spellBook->strategy.WalkAside = false;
+            spellBook->motion.Vx = 0;
+            if(spellBook->perception.vision.ball.BallDetected)
+            {
+                if(abs(spellBook->perception.vision.ball.BallYaw) > Deg2Rad(5.0f))
+                {
+                    spellBook->motion.Vy = 0.1f * SIG(spellBook->perception.vision.ball.BallYaw);
+                    spellBook->motion.DefenderCentre = false;
+                    kick = 0;
+                }
+                else
+                {
+                    spellBook->motion.Vy = 0.0f;
+                    if(spellBook->perception.vision.ball.BallDistance < 1.0f)
+                    {
+                        if(spellBook->perception.vision.ball.BallDistance < 0.4f)
+                        {
+                            spellBook->motion.DefenderCentre = false;
+                            kick++;
+                            kickLeft = spellBook->perception.vision.ball.BallYaw < 0;
+                        }
+                        else
+                        {
+                            kick = 0;
+                            spellBook->motion.DefenderCentre = true;
+                        }
+                    }
+                    else
+                    {
+                        spellBook->motion.DefenderCentre = false;
+                        kick = 0;
+                    }
+                }
+            }
             else
-                spellBook->motion.Vy = 0.0f;
-            spellBook->motion.DefenderCentre = false;
+            {
+                kick = 0;
+                if(spellBook->perception.vision.localization.Enabled)
+                    spellBook->strategy.WalkAside = false;
+                else
+                    spellBook->motion.Vy = 0.0f;
+                spellBook->motion.DefenderCentre = false;
+            }
         }
     }
 }

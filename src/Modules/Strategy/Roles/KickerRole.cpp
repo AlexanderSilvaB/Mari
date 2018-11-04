@@ -102,9 +102,9 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
                         spellBook->motion.HeadPitch = Deg2Rad(24.0f);
                     else if(spellBook->perception.vision.ball.BallDistance > 0.5f)
                         spellBook->motion.HeadPitch = Deg2Rad(0.0f);
-                    if(spellBook->perception.vision.ball.BallDistance > 0.2f)
+                    if(spellBook->perception.vision.ball.BallDistance > 0.25f)
                     {
-                        spellBook->motion.Vx = min(spellBook->perception.vision.ball.BallDistance * 0.2f, 0.2f);
+                        spellBook->motion.Vx = min(spellBook->perception.vision.ball.BallDistance * 0.25f, 0.25f);
                         kick = 0;
                     }
                     else

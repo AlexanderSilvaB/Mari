@@ -10,6 +10,8 @@ class GoalieRole : public InnerModule
 {
     private:
         bool onGoal;
+        int kick;
+        bool kickLeft;
     public:
         GoalieRole(SpellBook *spellBook);
         void Tick(float ellapsedTime, const SensorValues &sensor);

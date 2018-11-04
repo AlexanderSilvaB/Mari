@@ -39,8 +39,6 @@ void RobotTracker::Tick(float ellapsedTime)
 
     X(2) = FixAngle(X(2));
 
-    cout << "Odometry: " << X << endl;
-
     spellBook->perception.vision.localization.X = X(0);
     spellBook->perception.vision.localization.Y = X(1);
     spellBook->perception.vision.localization.Theta = X(2);
