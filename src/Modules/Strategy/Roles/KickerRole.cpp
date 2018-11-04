@@ -128,7 +128,7 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
 
                 // Avanço da máquina de estados
                 wait++;
-                if(wait >  100)
+                if(wait >  60)
                 {
                     searchState++;    
                     wait = 0;
@@ -211,7 +211,6 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
                         break;
                     case 12: // Anda pra frente
                     case 13:
-                    case 14:
                         lookingDown = false;
                         turningLeft = false;
                         turningRight = false;
@@ -227,14 +226,14 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
                 }
 
                 if(turningLeft)
-                    spellBook->motion.Vth = -Deg2Rad(10.0f);
+                    spellBook->motion.Vth = -Deg2Rad(20.0f);
                 else if(turningRight)
-                    spellBook->motion.Vth = Deg2Rad(10.0f);
+                    spellBook->motion.Vth = Deg2Rad(20.0f);
                 else
                     spellBook->motion.Vth = 0.0f;
             
                 if(goingForward)
-                    spellBook->motion.Vx = 0.1f;
+                    spellBook->motion.Vx = 0.2f;
                 else 
                     spellBook->motion.Vx = 0;
 

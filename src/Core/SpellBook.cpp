@@ -475,6 +475,9 @@ StrategySpell::StrategySpell()
     HeadScanCount = 0;
     MoveHead = true;
     FakeKick = true;
+
+    TimeSincePenalized = 0;
+    TimeSinceStarted = 0;
 }
 
 void StrategySpell::CopyTo(Spell *spell)
@@ -501,6 +504,9 @@ void StrategySpell::CopyTo(Spell *spell)
     COPY(s, HeadScanCount)
     COPY(s, MoveHead)
     COPY(s, FakeKick)
+
+    COPY(s, TimeSinceStarted)
+    COPY(s, TimeSincePenalized)
 }
 
 void StrategySpell::Load(Storage &storage)

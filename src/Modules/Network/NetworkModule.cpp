@@ -26,16 +26,21 @@ NetworkModule::~NetworkModule()
 void NetworkModule::OnStart()
 {
     sock = new TcpUdpSocket(SERVER_PORT, "", false, false, true, true, 200);
+    gcsock = new TcpUdpSocket(GAMECONTROLLER_PORT, "255.255.255.255", true, true, true, false, 200);
+    gcsockReturn = new TcpUdpSocket(GAMECONTROLLER_PORT, "255.255.255.255", true, true, true, false, 200);
 }
 
 void NetworkModule::OnStop()
 {
     delete sock;
+    delete gcsock;
+    delete gcsockReturn;
 }
 
 void NetworkModule::Load()
 {
     LOAD(network)
+    LOAD(behaviour)
 }
 
 void NetworkModule::Save()

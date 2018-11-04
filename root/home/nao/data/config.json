@@ -4,7 +4,7 @@
             "Enabled": true
         },
         "Network": {
-            "Enabled": true
+            "Enabled": false
         },
         "Perception": {
             "Enabled": true,
@@ -48,6 +48,7 @@
         "Behaviour": {
             "Enabled": true,
             "Number" : 3,
+            "TeamNumber" : 47,
             "Names" : ["NAO 1", "NAO 2", "NAO 3", "NAO 4", "NAO 5", "NAO 6"]
         }
     }

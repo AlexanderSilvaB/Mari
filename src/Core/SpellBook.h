@@ -203,6 +203,9 @@ class StrategySpell : public Spell
         bool MoveHead;
         bool FakeKick;
 
+        float TimeSinceStarted;
+        float TimeSincePenalized;
+
 
         StrategySpell();
         void CopyTo(Spell *spell);

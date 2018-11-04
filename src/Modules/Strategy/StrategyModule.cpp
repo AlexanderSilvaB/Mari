@@ -122,21 +122,26 @@ void StrategyModule::Tick(float ellapsedTime)
         return;
     }
 
+
     if(!spellBook->strategy.Started)
     {
+        spellBook->strategy.TimeSinceStarted = 0;
         spellBook->motion.Stiff = false;
         spellBook->motion.Stand = false;
         spellBook->motion.Walk = false;
         return;
     }
+    spellBook->strategy.TimeSinceStarted += ellapsedTime;
 
     if(spellBook->strategy.Penalized)
     {
+        spellBook->strategy.TimeSincePenalized = 0;
         spellBook->motion.Stiff = true;
         spellBook->motion.Stand = false;
         spellBook->motion.Walk = false;
         return;
     }
+    spellBook->strategy.TimeSincePenalized += ellapsedTime;
 
     spellBook->motion.Dead = spellBook->strategy.Die;
     if(spellBook->strategy.Die)

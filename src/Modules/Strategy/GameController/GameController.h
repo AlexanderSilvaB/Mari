@@ -13,6 +13,7 @@ class GameController : public InnerModule
 {
     private:
         bool pressed;
+        float timeSincePressed;
     public:
         GameController(SpellBook *spellBook);
         void OnStart();
