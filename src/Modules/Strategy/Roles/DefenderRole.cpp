@@ -11,12 +11,15 @@ DefenderRole::DefenderRole(SpellBook *spellBook) : InnerModule(spellBook)
     onPosition = false;
     contPerdido = 0;
     scanPitch = 0;
+    conta = 0;
+    conta2 = 0;
 }
 DefenderRole::~DefenderRole()
 {
 }
 void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
 {
+    spellBook->strategy.MoveHead = false;
     CartesianCoord coord;
     RelativeCoord rr;
     if ((spellBook->strategy.GameState == GC::READY || spellBook->strategy.GameState == GC::PLAYING) &&
@@ -46,11 +49,76 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
     }
     if (spellBook->strategy.GameState == GC::PLAYING)
     {
+        
         spellBook->motion.KickRight = false;
         spellBook->motion.Vth = 0;
         spellBook->motion.Vx = 0;
-        spellBook->motion.Vy = 0;
-        if (spellBook->perception.vision.ball.BallDetected)
+        //cout << "Não entrou no IF" << endl;
+
+        // Para -Y negativo, variar Vth=-1.6 e Vy=-0.1
+        
+        if(conta<550){
+            conta++;
+            spellBook->motion.Vy=0.1;
+            spellBook->motion.Vth=Deg2Rad(2.75);
+        } else if(conta<750){
+            conta++;
+            spellBook->motion.Vy=0;
+        } else if(conta<900 && conta2<2){
+            conta++;
+            spellBook->motion.Vth=Deg2Rad(5.8);
+        } else if(conta<1100){
+            conta++;
+            spellBook->motion.Vth=0;
+            if(conta == 1099){
+                conta2++;
+            }
+            if(conta2<2 && conta == 1099){
+                conta = 0;
+            }
+        } else if(conta <2350) {
+            spellBook->motion.Vy = -0.1;
+            spellBook->motion.Vth = -Deg2Rad(1.6); 
+            conta++;
+        } else {
+            conta = 0;
+            conta2 = 0;
+        }
+
+
+
+        /*if (conta < 250) 
+        {
+            spellBook->motion.Vy = 0.1;
+            spellBook->motion.Vth = Deg2Rad(7); //8.9
+
+            conta++;
+            cout << "Conta: " << conta << endl;
+
+        } else if(conta >=250 &&  conta <=500) {
+            spellBook->motion.Vy = -0.1;
+            spellBook->motion.Vth = -Deg2Rad(1.6); 
+            conta++;
+
+        } else {
+            conta = 0;
+        }*/
+        /*else if(conta>=500 && conta <1000)
+        {
+            spellBook->motion.Vy = -0.1;
+            spellBook->motion.Vth = Deg2Rad(-1.6);
+            conta++;
+        }
+        else
+        {
+            conta=0;
+        }*/
+            //conta = 0;
+            cout << "Parado" << endl;
+        
+        
+        
+        /*if (spellBook->perception.vision.ball.BallDetected)
         {
             cout << "Valor atual do GetX: " << coord.getX() << endl;
             rr.fromPixel(spellBook->perception.vision.ball.ImageX, spellBook->perception.vision.ball.ImageY, sensor.joints.angles[Joints::HeadYaw], -sensor.joints.angles[Joints::HeadPitch]);
@@ -105,22 +173,7 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
                     spellBook->motion.Vy = 0;
                     spellBook->motion.Vth = 0;
                 }
-            }
-            /*if (rr.getDistance() < 0.4f)
-            {
-                cout << "ENTROU NA MERDA DO IF E A DISTANCIA É: " << rr.getDistance();
-                spellBook->motion.Vth = 0;
-                spellBook->motion.Vx = 0;
-                spellBook->motion.Vy = 0;
-                spellBook->motion.KickRight = true;
-                
-            }*/
-            /*else
-            {
-                spellBook->motion.Vx = 0;
-                spellBook->motion.Vy = 0;
-                spellBook->motion.Vth = Deg2Rad(0.5f);
-            }*/
+            }                       
         }
         else if (rr.getDistance() < 0.5f && !spellBook->perception.vision.ball.BallDetected)
         {
@@ -148,9 +201,7 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
             spellBook->motion.Vy = 0.02f;
             spellBook->motion.Vth = Deg2Rad(1.0f) * SIG(rr.getYaw());
         }
-    }else{
-        spellBook->motion.Vx = 1;
-        spellBook->motion.Vy = 0;
-        spellBook->motion.Vth = 0;
+        */
+
     }
 }
