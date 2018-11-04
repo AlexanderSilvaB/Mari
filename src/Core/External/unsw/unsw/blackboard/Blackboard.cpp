@@ -39,12 +39,13 @@ Blackboard::~Blackboard() {
 }
 
 void Blackboard::readOptions(const program_options::variables_map& config) {
-   behaviour.readOptions(config);
-   gameController.readOptions(config);
-   receiver.readOptions(config);
+   //behaviour.readOptions(config);
+   //gameController.readOptions(config);
+   //receiver.readOptions(config);
    kinematics.readOptions(config);
 }
 
+/*
 BehaviourBlackboard::BehaviourBlackboard() {
    llog(INFO) << "Initialising blackboard: behaviour" << endl;
    readBuf = 0;
@@ -98,6 +99,7 @@ void BehaviourBlackboard::readOptions(const program_options::variables_map& conf
       request[readBuf].actions.body.foot = ActionCommand::Body::RIGHT;
    }
 }
+*/
 
 LocalisationBlackboard::LocalisationBlackboard() {
    llog(INFO) << "Initialising blackboard: localisation" << endl;
@@ -153,7 +155,7 @@ PerceptionBlackboard::PerceptionBlackboard() {
    kinematics = 0;
    localisation = 0;
    vision = 0;
-   behaviour = 0;
+   //behaviour = 0;
    total = 33;
 }
 
@@ -209,6 +211,7 @@ void KinematicsBlackboard::readOptions(const program_options::variables_map& con
    }
 }
 
+/*
 GameControllerBlackboard::GameControllerBlackboard() {
    llog(INFO) << "Initialising blackboard: gameController" << endl;
    connected = false;
@@ -265,7 +268,9 @@ void GameControllerBlackboard::readOptions(const program_options::variables_map&
    data.teams[our_team.teamColour] = our_team;
    data.teams[their_team.teamColour] = their_team;
 }
+*/
 
+/*
 ReceiverBlackboard::ReceiverBlackboard() {
    BOOST_FOREACH(time_t & lr, lastReceived) {
       lr = 0;
@@ -278,6 +283,7 @@ ReceiverBlackboard::ReceiverBlackboard() {
 void ReceiverBlackboard::readOptions(const program_options::variables_map& config) {
    team = config["player.team"].as<int>();
 }
+*/
 
 ThreadBlackboard::ThreadBlackboard() {
    llog(INFO) << "Initialising blackboard: thread" << endl;

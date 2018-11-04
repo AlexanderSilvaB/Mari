@@ -161,7 +161,7 @@ void rUNSWiftPerceptionAdapter::Tick()
    writeTo(perception, kinematics, kinematics);
    //writeTo(perception, vision, vision);
    //writeTo(perception, localisation, localisation);
-   writeTo(perception, behaviour, behaviour);
+   //writeTo(perception, behaviour, behaviour);
    writeTo(perception, total, total);
 
    if (dumper) {

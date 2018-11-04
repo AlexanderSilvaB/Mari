@@ -22,7 +22,7 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
     spellBook->strategy.MoveHead = false;
     CartesianCoord coord;
     RelativeCoord rr;
-    if ((spellBook->strategy.GameState == GC::READY || spellBook->strategy.GameState == GC::PLAYING) &&
+    if ((spellBook->strategy.GameState == STATE_READY || spellBook->strategy.GameState == STATE_PLAYING) &&
         !onPosition)
     {
 
@@ -47,7 +47,7 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
             onPosition = true;
         }
     }
-    if (spellBook->strategy.GameState == GC::PLAYING)
+    if (spellBook->strategy.GameState == STATE_PLAYING)
     {
         
         spellBook->motion.KickRight = false;

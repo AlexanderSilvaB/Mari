@@ -60,6 +60,7 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
     if(detected)
     {
         spellBook->perception.vision.ball.BallLostCount = 0;
+        spellBook->perception.vision.ball.TimeSinceBallSeen = 0;
         
         float currHeadYaw = sensor.joints.angles[Joints::HeadYaw];
         float currHeadPitch = sensor.joints.angles[Joints::HeadPitch];
@@ -82,7 +83,10 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
 
     }
     else
+    {
         spellBook->perception.vision.ball.BallLostCount++;
+        spellBook->perception.vision.ball.TimeSinceBallSeen += ellapsedTime;
+    }
 }
 
 bool BallDetector::CascadeMethod(CameraFrame &top, CameraFrame &bottom)

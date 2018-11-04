@@ -3,7 +3,7 @@
 #include <string>
 //#include "perception/vision/VisionAdapter.hpp"
 //#include "perception/localisation/LocalisationAdapter.hpp"
-#include "perception/behaviour/BehaviourAdapter.hpp"
+//#include "perception/behaviour/BehaviourAdapter.hpp"
 #include "perception/kinematics/KinematicsAdapter.hpp"
 #include "perception/dumper/PerceptionDumper.hpp"
 #include "blackboard/Adapter.hpp"

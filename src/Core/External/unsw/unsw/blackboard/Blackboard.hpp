@@ -11,7 +11,7 @@
 #include <vector>
 #include <deque>
 
-#include "perception/behaviour/ReadySkillPositionAllocation.hpp"
+//#include "perception/behaviour/ReadySkillPositionAllocation.hpp"
 #include "motion/generator/PendulumModel.hpp"
 #include "utils/body.hpp"
 #include "utils/boostSerializationVariablesMap.hpp"
@@ -21,10 +21,10 @@
 #include "perception/localisation/LocalisationDefs.hpp"
 #include "perception/localisation/SharedLocalisationUpdateBundle.hpp"
 #include "perception/kinematics/Pose.hpp"
-#include "gamecontroller/RoboCupGameControlData.hpp"
+//#include "gamecontroller/RoboCupGameControlData.hpp"
 #include "utils/Logger.hpp"
 #include "transmitter/TransmitterDefs.hpp"
-#include "types/BehaviourRequest.hpp"
+//#include "types/BehaviourRequest.hpp"
 
 #include "types/ActionCommand.hpp"
 #include "types/ButtonPresses.hpp"
@@ -33,8 +33,8 @@
 #include "types/RRCoord.hpp"
 #include "types/AbsCoord.hpp"
 #include "types/XYZ_Coord.hpp"
-#include "types/BroadcastData.hpp"
-#include "types/BehaviourSharedData.hpp"
+//#include "types/BroadcastData.hpp"
+//#include "types/BehaviourSharedData.hpp"
 
 #include "types/FootInfo.hpp"
 #include "types/BallInfo.hpp"
@@ -128,6 +128,7 @@ struct KinematicsBlackboard {
 };
 
 /* Data Behaviour module will be sharing with others */
+/*
 struct BehaviourBlackboard {
    explicit BehaviourBlackboard();
    void readOptions(const boost::program_options::variables_map& config);
@@ -136,6 +137,7 @@ struct BehaviourBlackboard {
    std::string skill;
    BehaviourSharedData behaviourSharedData;
 };
+*/
 
 /* Data Localisation module will be sharing */
 struct LocalisationBlackboard {
@@ -241,10 +243,11 @@ struct PerceptionBlackboard {
    uint32_t kinematics;
    uint32_t localisation;
    uint32_t vision;
-   uint32_t behaviour;
+   //uint32_t behaviour;
    uint32_t total;
 };
 
+/*
 struct GameControllerBlackboard {
    explicit GameControllerBlackboard();
    void readOptions(const boost::program_options::variables_map& config);
@@ -256,6 +259,7 @@ struct GameControllerBlackboard {
    int player_number;
    GameType game_type;
 };
+*/
 
 
 struct MotionBlackboard {
@@ -275,10 +279,11 @@ struct MotionBlackboard {
 
 struct RemoteControlBlackboard {
    explicit RemoteControlBlackboard();
-   BehaviourRequest request;
+   //BehaviourRequest request;
    time_t time_received;
 };
 
+/*
 struct ReceiverBlackboard {
    explicit ReceiverBlackboard();
    // one for each robot on the team
@@ -288,6 +293,7 @@ struct ReceiverBlackboard {
    time_t lastReceived[ROBOTS_PER_TEAM];
    bool incapacitated[ROBOTS_PER_TEAM];
 };
+*/
 
 
 struct SynchronisationBlackboard {
@@ -314,8 +320,8 @@ class Blackboard {
    friend class LocalisationAdapter;
    friend class VisionAdapter;
    friend class MotionAdapter;
-   friend class BehaviourAdapter;
-   friend class GameController;
+   //friend class BehaviourAdapter;
+   //friend class GameController;
    friend class OffNaoTransmitter;
    friend class NaoTransmitter;
    friend class TeamTransmitter;
@@ -405,7 +411,7 @@ class Blackboard {
       KinematicsBlackboard kinematics;
 
       /* Data Behaviour module will be sharing with others */
-      BehaviourBlackboard behaviour;
+      //BehaviourBlackboard behaviour;
 
       /* Data Localisation module will be sharing */
       LocalisationBlackboard localisation;
@@ -416,13 +422,13 @@ class Blackboard {
       PerceptionBlackboard perception;
 
       /* Data GameController will be sharing */
-      GameControllerBlackboard gameController;
+      //GameControllerBlackboard gameController;
 
       /* Data Motion module will be sharing with others */
       MotionBlackboard motion;
 
       /* Data received from friendly robots */
-      ReceiverBlackboard receiver;
+      //ReceiverBlackboard receiver;
 
 	  /* Data received from remote-control piece in Off-Nao */
 	  RemoteControlBlackboard remoteControl;

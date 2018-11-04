@@ -16,6 +16,8 @@ NetworkModule::NetworkModule(SpellBook *spellBook) : Module(spellBook, "Network"
     infoData[3] = 'O';
     inSize = 0;
 
+    timeSinceLastGCReturn = 0;
+    timeSinceLastGCPlayerData = 0;
 }
 
 NetworkModule::~NetworkModule()
@@ -26,21 +28,24 @@ NetworkModule::~NetworkModule()
 void NetworkModule::OnStart()
 {
     sock = new TcpUdpSocket(SERVER_PORT, "", false, false, true, true, 200);
-    gcsock = new TcpUdpSocket(GAMECONTROLLER_PORT, "255.255.255.255", true, true, true, false, 200);
-    gcsockReturn = new TcpUdpSocket(GAMECONTROLLER_PORT, "255.255.255.255", true, true, true, false, 200);
+    gcsock = new TcpUdpSocket(GAMECONTROLLER_DATA_PORT, "255.255.255.255", true, true, true, false, 200);
+    gcsockRet = NULL;
 }
 
 void NetworkModule::OnStop()
 {
     delete sock;
     delete gcsock;
-    delete gcsockReturn;
+    if(gcsockRet != NULL)
+        delete gcsockRet;
 }
 
 void NetworkModule::Load()
 {
     LOAD(network)
+    LOAD(perception)
     LOAD(behaviour)
+    LOAD(strategy)
 }
 
 void NetworkModule::Save()
@@ -110,48 +115,55 @@ void NetworkModule::Tick(float ellapsedTime)
     connected = spellBook->network.TCPConnected;
 
     // GameController
+    timeSinceLastGCPlayerData += ellapsedTime;
+    timeSinceLastGCReturn += ellapsedTime;
+    if(timeSinceLastGCPlayerData > 1.0f && outSizeGC == 0)
     {
-        cout << "GC Connected" << endl;
-        timeSinceLastGCData += ellapsedTime;
-        if(timeSinceLastGCData > 1.0f)
+        timeSinceLastGCPlayerData = 0;
+        gcSPLData.teamNum = spellBook->behaviour.TeamNumber;
+        gcSPLData.playerNum = spellBook->behaviour.Number;
+        gcSPLData.fallen = spellBook->behaviour.Fallen ? 1 : 0;
+        gcSPLData.pose[0] = spellBook->perception.vision.localization.X;
+        gcSPLData.pose[1] = spellBook->perception.vision.localization.Y;
+        gcSPLData.pose[2] = spellBook->perception.vision.localization.Theta;
+        gcSPLData.ballAge = spellBook->perception.vision.ball.TimeSinceBallSeen;
+        // TO-DO
+        gcSPLData.ball[0] = 0;
+        gcSPLData.ball[1] = 0;
+        gcSPLData.numOfDataBytes = 0;
+
+        
+        memcpy (outDataGC, &gcSPLData, sizeof(gcSPLData));
+        outSizeGC = sizeof(gcSPLData);
+    }
+    if(timeSinceLastGCReturn > 1.0f && outSizeGC == 0)
+    {
+        timeSinceLastGCReturn = 0;
+        gcRetData.team = spellBook->behaviour.TeamNumber;
+        gcRetData.player = spellBook->behaviour.Number;
+        gcRetData.message = GAMECONTROLLER_RETURN_MSG_ALIVE;    
+        memcpy (outDataGC, &gcRetData, sizeof(gcRetData));
+        outSizeGC = sizeof(gcRetData);
+    }
+    if(outSizeGC > 0 && gcsockRet != NULL)
+    {
+        int sz = gcsockRet->send(outDataGC, outSizeGC);
+        cout << "GC Send size: " << sz << endl;
+        outSizeGC = 0;
+    }
+    int inSizeGC = gcsock->receive(inDataGC, MAX_GC_MSG);
+    if(inSizeGC > 0)
+    {
+        memcpy (&gcData, inDataGC, inSizeGC);
+        cout << "Packet Number: " << (int)gcData.packetNumber << endl;
+        char *ip = gcsock->received_from();
+        cout << "IP: " << string(ip) << endl;
+        if(ip[0] != '\0' && gcsockRet == NULL)
         {
-            timeSinceLastGCData = 0;
-            gcReturnData.team = spellBook->behaviour.TeamNumber;
-            gcReturnData.player = spellBook->behaviour.Number;
-            if(!spellBook->behaviour.Started)
-            {
-                gcReturnData.message = GAMECONTROLLER_RETURN_MSG_MAN_UNPENALISE;
-            }
-            else
-            {
-                if(spellBook->behaviour.Penalized)
-                {
-                    gcReturnData.message = GAMECONTROLLER_RETURN_MSG_MAN_PENALISE;
-                }
-                else
-                {
-                    gcReturnData.message = GAMECONTROLLER_RETURN_MSG_ALIVE;
-                }
-            }
-            memcpy (outDataGC, &gcReturnData, sizeof(gcReturnData));
-            outSizeGC = sizeof(gcReturnData);
-        }
-        if(outSizeGC > 0)
-        {
-            gcsockReturn->send(outDataGC, outSizeGC);
-            outSizeGC = 0;
-        }
-        int inSizeGC = gcsock->receive(inDataGC, MAX_GC_MSG);
-        cout << inSizeGC << endl;
-        if(inSizeGC > 0)
-        {
-            cout << "Before memcpy" << endl;
-            //Tratar a mensagem do GC aqui
-            memcpy (&gcData, inDataGC, inSizeGC);
-            cout << "Packet Number: " << (int)gcData.packetNumber << endl;
+            gcsockRet = new TcpUdpSocket(GAMECONTROLLER_RETURN_PORT, ip, true, true, true, false, 200);
         }
     }
-}
+}   
 
 void NetworkModule::Process(int inSize)
 {

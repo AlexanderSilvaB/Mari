@@ -55,6 +55,12 @@ file(GLOB_RECURSE CORE_UTILS_SRC
 	"Core/Utils/*.h"
     "Core/Utils/*.hpp")
 
+file(GLOB_RECURSE CORE_GC_SRC
+	"Core/GC/*.cpp"
+    "Core/GC/*.c"
+	"Core/GC/*.h"
+    "Core/GC/*.hpp")
+
 file(GLOB_RECURSE MODULES_SRC
 	"Modules/*.cpp"
     "Modules/*.c"
@@ -63,7 +69,7 @@ file(GLOB_RECURSE MODULES_SRC
 
 add_subdirectory("Core/External")
 
-qi_create_bin(rinobot ${src} ${CORE_SRC} ${CORE_DRIVERS_SRC} ${CORE_UTILS_SRC} ${MODULES_SRC})
+qi_create_bin(rinobot ${src} ${CORE_SRC} ${CORE_DRIVERS_SRC} ${CORE_UTILS_SRC} ${CORE_GC_SRC} ${MODULES_SRC})
 qi_use_lib(rinobot unsw     
         OPENCV2_CORE 
         OPENCV2_HIGHGUI 

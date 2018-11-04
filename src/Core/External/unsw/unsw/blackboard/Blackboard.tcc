@@ -24,8 +24,8 @@ void Blackboard::shallowSerialize(Archive & ar,
       throw std::runtime_error("Depricated 2011 dump file detected");
    }
 
-   ar & gameController.team_red;
-   ar & gameController.player_number;
+   //ar & gameController.team_red;
+   //ar & gameController.player_number;
 
    ar & motion.sensors;
    ar & motion.pose;
@@ -33,13 +33,13 @@ void Blackboard::shallowSerialize(Archive & ar,
    ar & motion.odometry;
    ar & motion.active;
 
-   ar & perception.behaviour;
+   //ar & perception.behaviour;
    ar & perception.kinematics;
    ar & perception.localisation;
    ar & perception.total;
    ar & perception.vision;
 
-   ar & behaviour.request;
+   //ar & behaviour.request;
 
    ar & kinematics.sonarFiltered;
    ar & kinematics.parameters;
@@ -78,8 +78,8 @@ void Blackboard::shallowSerialize(Archive & ar,
    ar & vision.missedFrames;
    ar & vision.dxdy;
 
-   ar & receiver.data;
-   ar & receiver.incapacitated;
+   //ar & receiver.data;
+   //ar & receiver.incapacitated;
 
    ar & motion.pendulumModel;
 

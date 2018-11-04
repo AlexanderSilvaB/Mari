@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gamecontroller/RoboCupGameControlData.hpp"
+//#include "gamecontroller/RoboCupGameControlData.hpp"
 #include "types/ActionCommand.hpp"
 
 #define SECS_TILL_INCAPACITATED 3

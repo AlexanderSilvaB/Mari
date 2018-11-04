@@ -22,7 +22,7 @@ void GoalieRole::Tick(float ellapsedTime, const SensorValues &sensor)
     spellBook->strategy.HeadPitchRange = Deg2Rad(20.0f);
     spellBook->strategy.HeadSearchSpeed = 0.1f;
     
-    if((spellBook->strategy.GameState == GC::READY || spellBook->strategy.GameState == GC::PLAYING) &&
+    if((spellBook->strategy.GameState == STATE_READY || spellBook->strategy.GameState == STATE_PLAYING) &&
         !onGoal)
     {
         if(spellBook->perception.vision.localization.Enabled)
@@ -45,7 +45,7 @@ void GoalieRole::Tick(float ellapsedTime, const SensorValues &sensor)
             onGoal = true;
         }
     }
-    if(spellBook->strategy.GameState == GC::PLAYING && onGoal)
+    if(spellBook->strategy.GameState == STATE_PLAYING && onGoal)
     {
         if(kick > 60)
         {

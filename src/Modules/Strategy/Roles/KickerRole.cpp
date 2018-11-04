@@ -23,7 +23,7 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
     spellBook->motion.HeadSpeedYaw = 0.2f;
     spellBook->motion.HeadSpeedPitch = 0.2f;
     
-    if((spellBook->strategy.GameState == GC::READY || spellBook->strategy.GameState == GC::PLAYING) && !onStart)
+    if((spellBook->strategy.GameState == STATE_READY || spellBook->strategy.GameState == STATE_PLAYING) && !onStart)
     {
         if(spellBook->perception.vision.localization.Enabled)
         {
@@ -45,7 +45,7 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
             onStart = true;
         }
     }
-    if(spellBook->strategy.GameState == GC::PLAYING && onStart)
+    if(spellBook->strategy.GameState == STATE_PLAYING && onStart)
     {
         if(kick > 60)
         {

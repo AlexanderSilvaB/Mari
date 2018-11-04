@@ -7,6 +7,8 @@
 #include "Core/Utils/CameraSettingMessage.h"
 #include <semaphore.h> 
 #include "Core/Utils/CombinedCamera.hpp"
+#include "Core/GC/RoboCupGameControlData.h"
+#include "Core/GC/SPLStandardMessage.h"
 
 using namespace std;
 
@@ -32,17 +34,17 @@ class NetworkModule : public Module
         void ProcessCameraSetting(CameraSettingMessage &setting);
         void setControl(Camera *camera, const uint32_t controlId, const int32_t controlValue);
 
-        //Game Controller
-        TcpUdpSocket *gcsock, *gcsockReturn;
+        //Game Controller   
+        TcpUdpSocket *gcsock, *gcsockRet;
         char outDataGC[MAX_GC_MSG];
         char inDataGC[MAX_GC_MSG];
         int outSizeGC;
-        float timeSinceLastGCData;
-        
+        float timeSinceLastGCReturn;
+        float timeSinceLastGCPlayerData;
+
         struct RoboCupGameControlData gcData;
-        struct RoboCupGameControlReturnData gcReturnData;
-
-
+        struct SPLStandardMessage gcSPLData;
+        struct RoboCupGameControlReturnData gcRetData;
 
     public:
         NetworkModule(SpellBook *spellBook);

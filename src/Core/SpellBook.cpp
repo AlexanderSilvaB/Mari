@@ -407,6 +407,34 @@ void RemoteSpell::Save(Storage &storage)
     storage["Modules"]["Remote"]["Network"]["Enabled"] = EnableNetwork;
 }
 
+GameControllerSpell::GameControllerSpell()
+{
+    TeamRed = false;
+    Connected = false;
+    GameState = 0;
+}
+
+void GameControllerSpell::CopyTo(Spell *spell)
+{
+    GameControllerSpell *s = (GameControllerSpell*)spell;
+    COPY(s, TeamRed)
+    COPY(s, Connected)
+    COPY(s, GameState)
+    COPY(s, OurTeam)
+    COPY(s, Data)
+}
+
+void GameControllerSpell::Load(Storage &storage)
+{
+    
+}
+
+void GameControllerSpell::Save(Storage &storage)
+{
+    
+}
+
+
 NetworkSpell::NetworkSpell()
 {
     TCPConnected = false;
@@ -420,6 +448,7 @@ NetworkSpell::NetworkSpell()
 void NetworkSpell::CopyTo(Spell *spell)
 {
     NetworkSpell *s = (NetworkSpell*)spell;
+    gameController.CopyTo(&(s->gameController));
     COPY(s, TCPConnected)
     COPY(s, SelectedCamera)
 
@@ -455,7 +484,7 @@ void NetworkSpell::Save(Storage &storage)
 
 StrategySpell::StrategySpell()
 {
-    GameState = GC::INITIAL;
+    GameState = STATE_INITIAL;
     WalkInCircle = WalkInSquare = false;
     Started = false;
     Penalized = false;

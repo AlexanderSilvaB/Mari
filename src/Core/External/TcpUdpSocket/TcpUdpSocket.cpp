@@ -7,10 +7,11 @@ typedef int socklen_t;
 TcpUdpSocket::TcpUdpSocket(int port, char* address, bool udp, bool broadcast, bool reusesock, bool isServer, int timeout)
 {
 	connected = false;
+	received[0] = '\0';
 #ifdef WIN32
 	retval = WSAStartup(MAKEWORD(2, 2), &wsaData);
 #endif
-
+	
 	sockaddr_in addr;
 	if(udp)
 		sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);

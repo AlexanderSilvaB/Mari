@@ -5,7 +5,7 @@
 #include <boost/algorithm/string/classification.hpp>
 
 #include "perception/PerceptionThread.hpp"
-#include "perception/behaviour/SafetySkill.hpp"
+//#include "perception/behaviour/SafetySkill.hpp"
 #include "soccer.hpp"
 #include "blackboard/Blackboard.hpp"
 #include "utils/Logger.hpp"
@@ -115,7 +115,7 @@ void PerceptionThread::tick() {
    writeTo(perception, kinematics, kinematics);
    //writeTo(perception, vision, vision);
    //writeTo(perception, localisation, localisation);
-   writeTo(perception, behaviour, behaviour);
+   //writeTo(perception, behaviour, behaviour);
    writeTo(perception, total, total);
 
    if (dumper) {

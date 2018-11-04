@@ -8,11 +8,7 @@
 #include <boost/program_options.hpp>
 #include "Core/InitManager.h"
 #include <pthread.h>
-
-namespace GC
-{
-    enum GameStates { INITIAL, READY, SET, PENALIZED, PLAYING, FINISHED };
-}
+#include "GC/RoboCupGameControlData.h"
 
 class Spell
 {
@@ -158,6 +154,21 @@ class RemoteSpell : public Spell
         void Save(Storage &storage);
 };
 
+class GameControllerSpell : public Spell
+{
+    public:
+        RoboCupGameControlData Data;
+        TeamInfo OurTeam;
+        bool TeamRed;
+        bool Connected;
+        uint8_t GameState;
+
+        GameControllerSpell();
+        void CopyTo(Spell *spell);
+        void Load(Storage &storage);
+        void Save(Storage &storage);
+};
+
 class NetworkSpell : public Spell
 {
     public:
@@ -176,6 +187,7 @@ class NetworkSpell : public Spell
         bool TCPConnected;
         int SelectedCamera;
         CameraSettings topSettings, botSettings;
+        GameControllerSpell gameController;
 
         NetworkSpell();
         void CopyTo(Spell *spell);
@@ -186,7 +198,7 @@ class NetworkSpell : public Spell
 class StrategySpell : public Spell
 {
     public:
-        GC::GameStates GameState;
+        uint8_t GameState;
         bool WalkInCircle, WalkInSquare;
         bool Started;
         bool Penalized;

@@ -5,7 +5,6 @@
 #include "Core/SpellBook.h"
 #include "types/SensorValues.hpp"
 #include "types/ButtonPresses.hpp"
-#include "gamecontroller/RoboCupGameControlData.hpp"
 
 using namespace std;
 
