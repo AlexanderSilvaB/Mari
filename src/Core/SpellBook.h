@@ -212,6 +212,7 @@ class StrategySpell : public Spell
         int HeadScanCount;
         bool MoveHead;
         bool FakeKick;
+        bool Defensive;
 
         float TimeSinceStarted;
         float TimeSincePenalized;

@@ -14,9 +14,10 @@ private:
     bool onPosition;
     int contPerdido;
     float scanPitch;
-    int conta, conta2, kick;
+    int conta, conta2, conta3, kick;
+    float Deg, Vel;
     bool kickLeft;
-
+    bool reset;
 public:
 
     DefenderRole(SpellBook *spellBook);

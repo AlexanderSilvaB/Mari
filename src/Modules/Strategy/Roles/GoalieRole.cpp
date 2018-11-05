@@ -63,15 +63,20 @@ void GoalieRole::Tick(float ellapsedTime, const SensorValues &sensor)
             kick++;
             if(kick > 100)
             {
-                kick = 0;
                 if(spellBook->strategy.FakeKick)
                 {
-                    spellBook->motion.Vx = 0;
+                    spellBook->motion.Vx = -3.0f;
+                    if(kick > 140)
+                    {
+                        kick = 0;
+                        spellBook->motion.Vx = 0;
+                    }
                 }
                 else
                 {
                     spellBook->motion.KickLeft = false;
                     spellBook->motion.KickRight = false;
+                    kick = 0;
                 }
             }
         }

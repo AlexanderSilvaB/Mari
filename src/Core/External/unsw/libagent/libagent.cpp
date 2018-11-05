@@ -74,17 +74,17 @@ void Agent::doBattery(float charge, float current, int status) {
    int battery = charge * 33;
    // if battery decreasing & <= 30%
    if (old_battery > battery && battery <= 10) {
-      SAY("bateria " + boost::lexical_cast<string>(battery * 3) +
-          " porcento");
+      SAY("battery " + boost::lexical_cast<string>(battery * 3) +
+          " percent");
    }
    old_battery = battery;
    std::bitset<16> b = status;
    if (!old_battery_status[5] && b[5]) {
-      log->info(name, "Descarregando");
+      log->info(name, "Discharging");
    } else if (!old_battery_status[6] && b[6]) {
-      log->info(name, "Carregado");
+      log->info(name, "Charged");
    } else if (!old_battery_status[7] && b[7]) {
-      log->info(name, "Carregando");
+      log->info(name, "Charging");
    }
    old_battery_status = b;
 }
@@ -95,7 +95,7 @@ void Agent::doTemps() {
        *temperature_pointers[t / 100] > 70 &&
        !limp && !shared_data->standing &&
        shared_data->joints[shared_data->actuators_read].stiffnesses[t / 100] > 0)
-      SAY("Estou quentinho: " + Joints::fliteJointNames[t / 100]);
+      SAY("Hot: " + Joints::fliteJointNames[t / 100]);
    t = (t + 1) % (Joints::NUMBER_OF_JOINTS * 100);
 }
 
@@ -108,8 +108,8 @@ void Agent::doButtons(bool chest, bool left, bool right) {
       if (buttons.pop(2)) {
          if (left || right) {
             head_limp = !head_limp;
-            SAY(std::string("cabeça ") +
-                (head_limp ? "mole" : "dura"));
+            SAY(std::string("head ") +
+                (head_limp ? "limp" : "stiff"));
          } else {
             if (limp) {
                limp = false;
@@ -120,12 +120,12 @@ void Agent::doButtons(bool chest, bool left, bool right) {
                shared_data->standing = false;
                motion->killAll();
             }
-            SAY(std::string("corpo ") +
-                (limp ? "mole" : "duro"));
+            SAY(std::string("body ") +
+                (limp ? "limp" : "stiff"));
          }
       } else if (buttons.pop(3)) {
          if (left || right) {
-            SAY("Reiniciando a NAO Qi");  // yay transliteration
+            SAY("Restarting NAO Key");  // yay transliteration
             // Runlevel a is set up to run nao restart on demand.
             // This avoids the problem where killall naoqi kills us and
             // therefore our children (including /etc/init.d/naoqi).
@@ -136,7 +136,7 @@ void Agent::doButtons(bool chest, bool left, bool right) {
             // should not get here
          } else {
             if (skipped_frames > MAX_SKIPS) {
-               SAY("Carregando rinobot");
+               SAY("Loading rinobot");
                if (!fork()) {
                   struct sched_param s;
                   s.sched_priority = 0;
@@ -146,7 +146,7 @@ void Agent::doButtons(bool chest, bool left, bool right) {
                                (char*)NULL);
                }
             } else {
-               SAY("Parando rinobot");
+               SAY("Stoping rinobot");
                ret = system("/usr/bin/killall rinobot");
                while (waitpid(-1, NULL, WNOHANG) > 0) ;
             }
@@ -175,7 +175,7 @@ void Agent::doButtons(bool chest, bool left, bool right) {
          limp = true;
          chest_down = std::numeric_limits<int>::min();
       } else {
-         SAY("Desligando");
+         SAY("Shutting down");
          ret = system("sudo '/usr/bin/killall rinobot'");
          ret = system("sudo /sbin/halt");
          limp = true;

@@ -129,7 +129,7 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
 
                 // Avanço da máquina de estados
                 wait++;
-                if(wait >  60)
+                if(wait > 40)
                 {
                     searchState++;    
                     wait = 0;
@@ -156,62 +156,69 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
                         turningRight = false;
                         goingForward = false;
                         break;
-                    case 3: // Procura no lado esquerdo na frente
+                    case 3: // Anda pouco
+                        lookingDown = false;
+                        turningLeft = false;
+                        turningRight = false;
+                        goingForward = true;
+                        break;
+                    case 4: // Procura no lado esquerdo na frente
                         lookingDown = false;
                         turningLeft = true;
                         turningRight = false;
                         goingForward = false;
                         break;
-                    case 4: // Procura no lado esquerdo no pé
+                    case 5: // Procura no lado esquerdo no pé
                         lookingDown = true;
                         turningLeft = false;
                         turningRight = false;
                         goingForward = false;
                         break;
-                    case 5: // Procura no lado esquerdo na frente de novo
+                    case 6: // Procura no lado esquerdo na frente de novo
                         lookingDown = false;
                         turningLeft = false;
                         turningRight = false;
                         goingForward = false;
                         break;
-                    case 6: // Volta a olhar pra frente
+                    case 7: // Volta a olhar pra frente
                         lookingDown = false;
                         turningLeft = false;
                         turningRight = true;
                         goingForward = false;
                         break;
-                    case 7: // Procura do lado direito
+                    case 8: // Procura do lado direito
                         lookingDown = false;
                         turningLeft = false;
                         turningRight = true;
                         goingForward = false;
                         break;
-                    case 8: // Procura do lado direito no pé
+                    case 9: // Procura do lado direito no pé
                         lookingDown = true;
                         turningLeft = false;
                         turningRight = false;
                         goingForward = false;
                         break;
-                    case 9: // Procura do lado direito na frente de novo
+                    case 10: // Procura do lado direito na frente de novo
                         lookingDown = false;
                         turningLeft = false;
                         turningRight = false;
                         goingForward = false;
                         break;
-                    case 10: // Volta a olhar pra frente
+                    case 11: // Volta a olhar pra frente
                         lookingDown = false;
                         turningLeft = true;
                         turningRight = false;
                         goingForward = false;
                         break;
-                    case 11: // Procura no pé
+                    case 12: // Procura no pé
                         lookingDown = true;
                         turningLeft = false;
                         turningRight = false;
                         goingForward = false;
                         break;
-                    case 12: // Anda pra frente
-                    case 13:
+                    case 13: // Anda muito pra frente
+                    case 14:
+                    case 15:
                         lookingDown = false;
                         turningLeft = false;
                         turningRight = false;

@@ -13,14 +13,32 @@ DefenderRole::DefenderRole(SpellBook *spellBook) : InnerModule(spellBook)
     scanPitch = 0;
     conta = 0;
     conta2 = 0;
+    conta3 = 0;
     kick = 0;
     kickLeft = false;
+    Deg = Deg2Rad(6.05);
+    Vel = 0.1;
+    reset = false;
 }
 DefenderRole::~DefenderRole()
 {
 }
 void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
 {
+    if(spellBook->strategy.TimeSincePenalized < 5.0f && !reset)
+    {
+        reset = true;
+        conta = 0;
+        conta2 = 0;
+        conta3 = 0;
+        Deg = Deg2Rad(6.05);
+        Vel = 0.1;
+    }
+    else if(spellBook->strategy.TimeSincePenalized >= 5.0f)
+    {
+        reset = false;
+    }
+
     spellBook->strategy.MoveHead = false;
     CartesianCoord coord;
     RelativeCoord rr;
@@ -127,42 +145,38 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
                 spellBook->motion.KickRight = false;
                 spellBook->motion.Vth = 0;
                 spellBook->motion.Vx = 0;
-                //cout << "Não entrou no IF" << endl;
-
-                // Para -Y negativo, variar Vth=-1.6 e Vy=-0.1
-                
-                if(conta<550){
-                    spellBook->strategy.MoveHead = false;
-                    conta++;
-                    spellBook->motion.Vy=0.1;
-                    spellBook->motion.Vth=Deg2Rad(2.75);
-                } else if(conta<650){
-                    conta++;
-                    spellBook->motion.Vy=0;
-                    spellBook->strategy.MoveHead = true;
-                } else if(conta<800 && conta2<2){
-                    conta++;
-                    //spellBook->motion.Vth=Deg2Rad(5.8);
-                } else if(conta<900){
-                    conta++;
-                    spellBook->motion.Vth=0;
-                    if(conta == 899){
-                        conta2++;
-                    }
-                    if(conta2<2 && conta == 899){
-                    conta = 0;
-                    }   
-                } else if(conta <2050) {
-                    spellBook->strategy.MoveHead = false;
-                    spellBook->motion.Vy = -0.1;
-                    spellBook->motion.Vth = -Deg2Rad(1.6); 
-                    conta++;
+                if(conta<250){
+                    spellBook->motion.Vy = Vel;
+                    spellBook->motion.Vth = Deg;
+                } else if(conta<350) {
+                    spellBook->motion.Vy = 0;
+                    spellBook->motion.Vth = 0;
                 } else {
-                    conta = 0;
+                    conta = 0; 
+                    conta2++; 
+                }
+                conta++;
+
+                if(conta2 == 4){
+                    Vel = -0.1;
+                    Deg = Deg2Rad(1.6);
+                }
+                if(conta2 == 9){
+                    Vel = 0.1;
+                    Deg = Deg2Rad(6.05);
                     conta2 = 0;
                 }
 
-                cout << "Parado" << endl;
+                if(conta3 < 50){
+                    spellBook->motion.HeadPitch = Deg2Rad(10);
+                } else if (conta3 <100){
+                    spellBook->motion.HeadPitch = Deg2Rad(20);
+                } else if (conta3 <150){
+                    spellBook->motion.HeadPitch = 0;
+                } else {
+                    conta3 = 0;
+                }
+                conta3++;
             }
         }
     }
