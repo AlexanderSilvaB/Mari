@@ -541,6 +541,7 @@ void StrategySpell::CopyTo(Spell *spell)
 
 void StrategySpell::Load(Storage &storage)
 {
+    FakeKick = storage["Modules"]["Strategy"]["FakeKick"].Default(true);
     Defensive = storage["Modules"]["Strategy"]["Defensive"].Default(true);
 }
 

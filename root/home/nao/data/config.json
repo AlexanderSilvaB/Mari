@@ -44,7 +44,8 @@
         },
         "Strategy": {
             "Enabled": true,
-            "Defensive" : false
+            "Defensive" : false,
+            "FakeKick" : true
         },
         "Behaviour": {
             "Enabled": true,
