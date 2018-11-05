@@ -47,7 +47,7 @@
         },
         "Behaviour": {
             "Enabled": true,
-            "Number" : 1,
+            "Number" : 2,
             "TeamNumber" : 47,
             "Names" : ["Saruman", "Luci", "Dino", "Lilith", "Morgana", "Unknown"]
         }

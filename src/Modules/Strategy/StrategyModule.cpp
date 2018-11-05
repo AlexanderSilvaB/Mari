@@ -115,7 +115,7 @@ void StrategyModule::Tick(float ellapsedTime)
 
     safetyMonitor->Tick(ellapsedTime, sensor);
     gameController->Tick(ellapsedTime, sensor);
-    
+
     spellBook->motion.Dead = spellBook->strategy.Die;
     if(spellBook->strategy.Die)
     {

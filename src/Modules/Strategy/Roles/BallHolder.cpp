@@ -50,17 +50,6 @@ void BallHolder::Tick(float ellapsedTime, const SensorValues &sensor)
         spellBook->motion.Vx = 0;
         spellBook->motion.Vy = 0;
 
-        if (!spellBook->perception.vision.ball.BallDetected)
-        {
-            cout << "to perdido" << endl;
-            spellBook->motion.Vth = 0.02;
-            spellBook->motion.Vx = 0.03;
-            spellBook->motion.Vy = 0;
-            spellBook->motion.HeadPitch = Deg2Rad(2.0);
-            spellBook->motion.HeadYaw = 0.0;
-            spellBook->motion.HeadSpeedYaw = 0.2f;
-            spellBook->motion.HeadSpeedPitch = 0.2f;
-        }
         if (spellBook->perception.vision.ball.BallLostCount < 5)
         {
             cout << "ballLost" << endl;
@@ -99,18 +88,32 @@ void BallHolder::Tick(float ellapsedTime, const SensorValues &sensor)
         }
         else 
         {
-            cout<<"distancia"<< spellBook->perception.vision.ball.BallDistance<< endl;
-            spellBook->motion.Vth = -(spellBook->perception.vision.ball.BallYaw) * 0.5f;
-            spellBook->motion.Vy = 0;
-            spellBook->motion.HeadPitch = Deg2Rad(15.0f);
-            spellBook->motion.HeadYaw = Deg2Rad(0);
-            if (spellBook->perception.vision.ball.BallDistance < 0.25)
+            if (spellBook->perception.vision.ball.BallLostCount < 30)
             {
-                spellBook->motion.Vx = -(spellBook->perception.vision.ball.BallDistance) * 0.25f;
+                cout<<"distancia"<< spellBook->perception.vision.ball.BallDistance<< endl;
+                spellBook->motion.Vth = -(spellBook->perception.vision.ball.BallYaw) * 0.5f;
+                spellBook->motion.Vy = 0;
+                spellBook->motion.HeadPitch = Deg2Rad(15.0f);
+                spellBook->motion.HeadYaw = Deg2Rad(0);
+                if (spellBook->perception.vision.ball.BallDistance < 0.25)
+                {
+                    spellBook->motion.Vx = -(spellBook->perception.vision.ball.BallDistance) * 0.25f;
+                }
+                else
+                {
+                    spellBook->motion.Vx = (spellBook->perception.vision.ball.BallDistance) * 0.25f;
+                }
             }
             else
             {
-                spellBook->motion.Vx = (spellBook->perception.vision.ball.BallDistance) * 0.25f;
+                cout << "to perdido" << endl;
+                spellBook->motion.Vth = 0.02;
+                spellBook->motion.Vx = 0.03;
+                spellBook->motion.Vy = 0;
+                spellBook->motion.HeadPitch = Deg2Rad(2.0);
+                spellBook->motion.HeadYaw = 0.0;
+                spellBook->motion.HeadSpeedYaw = 0.2f;
+                spellBook->motion.HeadSpeedPitch = 0.2f;
             }
         }
     }

@@ -132,15 +132,17 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
                 // Para -Y negativo, variar Vth=-1.6 e Vy=-0.1
                 
                 if(conta<550){
+                    spellBook->strategy.MoveHead = false;
                     conta++;
                     spellBook->motion.Vy=0.1;
                     spellBook->motion.Vth=Deg2Rad(2.75);
                 } else if(conta<650){
                     conta++;
                     spellBook->motion.Vy=0;
+                    spellBook->strategy.MoveHead = true;
                 } else if(conta<800 && conta2<2){
                     conta++;
-                    spellBook->motion.Vth=Deg2Rad(5.8);
+                    //spellBook->motion.Vth=Deg2Rad(5.8);
                 } else if(conta<900){
                     conta++;
                     spellBook->motion.Vth=0;
@@ -151,6 +153,7 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
                     conta = 0;
                     }   
                 } else if(conta <2050) {
+                    spellBook->strategy.MoveHead = false;
                     spellBook->motion.Vy = -0.1;
                     spellBook->motion.Vth = -Deg2Rad(1.6); 
                     conta++;

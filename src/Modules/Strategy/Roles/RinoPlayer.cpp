@@ -103,7 +103,7 @@ void RinoPlayer::Tick(float ellapsedTime, const SensorValues &sensor)
                 }
             //}
 
-            if (time > 100 * ellapsedTime && time < 160 * ellapsedTime)
+            if (time > 200 * ellapsedTime && time < 320 * ellapsedTime) //Se o robo estiver rodando muito, aumentar o intervalo. Ou remover o IF e aumentar velocidade em X. Ou falar com o Pedro.
             {
                 spellBook->motion.Vth = 0;
                 spellBook->motion.Vx = 0.6f;

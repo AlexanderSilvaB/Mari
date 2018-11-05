@@ -96,7 +96,9 @@ bool BallDetector::CascadeMethod(CameraFrame &top, CameraFrame &bottom)
     cv::Mat mask;
     //cv::equalizeHist(bottom.GRAY, hist);
     inRange(bottom.HSV, Scalar(56, 102, 25), Scalar(116, 255, 255), mask);
-    cascade.detectMultiScale(bottom.GRAY, balls, 2, 1, 0, Size(16, 16));
+    //cascade.detectMultiScale(bottom.GRAY, balls, 2, 1, 0, Size(16, 16));
+    //cascade.detectMultiScale((ottom.GRAY, balls, 1.3, 5, 8, Size(16, 16));
+    cascade.detectMultiScale(bottom.GRAY, balls, 2, 5, 8, Size(16, 16));
     //cascade.detectMultiScale(hist, balls, 1.3, 5, 8, Size(16, 16));
     //cascade.detectMultiScale(gray, balls, 1.1, 5, 8, cv::Size(16, 16));
     if (balls.size() == 0)
