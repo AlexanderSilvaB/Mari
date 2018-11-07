@@ -45,11 +45,11 @@
         "Strategy": {
             "Enabled": true,
             "Defensive" : false,
-            "FakeKick" : true
+            "FakeKick" : false
         },
         "Behaviour": {
             "Enabled": true,
-            "Number" : 1,
+            "Number" : 2,
             "TeamNumber" : 47,
             "Names" : ["Dino", "Luci", "Tiny Hand", "Lilith", "Morgana", "Unknown"]
         }

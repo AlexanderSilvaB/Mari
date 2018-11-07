@@ -3,8 +3,11 @@ ctrl_interface_group=0
 ap_scan=1
 
 network={
-  ssid="Rinoboto com Internet"
+  ssid="SPLHL-2018"
   scan_ssid=1
+  proto=WPA
   key_mgmt=WPA-PSK
-  psk="naonaonao"
+  pairwise=TKIP
+  group=TKIP
+  psk="LARC2018"
 }
