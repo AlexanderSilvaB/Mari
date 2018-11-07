@@ -554,15 +554,15 @@ void StrategySpell::AddOptions(po::options_description &description)
 {
     description.add_options()
             ("walk.circle", po::value<bool>()->default_value(false), "walks in circle")
-            ("walk.square", po::value<bool>()->default_value(false), "walks in square")
-            ("kick.fake", po::value<bool>()->default_value(true), "Use a fast walk as a kick");
+            ("walk.square", po::value<bool>()->default_value(false), "walks in square");
+            //("kick.fake", po::value<bool>()->default_value(true), "Use a fast walk as a kick");
 }
 
 void StrategySpell::Update(const po::variables_map &config)
 {
     WalkInCircle = config["walk.circle"].as<bool>();
     WalkInSquare = config["walk.square"].as<bool>();
-    FakeKick = config["kick.fake"].as<bool>();
+    //FakeKick = config["kick.fake"].as<bool>();
 }
 
 BehaviourSpell::BehaviourSpell()
