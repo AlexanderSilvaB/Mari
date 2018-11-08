@@ -102,6 +102,14 @@ bool BallDetector::CascadeMethod(CameraFrame &top, CameraFrame &bottom)
     if (balls.size() == 0)
         return false;
 
+    // Gambiarra
+    double raio = balls[0].width / 2.0;
+    cv::Point pt(balls[0].x + raio, balls[0].y + raio);
+    ball.radius = raio;
+    ball.x = pt.x;
+    ball.y = pt.y;    
+    return true;
+
     double melhorRaio;
     double melhorConfidence = -1; // -1 ele continuar mostrando todos candidatos, =0
     cv::Point melhorPt;
