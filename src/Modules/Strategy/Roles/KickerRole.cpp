@@ -64,41 +64,17 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
                 spellBook->motion.KickRight = !kickLeft;
             }
             kick++;
-            if(spellBook->strategy.FakeKick)
+            if(kick > 100)
             {
-                if(kick > 100)
+                kick = 0;
+                if(spellBook->strategy.FakeKick)
                 {
-                    kick = 0;
-                    if(spellBook->strategy.FakeKick)
-                    {
-                        spellBook->motion.Vx = 0;
-                    }
-                    else
-                    {
-                        spellBook->motion.KickLeft = false;
-                        spellBook->motion.KickRight = false;
-                    }
-                }
-            }
-            else
-            {
-                if(!preKick)
-                {
-                    if(kick > 70)
-                    {
-                        kick = 0;
-                        preKick = true;
-                    }
+                    spellBook->motion.Vx = 0;
                 }
                 else
                 {
-                    if(kick > 100)
-                    {
-                        kick = 0;
-                        spellBook->motion.KickLeft = false;
-                        spellBook->motion.KickRight = false;
-                        preKick = false;
-                    }
+                    spellBook->motion.KickLeft = false;
+                    spellBook->motion.KickRight = false;
                 }
             }
         }
@@ -115,7 +91,6 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
                     spellBook->motion.Vth = -spellBook->perception.vision.ball.BallYaw * 0.5f;
                     spellBook->motion.Vx = 0;
                     kick = 0;
-                    preKick = false;
                 }
                 else
                 {
@@ -132,7 +107,6 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
                     {
                         spellBook->motion.Vx = min(spellBook->perception.vision.ball.BallDistance * 0.25f, 0.25f);
                         kick = 0;
-                        preKick = false;
                     }
                     else
                     {
@@ -151,7 +125,6 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
             }
             else
             {
-                preKick = false;
                 kick = 0;
 
                 // Avanço da máquina de estados

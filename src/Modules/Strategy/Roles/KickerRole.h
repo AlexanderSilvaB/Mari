@@ -12,7 +12,6 @@ class KickerRole : public InnerModule
         bool onStart;
         int kick;
         bool kickLeft;
-        bool preKick;
         int wait;
         int searchState;
         bool lookingDown, turningLeft, turningRight, goingForward;
