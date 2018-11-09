@@ -48,9 +48,32 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
     }
     if(spellBook->strategy.GameState == STATE_PLAYING && onStart)
     {
-        if(kick > 60)
+        if(kick > 50)
         {
             searchState = 0;
+            kick++;
+            if(kick < 60)
+            {
+                spellBook->motion.KickLeft = kickLeft;
+                spellBook->motion.KickRight = !kickLeft;
+            }
+            else if(kick < 200)
+            {
+                spellBook->motion.KickLeft = false;
+                spellBook->motion.KickRight = false;
+            }
+            else if(kick < 600)
+            {
+                spellBook->motion.KickLeft = kickLeft;
+                spellBook->motion.KickRight = !kickLeft;
+            }
+            else
+            {
+                spellBook->motion.KickLeft = false;
+                spellBook->motion.KickRight = false;
+                kick = 0;
+            }
+            /*
             spellBook->motion.Vth = 0;
             spellBook->motion.Vx = 0;
             //spellBook->motion.HeadPitch = 0;
@@ -63,7 +86,6 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
                 spellBook->motion.KickLeft = kickLeft;
                 spellBook->motion.KickRight = !kickLeft;
             }
-            kick++;
             if(kick > 100)
             {
                 kick = 0;
@@ -77,6 +99,7 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
                     spellBook->motion.KickRight = false;
                 }
             }
+            */
         }
         else
         {            
