@@ -52,6 +52,7 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
         {
             searchState = 0;
             kick++;
+            spellBook->motion.Vx = 0.05f;
             if(kick < 60)
             {
                 spellBook->motion.KickLeft = kickLeft;
