@@ -53,7 +53,7 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
             searchState = 0;
             spellBook->motion.Vth = 0;
             spellBook->motion.Vx = 0;
-            spellBook->motion.HeadPitch = 0;
+            //spellBook->motion.HeadPitch = 0;
             if(spellBook->strategy.FakeKick)
             {
                 spellBook->motion.Vx = 0.3f;
@@ -64,17 +64,41 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
                 spellBook->motion.KickRight = !kickLeft;
             }
             kick++;
-            if(kick > 100)
+            if(spellBook->strategy.FakeKick)
             {
-                kick = 0;
-                if(spellBook->strategy.FakeKick)
+                if(kick > 100)
                 {
-                    spellBook->motion.Vx = 0;
+                    kick = 0;
+                    if(spellBook->strategy.FakeKick)
+                    {
+                        spellBook->motion.Vx = 0;
+                    }
+                    else
+                    {
+                        spellBook->motion.KickLeft = false;
+                        spellBook->motion.KickRight = false;
+                    }
+                }
+            }
+            else
+            {
+                if(!preKick)
+                {
+                    if(kick > 70)
+                    {
+                        kick = 0;
+                        preKick = true;
+                    }
                 }
                 else
                 {
-                    spellBook->motion.KickLeft = false;
-                    spellBook->motion.KickRight = false;
+                    if(kick > 100)
+                    {
+                        kick = 0;
+                        spellBook->motion.KickLeft = false;
+                        spellBook->motion.KickRight = false;
+                        preKick = false;
+                    }
                 }
             }
         }
@@ -91,6 +115,7 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
                     spellBook->motion.Vth = -spellBook->perception.vision.ball.BallYaw * 0.5f;
                     spellBook->motion.Vx = 0;
                     kick = 0;
+                    preKick = false;
                 }
                 else
                 {
@@ -107,6 +132,7 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
                     {
                         spellBook->motion.Vx = min(spellBook->perception.vision.ball.BallDistance * 0.25f, 0.25f);
                         kick = 0;
+                        preKick = false;
                     }
                     else
                     {
@@ -125,6 +151,7 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
             }
             else
             {
+                preKick = false;
                 kick = 0;
 
                 // Avanço da máquina de estados
@@ -139,94 +166,86 @@ void KickerRole::Tick(float ellapsedTime, const SensorValues &sensor)
                 switch(searchState)
                 {
                     case 0: // Só espera
-                    case 1: // Só espera
-                    case 2: // Só espera
+                        lookingDown = false;
+                        turningLeft = false;
+                        turningRight = false;
+                        goingForward = false;
+                        break;
+                    case 1: // Procura no pé
+                        lookingDown = true;
+                        turningLeft = false;
+                        turningRight = false;
+                        goingForward = false;
+                        break;
+                    case 2: // Procura na frente de novo
+                        lookingDown = false;
+                        turningLeft = false;
+                        turningRight = false;
+                        goingForward = false;
+                        break;
+                    case 3: // Anda pouco
                         lookingDown = false;
                         turningLeft = false;
                         turningRight = false;
                         goingForward = true;
                         break;
-                    case 3: // Só espera
-                        lookingDown = false;
-                        turningLeft = false;
-                        turningRight = false;
-                        goingForward = false;
-                        break;
-                    case 4: // Procura no pé
-                        lookingDown = true;
-                        turningLeft = false;
-                        turningRight = false;
-                        goingForward = false;
-                        break;
-                    case 5: // Procura na frente de novo
-                        lookingDown = false;
-                        turningLeft = false;
-                        turningRight = false;
-                        goingForward = false;
-                        break;
-                    case 6: // Anda pouco
-                        lookingDown = false;
-                        turningLeft = false;
-                        turningRight = false;
-                        goingForward = true;
-                        break;
-                    case 7: // Procura no lado esquerdo na frente
+                    case 4: // Procura no lado esquerdo na frente
                         lookingDown = false;
                         turningLeft = true;
                         turningRight = false;
                         goingForward = false;
                         break;
-                    case 8: // Procura no lado esquerdo no pé
+                    case 5: // Procura no lado esquerdo no pé
                         lookingDown = true;
                         turningLeft = false;
                         turningRight = false;
                         goingForward = false;
                         break;
-                    case 9: // Procura no lado esquerdo na frente de novo
+                    case 6: // Procura no lado esquerdo na frente de novo
                         lookingDown = false;
                         turningLeft = false;
                         turningRight = false;
                         goingForward = false;
                         break;
-                    case 10: // Volta a olhar pra frente
+                    case 7: // Volta a olhar pra frente
                         lookingDown = false;
                         turningLeft = false;
                         turningRight = true;
                         goingForward = false;
                         break;
-                    case 11: // Procura do lado direito
+                    case 8: // Procura do lado direito
                         lookingDown = false;
                         turningLeft = false;
                         turningRight = true;
                         goingForward = false;
                         break;
-                    case 10: // Procura do lado direito no pé
+                    case 9: // Procura do lado direito no pé
                         lookingDown = true;
                         turningLeft = false;
                         turningRight = false;
                         goingForward = false;
                         break;
-                    case 11: // Procura do lado direito na frente de novo
+                    case 10: // Procura do lado direito na frente de novo
                         lookingDown = false;
                         turningLeft = false;
                         turningRight = false;
                         goingForward = false;
                         break;
-                    case 12: // Volta a olhar pra frente
+                    case 11: // Volta a olhar pra frente
                         lookingDown = false;
                         turningLeft = true;
                         turningRight = false;
                         goingForward = false;
                         break;
-                    case 13: // Procura no pé
+                    case 12: // Procura no pé
                         lookingDown = true;
                         turningLeft = false;
                         turningRight = false;
                         goingForward = false;
                         break;
-                    case 14: // Anda muito pra frente
+                    case 13: // Anda muito pra frente
+                    case 14:
                     case 15:
-                    case 16:
                         lookingDown = false;
                         turningLeft = false;
                         turningRight = false;
