@@ -54,7 +54,7 @@ void BehaviourModule::Tick(float ellapsedTime)
         timeSinceAct = 0;
         spellBook->behaviour.LeftEye = RED;
         spellBook->behaviour.RightEye = RED;
-        string text = "Hi, I am "+spellBook->behaviour.Name+"! It is time to play!";
+        string text = "Hi, I am "+spellBook->behaviour.Name+"!";
         SAY(text);
     }
     else if(spellBook->behaviour.Penalized && timeSinceAct > 10.0f)

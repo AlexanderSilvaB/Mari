@@ -58,7 +58,7 @@ void GoalieRole::Tick(float ellapsedTime, const SensorValues &sensor)
 
                 if(abs(spellBook->perception.vision.ball.BallYaw) > Deg2Rad(5.0f))
                 {
-                    spellBook->motion.Vy = 0.1f * SIG(spellBook->perception.vision.ball.BallYaw);
+                    spellBook->motion.Vy = 0.1f * -SIG(spellBook->perception.vision.ball.BallYaw);
                     spellBook->motion.DefenderCentre = false;
                     CancelKick();
                 }
@@ -94,7 +94,7 @@ void GoalieRole::Tick(float ellapsedTime, const SensorValues &sensor)
                     spellBook->motion.Vy = 0.0f;
                 spellBook->motion.DefenderCentre = false;
 
-                spellBook->motion.HeadPitch = Deg2Rad(12.0f) + Deg2Rad(12.0f) * sin( (spellBook->perception.vision.ball.BallLostCount * 0.01f) * PI );
+                spellBook->motion.HeadPitch = Deg2Rad(12.0f) + Deg2Rad(12.0f) * sin( (spellBook->perception.vision.ball.BallLostCount * 0.05f) * PI );
             }
         }
     }
