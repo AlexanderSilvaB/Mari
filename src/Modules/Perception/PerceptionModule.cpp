@@ -30,7 +30,7 @@ void PerceptionModule::OnStop()
 void PerceptionModule::Load()
 {
     LOAD(perception);
-    //LOAD(network);
+    LOAD(network);
 }
 
 void PerceptionModule::Save()
