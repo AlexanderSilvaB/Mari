@@ -1,17 +1,14 @@
 #ifndef _ROLES_GOALIE_H_
 #define _ROLES_GOALIE_H_
 
-#include "Core/Module.h"
-#include "Core/SpellBook.h"
+#include "Role.h"
 
 using namespace std;
 
-class GoalieRole : public InnerModule
+class GoalieRole : public Role
 {
     private:
         bool onGoal;
-        int kick;
-        bool kickLeft;
     public:
         GoalieRole(SpellBook *spellBook);
         void Tick(float ellapsedTime, const SensorValues &sensor);

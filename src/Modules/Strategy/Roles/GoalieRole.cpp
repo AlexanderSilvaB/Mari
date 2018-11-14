@@ -4,11 +4,9 @@
 #include "Core/Utils/CartesianCoord.h"
 
 GoalieRole::GoalieRole(SpellBook *spellBook)
-    : InnerModule(spellBook)
+    : Role(spellBook)
 {
     onGoal = false;
-    kick = 0;
-    kickLeft = false;
 }
 
 GoalieRole::~GoalieRole()
@@ -18,9 +16,10 @@ GoalieRole::~GoalieRole()
 
 void GoalieRole::Tick(float ellapsedTime, const SensorValues &sensor)
 {
-    spellBook->strategy.HeadYawRange = Deg2Rad(20.0f);
-    spellBook->strategy.HeadPitchRange = Deg2Rad(20.0f);
-    spellBook->strategy.HeadSearchSpeed = 0.1f;
+    spellBook->strategy.MoveHead = false;
+    spellBook->motion.HeadYaw = 0;
+    spellBook->motion.HeadSpeedYaw = 0.2f;
+    spellBook->motion.HeadSpeedPitch = 0.2f;
     
     if((spellBook->strategy.GameState == STATE_READY || spellBook->strategy.GameState == STATE_PLAYING) &&
         !onGoal)
@@ -47,49 +46,21 @@ void GoalieRole::Tick(float ellapsedTime, const SensorValues &sensor)
     }
     if(spellBook->strategy.GameState == STATE_PLAYING && onGoal)
     {
-        if(kick > 60)
-        {
-            spellBook->motion.Vth = 0;
-            spellBook->motion.Vx = 0;
-            if(spellBook->strategy.FakeKick)
-            {
-                spellBook->motion.Vx = 0.3f;
-            }
-            else
-            {
-                spellBook->motion.KickLeft = kickLeft;
-                spellBook->motion.KickRight = !kickLeft;
-            }
-            kick++;
-            if(kick > 100)
-            {
-                if(spellBook->strategy.FakeKick)
-                {
-                    spellBook->motion.Vx = -3.0f;
-                    if(kick > 140)
-                    {
-                        kick = 0;
-                        spellBook->motion.Vx = 0;
-                    }
-                }
-                else
-                {
-                    spellBook->motion.KickLeft = false;
-                    spellBook->motion.KickRight = false;
-                    kick = 0;
-                }
-            }
-        }
-        else
+        if(!Kicking())
         {
             spellBook->motion.Vx = 0;
-            if(spellBook->perception.vision.ball.BallDetected)
+            if(spellBook->perception.vision.ball.BallLostCount < 5)
             {
+                if(spellBook->perception.vision.ball.BallDistance < 0.45f)
+                    spellBook->motion.HeadPitch = Deg2Rad(24.0f);
+                else if(spellBook->perception.vision.ball.BallDistance > 0.5f)
+                    spellBook->motion.HeadPitch = Deg2Rad(0.0f);
+
                 if(abs(spellBook->perception.vision.ball.BallYaw) > Deg2Rad(5.0f))
                 {
                     spellBook->motion.Vy = 0.1f * SIG(spellBook->perception.vision.ball.BallYaw);
                     spellBook->motion.DefenderCentre = false;
-                    kick = 0;
+                    CancelKick();
                 }
                 else
                 {
@@ -99,30 +70,31 @@ void GoalieRole::Tick(float ellapsedTime, const SensorValues &sensor)
                         if(spellBook->perception.vision.ball.BallDistance < 0.4f)
                         {
                             spellBook->motion.DefenderCentre = false;
-                            kick++;
-                            kickLeft = spellBook->perception.vision.ball.BallYaw < 0;
+                            PrepareKick(spellBook->perception.vision.ball.BallYaw);
                         }
                         else
                         {
-                            kick = 0;
+                            CancelKick();
                             spellBook->motion.DefenderCentre = true;
                         }
                     }
                     else
                     {
                         spellBook->motion.DefenderCentre = false;
-                        kick = 0;
+                        CancelKick();
                     }
                 }
             }
             else
             {
-                kick = 0;
+                CancelKick();
                 if(spellBook->perception.vision.localization.Enabled)
                     spellBook->strategy.WalkAside = false;
                 else
                     spellBook->motion.Vy = 0.0f;
                 spellBook->motion.DefenderCentre = false;
+
+                spellBook->motion.HeadPitch = Deg2Rad(12.0f) + Deg2Rad(12.0f) * sin( (spellBook->perception.vision.ball.BallLostCount * 0.01f) * PI );
             }
         }
     }

@@ -8,6 +8,11 @@ for i in "$@" ; do
     fi
 done
 
+if [ ! -d ".qi" ]; then
+    echo "Initializing qibuild"
+    qibuild init
+fi
+
 if [ ! -d "src/build-$1" ]; then
     configure=true
 fi

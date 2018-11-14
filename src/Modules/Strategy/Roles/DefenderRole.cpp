@@ -4,7 +4,7 @@
 #include "Core/Utils/RobotDefs.h"
 #include "Core/Utils/CartesianCoord.h"
 
-DefenderRole::DefenderRole(SpellBook *spellBook) : InnerModule(spellBook)
+DefenderRole::DefenderRole(SpellBook *spellBook) : Role(spellBook)
 {
 
     onBall = false;
@@ -14,8 +14,6 @@ DefenderRole::DefenderRole(SpellBook *spellBook) : InnerModule(spellBook)
     conta = 0;
     conta2 = 0;
     conta3 = 0;
-    kick = 0;
-    kickLeft = false;
     Deg = Deg2Rad(6.05);
     Vel = 0.1;
     reset = false;
@@ -70,36 +68,7 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
 
     if (spellBook->strategy.GameState == STATE_PLAYING)
     {
-        if(kick > 60)
-        {
-            spellBook->motion.Vth = 0;
-            spellBook->motion.Vx = 0;
-            spellBook->motion.HeadPitch = 0;
-            if(spellBook->strategy.FakeKick)
-            {
-                spellBook->motion.Vx = 0.3f;
-            }
-            else
-            {
-                spellBook->motion.KickLeft = kickLeft;
-                spellBook->motion.KickRight = !kickLeft;
-            }
-            kick++;
-            if(kick > 100)
-            {
-                kick = 0;
-                if(spellBook->strategy.FakeKick)
-                {
-                    spellBook->motion.Vx = 0;
-                }
-                else
-                {
-                    spellBook->motion.KickLeft = false;
-                    spellBook->motion.KickRight = false;
-                }
-            }
-        }
-        else
+        if(!Kicking())
         {
             if(spellBook->perception.vision.ball.BallLostCount < 8)
             {
@@ -108,7 +77,7 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
                 {
                     spellBook->motion.Vth = -spellBook->perception.vision.ball.BallYaw * 0.5f;
                     spellBook->motion.Vx = 0;
-                    kick = 0;
+                    CancelKick();
                 }
                 else
                 {
@@ -124,19 +93,18 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
                     if(spellBook->perception.vision.ball.BallDistance > 0.25f)
                     {
                         spellBook->motion.Vx = min(spellBook->perception.vision.ball.BallDistance * 0.25f, 0.25f);
-                        kick = 0;
+                        CancelKick();
                     }
                     else
                     {
                         spellBook->motion.Vx = 0;
                         if(spellBook->motion.HeadPitch > 0)
                         {
-                            kick++;
-                            kickLeft = spellBook->perception.vision.ball.BallYaw < 0;
+                            PrepareKick(spellBook->perception.vision.ball.BallYaw);
                         }
                         else
                         {
-                            kick = 0;
+                            CancelKick();
                         }
                     }
                 }

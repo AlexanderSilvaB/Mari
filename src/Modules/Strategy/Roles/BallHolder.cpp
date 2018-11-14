@@ -4,7 +4,7 @@
 #include "Core/Utils/RobotDefs.h"
 #include "Core/Utils/CartesianCoord.h"
 
-BallHolder::BallHolder(SpellBook *spellBook) : InnerModule(spellBook)
+BallHolder::BallHolder(SpellBook *spellBook) : Role(spellBook)
 {
 
     onBall = false;

@@ -4,7 +4,7 @@
 #include "Core/Utils/RobotDefs.h"
 #include "Core/Utils/CartesianCoord.h"
 
-RinoPlayer::RinoPlayer(SpellBook *spellBook) : InnerModule(spellBook)
+RinoPlayer::RinoPlayer(SpellBook *spellBook) : Role(spellBook)
 {
     onBall = false;
     onPosition = false;

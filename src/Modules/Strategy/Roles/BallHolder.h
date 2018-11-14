@@ -1,12 +1,11 @@
 #ifndef BALL_HOLDER_H
 #define BALL_HOLDER_H
 
-#include "Core/Module.h"
-#include "Core/SpellBook.h"
+#include "Role.h"
 
 using namespace std;
 
-class BallHolder: public InnerModule {
+class BallHolder: public Role {
 
 private:
 

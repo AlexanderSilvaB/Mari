@@ -1,12 +1,11 @@
 #ifndef RINO_PLAYER_H
 #define RINO_PLAYER_H
 
-#include "Core/Module.h"
-#include "Core/SpellBook.h"
+#include "Role.h"
 
 using namespace std;
 
-class RinoPlayer: public InnerModule {
+class RinoPlayer: public Role {
 
 private:
 

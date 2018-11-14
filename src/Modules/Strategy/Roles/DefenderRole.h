@@ -1,12 +1,11 @@
 #ifndef DEFENDER_ROLE_H
 #define DEFENDER_ROLE_H
 
-#include "Core/Module.h"
-#include "Core/SpellBook.h"
+#include "Role.h"
 
 using namespace std;
 
-class DefenderRole: public InnerModule {
+class DefenderRole: public Role {
 
 private:
 
@@ -14,9 +13,8 @@ private:
     bool onPosition;
     int contPerdido;
     float scanPitch;
-    int conta, conta2, conta3, kick;
+    int conta, conta2, conta3;
     float Deg, Vel;
-    bool kickLeft;
     bool reset;
 public:
 

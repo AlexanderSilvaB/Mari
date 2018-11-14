@@ -1,10 +1,19 @@
 cmake_minimum_required(VERSION 2.8)
 project(CodeRelease)
 
+#if(NOT CMAKE_BUILD_TYPE)
+set(CMAKE_BUILD_TYPE Release)
+#endif()
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
 add_definitions( " -DVERSION_MAJOR=1 ")
 add_definitions( " -DVERSION_MINOR=0 ")
 
 add_definitions(-Wall -fpermissive)
+
+message(INFO " Mode: ${CMAKE_BUILD_TYPE}")
 
 find_package(qibuild)
 
