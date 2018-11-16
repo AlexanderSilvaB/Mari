@@ -1,10 +1,14 @@
 #!/bin/bash
 
+toolchain="robot"
+
 configure=false
 
 for i in "$@" ; do
-    if [[ $i == "-configure" ]] ; then
+    if [[ $i == "--configure" ]] ; then
         configure=true
+    else
+        toolchain=$i
     fi
 done
 
@@ -13,13 +17,15 @@ if [ ! -d ".qi" ]; then
     qibuild init
 fi
 
-if [ ! -d "src/build-$1" ]; then
+if [ ! -d "src/build-$toolchain" ]; then
     configure=true
 fi
 
+
+echo "Build with $toolchain"
 cd src
 if [ $configure == true ]; then
-    qibuild configure -c $1
+    qibuild configure -c $toolchain
 fi
-qibuild make -c $1
+qibuild make -c $toolchain
 cd ..

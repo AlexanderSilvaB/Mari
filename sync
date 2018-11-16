@@ -1,13 +1,13 @@
 #!/bin/bash
 
-if [ "$#" -le 1 ]; then
+if [ "$#" -lt 1 ]; then
     echo "Invalid number of arguments"
-    echo "Usage: ./sync.sh robot-hostname toolchain-name"
+    echo "Usage: ./sync robot-hostname"
     exit
 fi
 
 robot=$1
-toolchain=$2
+toolchain="robot"
 sudo=false
 ssh=false
 root=false
@@ -23,6 +23,7 @@ user="nao"
 
 nextIsPwd=false
 nextIsUser=false
+ct=0
 for i in "$@" ; do 
     if [ $nextIsPwd == true ] ; then
 	pwd=$i
@@ -30,31 +31,31 @@ for i in "$@" ; do
     elif [ $nextIsUser == true ] ; then
 	user=$i
 	nextIsUser=false
-    elif [[ $i == "-pwd" ]] ; then
+    elif [[ $i == "--pwd" ]] ; then
         nextIsPwd=true
-    elif [[ $i == "-user" ]] ; then
+    elif [[ $i == "--user" ]] ; then
         nextIsUser=true
-    elif [[ $i == "-sudo" ]] ; then
+    elif [[ $i == "--sudo" ]] ; then
         sudo=true
-    elif [[ $i == "-clear" ]] ; then
+    elif [[ $i == "--clear" ]] ; then
         clear=true
-    elif [[ $i == "-ssh" ]] ; then
+    elif [[ $i == "--ssh" ]] ; then
         ssh=true
-    elif [[ $i == "-root" ]] ; then
+    elif [[ $i == "--root" ]] ; then
         root=true
-    elif [[ $i == "-services" ]] ; then
+    elif [[ $i == "--services" ]] ; then
         services=true
-    elif [[ $i == "-not-home" ]] ; then
+    elif [[ $i == "--not-home" ]] ; then
         home=false
-    elif [[ $i == "-restart" ]] ; then
+    elif [[ $i == "--restart" ]] ; then
         restart=true
-    elif [[ $i == "-build" ]] ; then
+    elif [[ $i == "--build" ]] ; then
         build=true
-    elif [[ $i == "-uninstall" ]] ; then
+    elif [[ $i == "--uninstall" ]] ; then
         uninstall=true
-    elif [[ $i == "-configure" ]] ; then
+    elif [[ $i == "--configure" ]] ; then
         configure=true
-    elif [[ $i == "-initial" ]] ; then
+    elif [[ $i == "--initial" ]] ; then
         configure=true
         build=true
         sudo=true
@@ -63,7 +64,7 @@ for i in "$@" ; do
         services=true
         home=true
         restart=true
-    elif [[ $i == "-all" ]] ; then
+    elif [[ $i == "--all" ]] ; then
         build=true
         sudo=true
         ssh=true
@@ -71,8 +72,13 @@ for i in "$@" ; do
         services=true
         home=true
         restart=true
+    elif [[ $ct -gt 0 ]]; then
+        toolchain=$i
     fi
+    ct=$((ct+1))
 done
+
+echo "Syncing build $toolchain to $robot"
 
 SSH_CMD="sshpass -p $pwd ssh -o StrictHostKeyChecking=no -o ControlMaster=auto -o ControlPath=/tmp/control_%l_%h_%p_%r"
 

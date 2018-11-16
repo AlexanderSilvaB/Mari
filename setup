@@ -3,7 +3,8 @@
 echo "Rinobot CodeRelease Setup"
 echo ""
 echo "Installing required packages"
-sudo apt-get install libnss-mdns avahi-discover avahi-utils sshpass unzip
+sudo apt-get install libnss-mdns avahi-discover avahi-utils sshpass unzip python2.7 python-pip
+sudo pip install qibuild
 
 toolchain="robot"
 if [ "$#" -gt 0 ]; then
@@ -34,6 +35,9 @@ else
         qitoolchain create $toolchain sdk/$filename/toolchain.xml
         echo "Adding config"
         qibuild add-config $toolchain -t $toolchain
-        echo "Installed"
+        echo "Installed as $toolchain"
+        echo "You are now able to build and sync to the robot as:"
+        echo "./build $toolchain"
+        echo "./sync robot-hostname $toolchain"
     fi
 fi
