@@ -108,7 +108,6 @@ if [ $ssh == true ]; then
         ssh-keygen -t rsa -f ~/.ssh/id_rsa -q -P ""
     fi
     ssh-keyscan $robot >> ~/.ssh/known_hosts
-    #cat ~/.ssh/id_rsa.pub | $SSH_CMD -l nao $robot "mkdir -p .ssh; sh -c 'cat >> .ssh/authorized_keys'; chmod 700 ~/.ssh; chmod 600 ~/.ssh/authorized_keys ; chmod g-w,o-w /home/nao"
     #ssh-copy-id $user@$robot
 fi
 
@@ -134,8 +133,6 @@ fi
 
 if [ $services == true ]; then
     echo "Turning off services we do not use"
-    # Add back in then delete because delete throws error if not installed
-    #  * Networking connection manager replaced with runswiftwireless above
     $SSH_CMD $user@$robot "sudo rc-update add connman boot"
     $SSH_CMD $user@$robot "sudo rc-update del connman boot"
     $SSH_CMD $user@$robot "sudo rc-update add qimessaging-json default"
