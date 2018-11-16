@@ -187,7 +187,7 @@ void MainWindow::on_btnInstall_clicked()
     saveModules();
     QString program = "bash";
     QStringList arguments;
-    arguments << "-c" << "cd "+ codeReleasePath + "; ./sync.sh " + selectedRobot + " " + selectedToolchain + (ui->chkAll->isChecked() ? " -all" : "");
+    arguments << "-c" << "cd "+ codeReleasePath + "; ./sync " + selectedRobot + " " + selectedToolchain + (ui->chkAll->isChecked() ? " --all" : "");
     executeProcess(program, arguments);
 }
 
@@ -203,7 +203,7 @@ void MainWindow::on_btnUninstall_clicked()
     {
         QString program = "bash";
         QStringList arguments;
-        arguments << "-c" << "cd "+ codeReleasePath + "; ./sync.sh " + selectedRobot + " " + selectedToolchain + " -uninstall";
+        arguments << "-c" << "cd "+ codeReleasePath + "; ./sync " + selectedRobot + " " + selectedToolchain + " --uninstall";
         executeProcess(program, arguments);
     }
 }
@@ -304,7 +304,7 @@ void MainWindow::load()
     {
         QMessageBox msgBox;
         msgBox.setText("Install");
-        msgBox.setInformativeText("You need some tools installed to use this software. You can install it running the 'requirements.sh' bundled with this software.");
+        msgBox.setInformativeText("You need some tools installed to use this software. Make sure to run 'setup' before using this software.");
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.setDefaultButton(QMessageBox::Ok);
         int ret = msgBox.exec();
@@ -384,7 +384,7 @@ void MainWindow::on_btnCompile_clicked()
 {
     QString program = "bash";
     QStringList arguments;
-    arguments << "-c" << "cd "+ codeReleasePath + "; ./build.sh " + selectedToolchain;
+    arguments << "-c" << "cd "+ codeReleasePath + "; ./build " + selectedToolchain;
     executeProcess(program, arguments);
 }
 
@@ -549,7 +549,7 @@ void MainWindow::on_btnConfigure_clicked()
 {
     QString program = "bash";
     QStringList arguments;
-    arguments << "-c" << "cd "+ codeReleasePath + "; ./build.sh " + selectedToolchain + " -configure";
+    arguments << "-c" << "cd "+ codeReleasePath + "; ./build " + selectedToolchain + " --configure";
     executeProcess(program, arguments);
 }
 
@@ -565,7 +565,7 @@ void MainWindow::on_btnClear_clicked()
     {
         QString program = "bash";
         QStringList arguments;
-        arguments << "-c" << "cd "+ codeReleasePath + "; ./sync.sh " + selectedRobot + " " + selectedToolchain + " -clear";
+        arguments << "-c" << "cd "+ codeReleasePath + "; ./sync " + selectedRobot + " " + selectedToolchain + " --clear";
         executeProcess(program, arguments);
     }
 }
