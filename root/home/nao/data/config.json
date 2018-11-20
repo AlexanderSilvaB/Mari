@@ -49,7 +49,7 @@
         },
         "Behaviour": {
             "Enabled": true,
-            "Number" : 5,
+            "Number" : 2,
             "TeamNumber" : 47,
             "Names" : ["Dino", "Luci", "Tiny Hand", "Lilith", "Morgana", "Unknown"]
         }

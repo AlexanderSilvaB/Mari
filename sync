@@ -95,9 +95,9 @@ fi
 
 if [ $build == true ]; then
     if [ $configure == true ]; then
-        ./build.sh $2 -configure
+        ./build $2 -configure
     else
-        ./build.sh $2
+        ./build $2
     fi
 fi
 
