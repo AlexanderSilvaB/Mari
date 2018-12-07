@@ -103,7 +103,7 @@ fi
 
 if [ $ssh == true ]; then
     echo "Sync keys"
-    mkdir -p keys
+    rm ~/.ssh/known_hosts
     if [ ! -f ~/.ssh/id_rsa ]; then
         ssh-keygen -t rsa -f ~/.ssh/id_rsa -q -P ""
     fi

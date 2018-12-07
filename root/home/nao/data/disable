@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cp /home/nao/naoqi/preferences/autoload_aldebaran.ini /home/nao/naoqi/preferences/autoload.ini
+sudo cp /etc/naoqi/autoload_aldebaran.ini /etc/naoqi/autoload.ini
