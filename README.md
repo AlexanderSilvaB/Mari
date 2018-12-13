@@ -1,22 +1,6 @@
 # Mari
 This is just a temporary code release
 
-## Structure
-Our repository is structured in a way that 3 main folders are used, as described bellow:
-* **root**: This will be copied to the robot root directory
-
-* **src**: This is complete source code
-
-* **supervisor**: Here lives our Supervisor software
-
-There is also 3 main script that are used:
-* **setup**: This script is used to configure the user machine
-
-* **sync**: This script is responsible to configure the robot and copy the binaries and data needed to run our software.
-
-* **build**: This is the script used to compile the source code. Is also possible to not run this script directly and instead use the argument *--build* in the *sync* script.
-
-
 ## Get Started
 In order to make your computer ready to compile our code, first run the script *setup*.
 ```shell
@@ -48,3 +32,18 @@ By default this script uses a toolchain called **rinobot-toolchain**, if you cha
 ```shell
 ./sync robot-hostname toolchain-name --build
 ```
+
+## Structure
+Our repository is structured in a way that 3 main folders are used, as described bellow:
+* **root**: This will be copied to the robot root directory
+
+* **src**: This is complete source code
+
+* **supervisor**: Here lives our Supervisor software
+
+There is also 3 main script that are used:
+* **setup**: This script is used to configure the user machine
+
+* **sync**: This script is responsible to configure the robot and copy the binaries and data needed to run our software.
+
+* **build**: This is the script used to compile the source code. Is also possible to not run this script directly and instead use the argument *--build* in the *sync* script.
