@@ -10,7 +10,7 @@ echo "Installing required packages"
 sudo apt-get install cmake libnss-mdns avahi-discover avahi-utils sshpass unzip python2.7 python-pip
 sudo pip install qibuild
 
-toolchain="robot"
+toolchain="rinobot-robot"
 if [ "$#" -gt 0 ]; then
     toolchain=$1
 fi

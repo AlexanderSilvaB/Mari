@@ -1,6 +1,6 @@
 #!/bin/bash
 
-toolchain="robot"
+toolchain="rinobot-robot"
 
 configure=false
 

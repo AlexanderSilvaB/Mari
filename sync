@@ -7,7 +7,7 @@ if [ "$#" -lt 1 ]; then
 fi
 
 robot=$1
-toolchain="robot"
+toolchain="rinobot-robot"
 sudo=false
 ssh=false
 root=false
