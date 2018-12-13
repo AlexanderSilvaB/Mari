@@ -15,6 +15,12 @@ if [ "$#" -gt 0 ]; then
     toolchain=$1
 fi
 
+if [ ! -d ".qi" ]; then
+    echo ""
+    echo "Initializing qibuild"
+    qibuild init
+fi
+
 echo ""
 echo "Installing SDK's"
 if [ ! -d "sdk" ]; then
