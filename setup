@@ -2,8 +2,12 @@
 
 echo "Rinobot CodeRelease Setup"
 echo ""
+if [[ $EUID -eq 0 ]]; then
+   echo "This script must not be run as root" 1>&2
+   exit 1
+fi
 echo "Installing required packages"
-sudo apt-get install libnss-mdns avahi-discover avahi-utils sshpass unzip python2.7 python-pip
+sudo apt-get install cmake libnss-mdns avahi-discover avahi-utils sshpass unzip python2.7 python-pip
 sudo pip install qibuild
 
 toolchain="robot"
