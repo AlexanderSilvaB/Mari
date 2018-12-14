@@ -24,17 +24,17 @@ for i in "$@" ; do
     elif [ $nextIsMask == true ] ; then
         mask=$i
 	    nextIsMask=false
-    elif [[ $i == "-no-network" ]] ; then
+    elif [[ $i == "--no-network" ]] ; then
         network=false
-    elif [[ $i == "-set-ip" ]] ; then
+    elif [[ $i == "--set-ip" ]] ; then
         ip=true
-    elif [[ $i == "-robot" ]] ; then
+    elif [[ $i == "--robot" ]] ; then
         nextIsNumber=true
-    elif [[ $i == "-team" ]] ; then
+    elif [[ $i == "--team" ]] ; then
         nextIsTeam=true
-    elif [[ $i == "-mask" ]] ; then
+    elif [[ $i == "--mask" ]] ; then
         nextIsMask=true
-    elif [[ $i == "-server" ]] ; then
+    elif [[ $i == "--server" ]] ; then
         nextIsServer=true
     fi
 done
@@ -48,7 +48,7 @@ if [ $network == true ]; then
     sleep 2
     killall -q wpa_supplicant
     ifconfig wlan0 up
-    wpa_supplicant -iwlan0 -Dnl80211 -c/home/nao/data/network/default -B
+    wpa_supplicant -iwlan0 -Dnl80211 -c/home/nao/data/profiles/default -B
 fi
 
 if [ $ip == true ]; then
