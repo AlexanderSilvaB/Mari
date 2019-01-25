@@ -7,7 +7,7 @@ https://github.com/butcherg/DatagramSocket
 
 ## Usage
 ```C++
-#include "DatagramSocket.h"
+#include "TcpUdpSocket.h"
 #include "Thread.h"  //another project
 #include <iostream>
 #include <string>
