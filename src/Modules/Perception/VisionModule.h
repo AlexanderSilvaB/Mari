@@ -9,6 +9,7 @@
 #include "Core/Utils/CombinedCamera.hpp"
 #include "Ball/BallDetector.h"
 #include "Localization/Localizer.h"
+#include "Feature/FeatureExtractor.h"
 
 #include "Core/Utils/FrameWriter.h"
 #include "Core/Utils/ImageMessage.h"
