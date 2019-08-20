@@ -22,6 +22,9 @@
                         ]
                     }
                 },
+                "FeatureExtractor": {
+                    "Enabled": true
+                },
                 "Localization":
                 {
                     "Enabled": false,
@@ -49,9 +52,9 @@
         },
         "Behaviour": {
             "Enabled": true,
-            "Number" : 3,
+            "Number" : 7,
             "TeamNumber" : 47,
-            "Names" : ["Dino", "Luci", "Tiny Hand", "Lilith", "Morgana", "Unknown"]
+            "Names" : ["Dino", "Luci", "Tiny Hand", "Lilith", "Morgana", "Unknown", "Localizer"]
         }
     }
 }
