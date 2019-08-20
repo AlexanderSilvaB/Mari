@@ -6,7 +6,7 @@
 StrategyModule::StrategyModule(SpellBook *spellBook)
     : Module(spellBook, "Strategy", 30)
 {
-    gameController = new GameController(this->spellBook);   
+    gameController = new GameController(this->spellBook);
     safetyMonitor = new SafetyMonitor(this->spellBook);
 
     potentialFields = new PotentialFields(this->spellBook);
@@ -16,6 +16,7 @@ StrategyModule::StrategyModule(SpellBook *spellBook)
 
     ballTracker = new BallTracker(this->spellBook);
     robotTracker = new RobotTracker(this->spellBook);
+    featureTracker = new FeatureTracker(this->spellBook);
 
     squareStep = 1;
     squareX = squareY = 0;
@@ -28,6 +29,7 @@ StrategyModule::StrategyModule(SpellBook *spellBook)
     kicker = new KickerRole(this->spellBook);
     rPlayer = new RinoPlayer(this->spellBook);
     ballHolder = new BallHolder(this->spellBook);
+    loca = new LocalizerRole(this->spellBook);
 }
 
 StrategyModule::~StrategyModule()
@@ -42,12 +44,14 @@ StrategyModule::~StrategyModule()
 
     delete ballTracker;
     delete robotTracker;
+    delete featureTracker;
 
     delete goalie;
     delete defender;
     delete kicker;
     delete rPlayer;
     delete ballHolder;
+    delete loca;
 }
 
 void StrategyModule::OnStart()
@@ -62,12 +66,13 @@ void StrategyModule::OnStart()
 
     ballTracker->OnStart();
     robotTracker->OnStart();
-
+    featureTracker->OnStart();
     goalie->OnStart();
     defender->OnStart();
     kicker->OnStart();
     rPlayer->OnStart();
     ballHolder->OnStart();
+    loca->OnStart();
 }
 
 void StrategyModule::OnStop()
@@ -82,12 +87,14 @@ void StrategyModule::OnStop()
 
     ballTracker->OnStop();
     robotTracker->OnStop();
+    featureTracker->OnStop();
 
     goalie->OnStop();
     defender->OnStop();
     kicker->OnStop();
     rPlayer->OnStop();
     ballHolder->OnStop();
+    loca->OnStop();
 }
 
 void StrategyModule::Load()
@@ -104,9 +111,8 @@ void StrategyModule::Save()
     SAVE(motion)
     SAVE(perception)
     SAVE(strategy)
-    SAVE(behaviour) 
+    SAVE(behaviour)
 }
-
 
 void StrategyModule::Tick(float ellapsedTime)
 {
@@ -117,28 +123,30 @@ void StrategyModule::Tick(float ellapsedTime)
     gameController->Tick(ellapsedTime, sensor);
 
     spellBook->motion.Dead = spellBook->strategy.Die;
-    if(spellBook->strategy.Die)
+    if (spellBook->strategy.Die)
     {
         return;
     }
 
-    if(spellBook->motion.Calibrate)
+    if (spellBook->motion.Calibrate)
     {
         spellBook->motion.Stiff = true;
         spellBook->motion.Stand = true;
         spellBook->motion.Walk = false;
-        cout << endl << endl << "Calibrate" << endl;
+        cout << endl
+             << endl
+             << "Calibrate" << endl;
         cout << "gyrXOffset=" << spellBook->motion.GyroX << endl;
         cout << "gyrYOffset=" << spellBook->motion.GyroY << endl;
         cout << "angleXOffset=" << spellBook->motion.AngleX << endl;
         cout << "angleYOffset=" << spellBook->motion.AngleY << endl;
         cout << "# Save this to /home/nao/data/configs/robotName.cfg" << endl;
-        cout << endl << endl;
+        cout << endl
+             << endl;
         return;
     }
 
-
-    if(!spellBook->strategy.Started)
+    if (!spellBook->strategy.Started)
     {
         spellBook->strategy.TimeSinceStarted = 0;
         spellBook->motion.Stiff = false;
@@ -148,7 +156,7 @@ void StrategyModule::Tick(float ellapsedTime)
     }
     spellBook->strategy.TimeSinceStarted += ellapsedTime;
 
-    if(spellBook->strategy.Penalized)
+    if (spellBook->strategy.Penalized)
     {
         spellBook->strategy.TimeSincePenalized = 0;
         spellBook->motion.Stiff = true;
@@ -158,7 +166,7 @@ void StrategyModule::Tick(float ellapsedTime)
     }
     spellBook->strategy.TimeSincePenalized += ellapsedTime;
 
-    if(spellBook->strategy.GameState == STATE_READY)
+    if (spellBook->strategy.GameState == STATE_READY)
     {
         spellBook->motion.Stiff = true;
         spellBook->motion.Stand = false;
@@ -166,7 +174,7 @@ void StrategyModule::Tick(float ellapsedTime)
         return;
     }
 
-    if(spellBook->strategy.GameState == STATE_SET)
+    if (spellBook->strategy.GameState == STATE_SET)
     {
         spellBook->strategy.MoveHead = true;
         spellBook->motion.Stiff = true;
@@ -179,7 +187,7 @@ void StrategyModule::Tick(float ellapsedTime)
         return;
     }
 
-    if(spellBook->strategy.GameState == STATE_FINISHED)
+    if (spellBook->strategy.GameState == STATE_FINISHED)
     {
         spellBook->motion.Stiff = true;
         spellBook->motion.Stand = false;
@@ -188,17 +196,17 @@ void StrategyModule::Tick(float ellapsedTime)
     }
 
     spellBook->motion.TipOver = spellBook->strategy.TurnOver;
-    if(spellBook->strategy.TurnOver)
+    if (spellBook->strategy.TurnOver)
     {
         return;
     }
     spellBook->motion.GetupBack = spellBook->strategy.FallenBack;
-    if(spellBook->strategy.FallenBack)
+    if (spellBook->strategy.FallenBack)
     {
         return;
     }
     spellBook->motion.GetupFront = spellBook->strategy.FallenFront;
-    if(spellBook->strategy.FallenFront)
+    if (spellBook->strategy.FallenFront)
     {
         return;
     }
@@ -208,52 +216,52 @@ void StrategyModule::Tick(float ellapsedTime)
     spellBook->motion.Walk = true;
 
     // Makes the robot move some predefined paths
-    if(spellBook->strategy.WalkInSquare)
+    if (spellBook->strategy.WalkInSquare)
     {
-        if(squareStep == 0)
+        if (squareStep == 0)
         {
             squareX += spellBook->motion.Vx * ellapsedTime;
             spellBook->motion.Vx = 0.3f;
-            if(squareX > squareL)
+            if (squareX > squareL)
             {
                 squareStep = 1;
                 spellBook->motion.Vx = 0;
             }
         }
-        else if(squareStep == 1)
+        else if (squareStep == 1)
         {
             squareY += spellBook->motion.Vy * ellapsedTime;
             spellBook->motion.Vy = 0.2f;
-            if(squareY > squareL)
+            if (squareY > squareL)
             {
                 squareStep = 2;
                 spellBook->motion.Vy = 0;
             }
         }
-        else if(squareStep == 2)
+        else if (squareStep == 2)
         {
             squareX += spellBook->motion.Vx * ellapsedTime;
             spellBook->motion.Vx = -0.3f;
-            if(squareX < 0)
+            if (squareX < 0)
             {
                 squareStep = 3;
                 spellBook->motion.Vx = 0;
             }
         }
-        else if(squareStep == 3)
+        else if (squareStep == 3)
         {
             squareY += spellBook->motion.Vy * ellapsedTime;
             spellBook->motion.Vy = -0.2f;
-            if(squareY < 0)
+            if (squareY < 0)
             {
                 squareStep = 4;
                 spellBook->motion.Vy = 0;
             }
         }
-        else if(squareStep == 4)
+        else if (squareStep == 4)
         {
             squareTimer += ellapsedTime;
-            if(squareTimer > 5.0f)
+            if (squareTimer > 5.0f)
             {
                 squareStep = 0;
                 squareTimer = 0;
@@ -261,7 +269,7 @@ void StrategyModule::Tick(float ellapsedTime)
         }
         return;
     }
-    else if(spellBook->strategy.WalkInCircle)
+    else if (spellBook->strategy.WalkInCircle)
     {
         spellBook->motion.Vx = 0.3f;
         spellBook->motion.Vth = spellBook->motion.Vx / circleRadius;
@@ -270,47 +278,50 @@ void StrategyModule::Tick(float ellapsedTime)
 
     ballTracker->Tick(ellapsedTime, sensor);
     robotTracker->Tick(ellapsedTime);
+    featureTracker->Tick(ellapsedTime, sensor);
 
-    if(spellBook->network.gameController.PenaltyPhase)
+    if (spellBook->network.gameController.PenaltyPhase)
     {
-        if(spellBook->behaviour.Number == 1)
+        if (spellBook->behaviour.Number == 1)
             goalie->Tick(ellapsedTime, sensor);
         else
             kicker->Tick(ellapsedTime, sensor);
     }
     else
     {
-        switch(spellBook->behaviour.Number)
+        switch (spellBook->behaviour.Number)
         {
-            case 1:
-                goalie->Tick(ellapsedTime, sensor);
-                break;
-            case 2:
+        case 1:
+            goalie->Tick(ellapsedTime, sensor);
+            break;
+        case 2:
+            kicker->Tick(ellapsedTime, sensor);
+            break;
+        case 3:
+            defender->Tick(ellapsedTime, sensor);
+            break;
+        case 4:
+            if (spellBook->strategy.Defensive)
+                rPlayer->Tick(ellapsedTime, sensor);
+            else
                 kicker->Tick(ellapsedTime, sensor);
-                break;
-            case 3:
-                defender->Tick(ellapsedTime, sensor);
-                break;
-            case 4:
-                if(spellBook->strategy.Defensive)
-                    rPlayer->Tick(ellapsedTime, sensor);
-                else
-                    kicker->Tick(ellapsedTime, sensor);
-                break;
-            case 5:
-                if(spellBook->strategy.Defensive)
-                    ballHolder->Tick(ellapsedTime, sensor);
-                else
-                    kicker->Tick(ellapsedTime, sensor);
-                break;
-            case 6:
+            break;
+        case 5:
+            if (spellBook->strategy.Defensive)
+                ballHolder->Tick(ellapsedTime, sensor);
+            else
                 kicker->Tick(ellapsedTime, sensor);
-                break;
-            default:
-                break;
+            break;
+        case 6:
+            kicker->Tick(ellapsedTime, sensor);
+            break;
+        case 7:
+            loca->Tick(ellapsedTime, sensor);
+            break;
+        default:
+            break;
         }
     }
-        
 
     //potentialFields->Tick(ellapsedTime);
     //pControl->Tick(ellapsedTime);
