@@ -28,6 +28,7 @@ class VisionModule : public InnerModule
 
         BallDetector *ballDetector;
         Localizer *localizer;
+        FeatureExtractor *featureExtractor;
 
         ImageMessage message;
 
