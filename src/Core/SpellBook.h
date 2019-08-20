@@ -61,8 +61,32 @@ class BallSpell : public Spell
         void CopyTo(Spell *spell);
         void Load(Storage &storage);
         void Save(Storage &storage);
-
 };
+
+class FeatureSpell : public Spell
+{
+    public:
+        bool Enabled;
+        enum Type { L, T, X, Unknown };
+        int ImageX, ImageY;
+        int FeatureLostCount;
+
+        bool FeatureDetected;
+        float FeatureYaw;
+        float FeaturePitch;
+        float FeatureDistance;
+        float HeadYaw;
+        float HeadPitch;
+        float HeadSpeed;
+        bool HeadRelative;
+        float TimeSinceFeatureSeen;
+
+        FeatureSpell();
+        void CopyTo(Spell *spell);
+        void Load(Storage &storage);
+        void Save(Storage &storage);
+};
+
 
 class LocalizationSpell : public Spell
 {
@@ -87,6 +111,7 @@ class VisionSpell : public Spell
 
         BallSpell ball;
         LocalizationSpell localization;
+        FeatureSpell feature;
 
         VisionSpell();
         void CopyTo(Spell *spell);

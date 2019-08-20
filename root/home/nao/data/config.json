@@ -44,12 +44,12 @@
         },
         "Strategy": {
             "Enabled": true,
-            "Defensive" : true,
+            "Defensive" : false,
             "FakeKick" : false
         },
         "Behaviour": {
             "Enabled": true,
-            "Number" : 1,
+            "Number" : 3,
             "TeamNumber" : 47,
             "Names" : ["Dino", "Luci", "Tiny Hand", "Lilith", "Morgana", "Unknown"]
         }
