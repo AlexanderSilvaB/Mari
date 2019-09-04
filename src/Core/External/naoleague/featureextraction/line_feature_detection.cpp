@@ -420,20 +420,50 @@ void line_most_prob_features(cv::Mat image, vector<cv::Vec4i> lines, vector<cv::
 		//imshow("feature_points" + ss.str(), sth);
 		field_point most_prob = decide_type(all_type_intersections[i]);
 		result_intersections.push_back(most_prob);
-
+		float precision = 0.5f;
 		if (most_prob.type == 0)
 		{
-			cout << "feature " << ss.str() << " is a L" << endl;
+			if(all_type_intersections[i].l.confidence > precision)
+			{
+				cout << "feature " << ss.str() << " is a L" << endl;
+				//imshow("feature_points" + ss.str(), sth);
+			}
+
 			//cout << "angle " << most_prob.orientation[0] << endl;
-			cout << "position " << most_prob.position << endl;
+			//cout << "position " << most_prob.confidence << endl;
 		}
 		else if (most_prob.type == 1)
-			cout << "feature " << ss.str() << " is a T" << endl;
+		{
+			if(all_type_intersections[i].t.confidence > precision)
+			{
+				cout << "feature " << ss.str() << " is a T" << endl;
+				//imshow("feature_points" + ss.str(), sth);				
+			}
+		}	
+			
 		else if (most_prob.type == 3)
-			cout << "feature " << ss.str() << " is a X" << endl;
-		else
-			cout << "feature " << ss.str() << " is unknown" << endl;
-;
+		{
+			if(all_type_intersections[i].x.confidence > precision)
+			{
+				cout << "feature " << ss.str() << " is a X" << endl;
+				//imshow("feature_points" + ss.str(), sth);				
+			}	
+		}
+
+
+		// if (most_prob.type == 0)
+		// {
+		// 	cout << "feature " << ss.str() << " is a L" << endl;
+		// 	//cout << "angle " << most_prob.orientation[0] << endl;
+		// 	cout << "position " << most_prob.position << endl;
+		// }
+		// else if (most_prob.type == 1)
+		// 	cout << "feature " << ss.str() << " is a T" << endl;
+		// else if (most_prob.type == 3)
+		// 	cout << "feature " << ss.str() << " is a X" << endl;
+		// else
+		// 	cout << "feature " << ss.str() << " is unknown" << endl;
+
 	}
 	all_type_intersections.clear();
 	return;

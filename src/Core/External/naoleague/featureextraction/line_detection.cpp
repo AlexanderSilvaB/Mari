@@ -254,7 +254,7 @@ void store_line(cv::Mat image, vector< vector<cv::Point> > &lines, vector<cv::Po
 				best_match_line = i;
 			}
 		}
-		double threshold_error = lines[best_match_line].size() * 20;
+		double threshold_error = 20;//lines[best_match_line].size() * 20;
 		if(best_match_error < threshold_error)
 		{
 			for(int i=0; i<line.size(); i++)

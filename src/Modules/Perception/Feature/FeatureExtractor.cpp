@@ -59,27 +59,27 @@ void FeatureExtractor::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &b
             break;
         }
     }
-    cout << "teste 1" << endl;
-    if(spellBook != NULL)
-        cout << "spellBook: OKK" << endl;
-    else
+    //cout << "teste 1" << endl;
+    //if(spellBook != NULL)
+        //cout << "spellBook: OKK" << endl;
+    //else
     {
-        cout << "spellBook: Invalid" << endl;
-        return;
+        //cout << "spellBook: Invalid" << endl;
+      //  return;
     }
-    if(result_intersections.size() > featureIndex)
-        cout << "featureIndex: OK" << endl;
-    else if(result_intersections.size() != 0)
-        cout << "result intersections" << endl;
-    else
+    //if(result_intersections.size() > featureIndex)
+        //cout << "featureIndex: OK" << endl;
+    //else if(result_intersections.size() != 0)
+        //cout << "result intersections" << endl;
+    //else
     {
-        cout << "featureIndex: Invalidd" << endl;
+        //cout << "featureIndex: Invalidd" << endl;
         //return;
     }
     //spellBook->perception.vision.feature.ImageX = result_intersections[featureIndex].position.x;
     //spellBook->perception.vision.feature.ImageY = result_intersections[featureIndex].position.y;
     //spellBook->perception.vision.feature.FeatureDetected = detected;
-    cout << "teste 2" << endl;
+    //cout << "teste 2" << endl;
 
     if (detected)
     {
@@ -108,14 +108,14 @@ void FeatureExtractor::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &b
     }
     else
     {
-        cout << "teste 8" << endl;
+       // cout << "teste 8" << endl;
 
         //spellBook->perception.vision.feature.FeatureLostCount++;
         //spellBook->perception.vision.feature.TimeSinceFeatureSeen += ellapsedTime;
-        cout << "teste 9" << endl;
+       // cout << "teste 9" << endl;
 
     }
-        cout << "teste 10" << endl;
+        //cout << "teste 10" << endl;
 
 }
 
