@@ -88,6 +88,18 @@ class FeatureSpell : public Spell
 };
 
 
+class OpponentsSpell : public Spell
+{
+    public:
+        bool Enabled;
+
+        OpponentsSpell();
+        void CopyTo(Spell *spell);
+        void Load(Storage &storage);
+        void Save(Storage &storage);
+};
+
+
 class LocalizationSpell : public Spell
 {
     public:
@@ -112,6 +124,7 @@ class VisionSpell : public Spell
         BallSpell ball;
         LocalizationSpell localization;
         FeatureSpell feature;
+        OpponentsSpell opponents;
 
         VisionSpell();
         void CopyTo(Spell *spell);

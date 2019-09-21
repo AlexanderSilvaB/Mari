@@ -202,6 +202,27 @@ void BallSpell::Save(Storage &storage)
     storage["Modules"]["Perception"]["Vision"]["BallDetector"]["Ball"]["Size"][1] = ballHeight;
 }
 
+OpponentsSpell::OpponentsSpell()
+{
+    Enabled = true;
+}
+
+void OpponentsSpell::CopyTo(Spell *spell)
+{
+    OpponentsSpell *s = (OpponentsSpell*)spell;
+    COPY(s, Enabled)
+}
+
+void OpponentsSpell::Load(Storage &storage)
+{
+    Enabled = storage["Modules"]["Perception"]["Vision"]["OpponentsDetector"]["Enabled"].Default(true);
+}
+
+void OpponentsSpell::Save(Storage &storage)
+{
+    storage["Modules"]["Perception"]["Vision"]["OpponentsDetector"]["Enabled"] = Enabled;
+}
+
 FeatureSpell::FeatureSpell()
 {
     Enabled = true;
