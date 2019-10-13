@@ -29,7 +29,7 @@ StrategyModule::StrategyModule(SpellBook *spellBook)
     kicker = new KickerRole(this->spellBook);
     rPlayer = new RinoPlayer(this->spellBook);
     ballHolder = new BallHolder(this->spellBook);
-    loca = new LocalizerRole(this->spellBook);
+    localizer = new LocalizerRole(this->spellBook);
 }
 
 StrategyModule::~StrategyModule()
@@ -51,7 +51,7 @@ StrategyModule::~StrategyModule()
     delete kicker;
     delete rPlayer;
     delete ballHolder;
-    delete loca;
+    delete localizer;
 }
 
 void StrategyModule::OnStart()
@@ -67,12 +67,13 @@ void StrategyModule::OnStart()
     ballTracker->OnStart();
     robotTracker->OnStart();
     featureTracker->OnStart();
+
     goalie->OnStart();
     defender->OnStart();
     kicker->OnStart();
     rPlayer->OnStart();
     ballHolder->OnStart();
-    loca->OnStart();
+    localizer->OnStart();
 }
 
 void StrategyModule::OnStop()
@@ -94,7 +95,7 @@ void StrategyModule::OnStop()
     kicker->OnStop();
     rPlayer->OnStop();
     ballHolder->OnStop();
-    loca->OnStop();
+    localizer->OnStop();
 }
 
 void StrategyModule::Load()
@@ -316,7 +317,7 @@ void StrategyModule::Tick(float ellapsedTime)
             kicker->Tick(ellapsedTime, sensor);
             break;
         case 7:
-            loca->Tick(ellapsedTime, sensor);
+            localizer->Tick(ellapsedTime, sensor);
             break;
         default:
             break;

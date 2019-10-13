@@ -202,25 +202,25 @@ void BallSpell::Save(Storage &storage)
     storage["Modules"]["Perception"]["Vision"]["BallDetector"]["Ball"]["Size"][1] = ballHeight;
 }
 
-OpponentsSpell::OpponentsSpell()
+RobotDetectorSpell::RobotDetectorSpell()
 {
     Enabled = true;
 }
 
-void OpponentsSpell::CopyTo(Spell *spell)
+void RobotDetectorSpell::CopyTo(Spell *spell)
 {
-    OpponentsSpell *s = (OpponentsSpell*)spell;
+    RobotDetectorSpell *s = (RobotDetectorSpell*)spell;
     COPY(s, Enabled)
 }
 
-void OpponentsSpell::Load(Storage &storage)
+void RobotDetectorSpell::Load(Storage &storage)
 {
-    Enabled = storage["Modules"]["Perception"]["Vision"]["OpponentsDetector"]["Enabled"].Default(true);
+    Enabled = storage["Modules"]["Perception"]["Vision"]["RobotDetector"]["Enabled"].Default(true);
 }
 
-void OpponentsSpell::Save(Storage &storage)
+void RobotDetectorSpell::Save(Storage &storage)
 {
-    storage["Modules"]["Perception"]["Vision"]["OpponentsDetector"]["Enabled"] = Enabled;
+    storage["Modules"]["Perception"]["Vision"]["RobotDetector"]["Enabled"] = Enabled;
 }
 
 FeatureSpell::FeatureSpell()
@@ -309,6 +309,7 @@ void VisionSpell::CopyTo(Spell *spell)
     ball.CopyTo(&(s->ball));
     localization.CopyTo(&(s->localization));
     feature.CopyTo(&(s->feature));
+    robotDetector.CopyTo(&(s->robotDetector));
     COPY(s, Enabled)
     COPY(s, Record)
     COPY(s, VideoName)
@@ -325,6 +326,7 @@ void VisionSpell::Load(Storage &storage)
     ball.Load(storage);
     localization.Load(storage);
     feature.Load(storage);
+    robotDetector.Load(storage);
 }
 
 void VisionSpell::Save(Storage &storage)
@@ -332,6 +334,8 @@ void VisionSpell::Save(Storage &storage)
     ball.Save(storage);
     localization.Save(storage);
     feature.Save(storage);
+    robotDetector.Save(storage);
+
     storage["Modules"]["Perception"]["Vision"]["Enabled"] = Enabled;
 }
 

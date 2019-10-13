@@ -413,8 +413,8 @@ void line_most_prob_features(cv::Mat image, vector<cv::Vec4i> lines, vector<cv::
 		cv::Mat sth;
 		image.copyTo(sth);
 		cv::circle(sth, cv::Point(all_type_intersections[i].position.x, all_type_intersections[i].position.y), 3, cv::Scalar(0, 0, 255), 3, 8, 0);
-		cout << "inter [" << all_type_intersections[i].position.x << "," << all_type_intersections[i].position.y << "] "
-			 << " L: " << all_type_intersections[i].l.confidence << " T: " << all_type_intersections[i].t.confidence << " X: " << all_type_intersections[i].x.confidence << endl;
+		//cout << "inter [" << all_type_intersections[i].position.x << "," << all_type_intersections[i].position.y << "] "
+		//	 << " L: " << all_type_intersections[i].l.confidence << " T: " << all_type_intersections[i].t.confidence << " X: " << all_type_intersections[i].x.confidence << endl;
 		stringstream ss;
 		ss << i;
 		//imshow("feature_points" + ss.str(), sth);
@@ -425,7 +425,7 @@ void line_most_prob_features(cv::Mat image, vector<cv::Vec4i> lines, vector<cv::
 		{
 			if(all_type_intersections[i].l.confidence > precision)
 			{
-				cout << "feature " << ss.str() << " is a L" << endl;
+				//cout << "feature " << ss.str() << " is a L" << endl;
 				//imshow("feature_points" + ss.str(), sth);
 			}
 
@@ -436,7 +436,7 @@ void line_most_prob_features(cv::Mat image, vector<cv::Vec4i> lines, vector<cv::
 		{
 			if(all_type_intersections[i].t.confidence > precision)
 			{
-				cout << "feature " << ss.str() << " is a T" << endl;
+				//cout << "feature " << ss.str() << " is a T" << endl;
 				//imshow("feature_points" + ss.str(), sth);				
 			}
 		}	
@@ -445,7 +445,7 @@ void line_most_prob_features(cv::Mat image, vector<cv::Vec4i> lines, vector<cv::
 		{
 			if(all_type_intersections[i].x.confidence > precision)
 			{
-				cout << "feature " << ss.str() << " is a X" << endl;
+				//cout << "feature " << ss.str() << " is a X" << endl;
 				//imshow("feature_points" + ss.str(), sth);				
 			}	
 		}

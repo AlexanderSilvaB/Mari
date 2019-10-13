@@ -48,7 +48,7 @@ class StrategyModule : public Module
         KickerRole *kicker;
         RinoPlayer *rPlayer;
         BallHolder *ballHolder;
-        LocalizerRole *loca;
+        LocalizerRole *localizer;
 
 
         int squareStep;

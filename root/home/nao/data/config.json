@@ -23,9 +23,9 @@
                     }
                 },
                 "FeatureExtractor": {
-                    "Enabled": true
+                    "Enabled": false
                 },
-                "OpponentsDetector": {
+                "RobotDetector": {
                     "Enabled": true
                 },
                 "Localization":
@@ -55,7 +55,7 @@
         },
         "Behaviour": {
             "Enabled": true,
-            "Number" : 1,
+            "Number" : 7,
             "TeamNumber" : 47,
             "Names" : ["Dino", "Luci", "Tiny Hand", "Lilith", "Morgana", "Unknown", "Localizer"]
         }

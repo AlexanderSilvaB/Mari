@@ -88,12 +88,12 @@ class FeatureSpell : public Spell
 };
 
 
-class OpponentsSpell : public Spell
+class RobotDetectorSpell : public Spell
 {
     public:
         bool Enabled;
 
-        OpponentsSpell();
+        RobotDetectorSpell();
         void CopyTo(Spell *spell);
         void Load(Storage &storage);
         void Save(Storage &storage);
@@ -124,7 +124,7 @@ class VisionSpell : public Spell
         BallSpell ball;
         LocalizationSpell localization;
         FeatureSpell feature;
-        OpponentsSpell opponents;
+        RobotDetectorSpell robotDetector;
 
         VisionSpell();
         void CopyTo(Spell *spell);
