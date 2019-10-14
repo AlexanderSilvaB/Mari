@@ -205,12 +205,18 @@ void BallSpell::Save(Storage &storage)
 RobotDetectorSpell::RobotDetectorSpell()
 {
     Enabled = true;
+    middleDetected = false;
+    leftDetected = false;
+    rightDetected = false;
 }
 
 void RobotDetectorSpell::CopyTo(Spell *spell)
 {
     RobotDetectorSpell *s = (RobotDetectorSpell*)spell;
     COPY(s, Enabled)
+    COPY(s, middleDetected)
+    COPY(s, leftDetected)
+    COPY(s, rightDetected)
 }
 
 void RobotDetectorSpell::Load(Storage &storage)

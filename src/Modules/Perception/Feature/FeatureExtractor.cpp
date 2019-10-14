@@ -128,7 +128,7 @@ void FeatureExtractor::Clustering(cv::Mat img)
     {
         for (int x = 0; x < img.cols; x++)
         {
-            Vec3b color = img.at<Vec3b>(x, y);
+            Vec3b color = img.at<Vec3b>(y, x);
             blue = (int)color.val[0];
             green = (int)color.val[1];
             red = (int)color.val[2];
@@ -140,7 +140,7 @@ void FeatureExtractor::Clustering(cv::Mat img)
                 color.val[1] = 255;
                 color.val[2] = 0;
             }
-            img.at<Vec3b>(x, y) = color;
+            img.at<Vec3b>(y, x) = color;
         }
     }
 }

@@ -92,6 +92,9 @@ class RobotDetectorSpell : public Spell
 {
     public:
         bool Enabled;
+        bool middleDetected;
+        bool leftDetected;
+        bool rightDetected;
 
         RobotDetectorSpell();
         void CopyTo(Spell *spell);
