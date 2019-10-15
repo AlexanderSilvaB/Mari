@@ -111,9 +111,7 @@ void LocalizerRole::Tick(float ellapsedTime, const SensorValues &sensor)
                 //     wait = 0;
                 // }
 
-                if (spellBook->perception.vision.robotDetector.leftDetected || 
-                    spellBook->perception.vision.robotDetector.middleDetected ||
-                    spellBook->perception.vision.robotDetector.rightDetected )
+                if (spellBook->perception.vision.robotDetector.middleDetected)
                 {
                     lookingDown = false;
                     turningLeft = false;

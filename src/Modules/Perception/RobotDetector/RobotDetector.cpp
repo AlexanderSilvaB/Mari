@@ -34,11 +34,11 @@ void RobotDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &bott
     
     if(IsObstacle())
     {   
-        obstacle = bottom.BGR;       
-        if(Clustering(obstacle) > 7000)
-        {
-            cout << "Is a robot" << endl;
-        }
+        //cout << "Obstacle detected" << endl;
+        //obstacle = bottom.BGR;       
+        //cout << "Bottom: " <<Clustering(obstacle) << endl;
+        //obstacle = top.BGR;       
+        //cout << "Top: " <<Clustering(obstacle) << endl;
     }
     // int menor = 2000;
     // for (int i = 0; i < sonarFilter.sonarFiltered[1].size(); i++)
@@ -60,7 +60,7 @@ void RobotDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &bott
 
 bool RobotDetector::IsObstacle()
 {
-    int distance = 450; //mm
+    int distance = 800; //mm
     for(int i = 0; i < sonarFilter.sonarFiltered.size(); i++)
         for(int j = 0; j < sonarFilter.sonarFiltered[i].size(); j++)
         {
