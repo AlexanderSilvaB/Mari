@@ -42,7 +42,6 @@ include_directories("Core/External/unsw/unsw")
 
 include_directories("Core/External/naoleague")
 
-
 include_directories(".")
 include_directories("Modules")
 set(src

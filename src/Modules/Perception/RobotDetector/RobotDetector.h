@@ -22,6 +22,7 @@ class RobotDetector : public InnerModule
         cv::Mat obstacle;
         SonarFilter sonarFilter;
         int *colorsTxt;
+        int buffer, equal;
     public:
         RobotDetector(SpellBook *spellBook);
         void Tick(float ellapsedTime, CameraFrame &top, CameraFrame &bottom, cv::Mat &combinedImage);

@@ -208,6 +208,7 @@ RobotDetectorSpell::RobotDetectorSpell()
     middleDetected = false;
     leftDetected = false;
     rightDetected = false;
+    SonarStopped = false;
 }
 
 void RobotDetectorSpell::CopyTo(Spell *spell)
@@ -217,6 +218,7 @@ void RobotDetectorSpell::CopyTo(Spell *spell)
     COPY(s, middleDetected)
     COPY(s, leftDetected)
     COPY(s, rightDetected)
+    COPY(s, SonarStopped)
 }
 
 void RobotDetectorSpell::Load(Storage &storage)

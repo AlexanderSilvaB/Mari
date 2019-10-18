@@ -96,6 +96,8 @@ class RobotDetectorSpell : public Spell
         bool leftDetected;
         bool rightDetected;
 
+        bool SonarStopped;
+
         RobotDetectorSpell();
         void CopyTo(Spell *spell);
         void Load(Storage &storage);
