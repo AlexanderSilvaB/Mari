@@ -45,190 +45,183 @@ void LocalizerRole::Tick(float ellapsedTime, const SensorValues &sensor)
     }
     if (spellBook->strategy.GameState == STATE_PLAYING && onStart)
     {
-        // if (Kicking())
-        // {
-        //     searchState = 0;
-        // }
-        // else
-        // {
-        //     spellBook->motion.KickLeft = false;
-        //     spellBook->motion.KickRight = false;
-        //     if (spellBook->perception.vision.ball.BallLostCount < 5)
-        //     {
-        //         searchState = 0;
-        //         wait = 0;
-        //         if (abs(spellBook->perception.vision.ball.BallYaw) > Deg2Rad(10.0f))
-        //         {
-        //             spellBook->motion.Vth = -spellBook->perception.vision.ball.BallYaw * 0.5f;
-        //             spellBook->motion.Vx = 0;
-        //             CancelKick();
-        //         }
-        //         else
-        //         {
-        //             if (abs(spellBook->perception.vision.ball.BallYaw) > Deg2Rad(5.0f))
-        //                 spellBook->motion.Vth = -spellBook->perception.vision.ball.BallYaw * 0.4f;
-        //             else
-        //                 spellBook->motion.Vth = 0;
-
-        //             if (spellBook->perception.vision.ball.BallDistance < 0.45f)
-        //                 spellBook->motion.HeadPitch = Deg2Rad(24.0f);
-        //             else if (spellBook->perception.vision.ball.BallDistance > 0.5f)
-        //                 spellBook->motion.HeadPitch = Deg2Rad(0.0f);
-        //             if (spellBook->perception.vision.ball.BallDistance > 0.25f)
-        //             {
-        //                 spellBook->motion.Vx = min(spellBook->perception.vision.ball.BallDistance * 0.25f, 0.25f);
-        //                 CancelKick();
-        //             }
-        //             else
-        //             {
-        //                 spellBook->motion.Vx = 0;
-        //                 if (spellBook->motion.HeadPitch > 0)
-        //                 {
-        //                     PrepareKick(spellBook->perception.vision.ball.BallYaw);
-        //                 }
-        //                 else
-        //                 {
-        //                     CancelKick();
-        //                 }
-        //             }
-        //         }
-        //     }
-        //     else
-        //     {
-        //         CancelKick();
-
-                // Avanço da máquina de estados
-                // wait++;
-                // if (wait > 40)
-                // {
-                //     if (spellBook->perception.vision.robotDetector.detected)
-                //     {
-                //         searchState = 1;
-                //         cout << "detected" << endl;
-                //     }
-                //     else
-                //         searchState = 0;
-                //     wait = 0;
-                // }
-
-                if (spellBook->perception.vision.robotDetector.middleDetected)
+        if (Kicking())
+        {
+            searchState = 0;
+        }
+        else
+        {
+            spellBook->motion.KickLeft = false;
+            spellBook->motion.KickRight = false;
+            if (spellBook->perception.vision.ball.BallLostCount < 5)
+            {
+                searchState = 0;
+                wait = 0;
+                if (abs(spellBook->perception.vision.ball.BallYaw) > Deg2Rad(10.0f))
                 {
-                    lookingDown = false;
-                    turningLeft = false;
-                    turningRight = false;
-                    goingForward = false;
+                    spellBook->motion.Vth = -spellBook->perception.vision.ball.BallYaw * 0.5f;
+                    spellBook->motion.Vx = 0;
+                    CancelKick();
                 }
                 else
                 {
+                    if (abs(spellBook->perception.vision.ball.BallYaw) > Deg2Rad(5.0f))
+                        spellBook->motion.Vth = -spellBook->perception.vision.ball.BallYaw * 0.4f;
+                    else
+                        spellBook->motion.Vth = 0;
+
+                    if (spellBook->perception.vision.ball.BallDistance < 0.45f)
+                        spellBook->motion.HeadPitch = Deg2Rad(24.0f);
+                    else if (spellBook->perception.vision.ball.BallDistance > 0.5f)
+                        spellBook->motion.HeadPitch = Deg2Rad(0.0f);
+                    if (spellBook->perception.vision.ball.BallDistance > 0.25f)
+                    {
+                        spellBook->motion.Vx = min(spellBook->perception.vision.ball.BallDistance * 0.25f, 0.25f);
+                        CancelKick();
+                    }
+                    else
+                    {
+                        spellBook->motion.Vx = 0;
+                        if (spellBook->motion.HeadPitch > 0)
+                        {
+                            PrepareKick(spellBook->perception.vision.ball.BallYaw);
+                        }
+                        else
+                        {
+                            CancelKick();
+                        }
+                    }
+                }
+            }
+            else //Quando perde a bola
+            {
+                CancelKick();
+
+                // Avanço da máquina de estados
+                wait++;
+                if (wait > 40)
+                {
+                    searchState++;
+                    wait = 0;
+                }
+
+                if (spellBook->perception.vision.robotDetector.middleDetected || spellBook->perception.vision.robotDetector.leftDetected || spellBook->perception.vision.robotDetector.rightDetected)
+                {
+                    if(searchState != 3)
+                        searchState = 2;
+                }
+                else
+                {
+                }
+                //     lookingDown = false;
+                //     turningLeft = false;
+                //     turningRight = false;
+                //     goingForward = true;
+                // }
+
+                //Controle da máquina de estados
+                switch (searchState)
+                {
+                case 0: // ANda
                     lookingDown = false;
                     turningLeft = false;
                     turningRight = false;
                     goingForward = true;
+                    break;
+                case 1: // Só espera
+                    lookingDown = false;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = false;
+                    break;
+                case 2: // Procura no pé
+                    lookingDown = true;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = false;
+                    break;
+                case 3: // Procura na frente de novo
+                    lookingDown = false;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = false;
+                    break;
+                case 4: // Anda pouco
+                    lookingDown = false;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = true;
+                    break;
+                case 5: // Procura no lado esquerdo na frente
+                    lookingDown = false;
+                    turningLeft = true;
+                    turningRight = false;
+                    goingForward = false;
+                    break;
+                case 6: // Procura no lado esquerdo no pé
+                    lookingDown = true;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = false;
+                    break;
+                case 7: // Procura no lado esquerdo na frente de novo
+                    lookingDown = false;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = false;
+                    break;
+                case 8: // Volta a olhar pra frente
+                    lookingDown = false;
+                    turningLeft = false;
+                    turningRight = true;
+                    goingForward = false;
+                    break;
+                case 9: // Procura do lado direito
+                    lookingDown = false;
+                    turningLeft = false;
+                    turningRight = true;
+                    goingForward = false;
+                    break;
+                case 10: // Procura do lado direito no pé
+                    lookingDown = true;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = false;
+                    break;
+                case 11: // Procura do lado direito na frente de novo
+                    lookingDown = false;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = false;
+                    break;
+                case 12: // Volta a olhar pra frente
+                    lookingDown = false;
+                    turningLeft = true;
+                    turningRight = false;
+                    goingForward = false;
+                    break;
+                case 13: // Procura no pé
+                    lookingDown = true;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = false;
+                    break;
+                case 14: // Anda muito pra frente
+                case 15:
+                case 16:
+                    lookingDown = false;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = true;
+                    break;
+                default: // Quando o ciclo terminar, começa de novo
+                    lookingDown = false;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = false;
+                    searchState = 0;
+                    break;
                 }
-
-                // Controle da máquina de estados
-                // switch (searchState)
-                // {
-                // case 0: // ANda
-                //     lookingDown = false;
-                //     turningLeft = false;
-                //     turningRight = false;
-                //     goingForward = true;
-                //     break;
-                // case 1: // Só espera
-                //     lookingDown = false;
-                //     turningLeft = false;
-                //     turningRight = false;
-                //     goingForward = false;
-                //     break;
-                // case 2: // Procura no pé
-                //     lookingDown = true;
-                //     turningLeft = false;
-                //     turningRight = false;
-                //     goingForward = false;
-                //     break;
-                // case 3: // Procura na frente de novo
-                //     lookingDown = false;
-                //     turningLeft = false;
-                //     turningRight = false;
-                //     goingForward = false;
-                //     break;
-                // case 4: // Anda pouco
-                //     lookingDown = false;
-                //     turningLeft = false;
-                //     turningRight = false;
-                //     goingForward = true;
-                //     break;
-                // case 5: // Procura no lado esquerdo na frente
-                //     lookingDown = false;
-                //     turningLeft = true;
-                //     turningRight = false;
-                //     goingForward = false;
-                //     break;
-                // case 6: // Procura no lado esquerdo no pé
-                //     lookingDown = true;
-                //     turningLeft = false;
-                //     turningRight = false;
-                //     goingForward = false;
-                //     break;
-                // case 7: // Procura no lado esquerdo na frente de novo
-                //     lookingDown = false;
-                //     turningLeft = false;
-                //     turningRight = false;
-                //     goingForward = false;
-                //     break;
-                // case 8: // Volta a olhar pra frente
-                //     lookingDown = false;
-                //     turningLeft = false;
-                //     turningRight = true;
-                //     goingForward = false;
-                //     break;
-                // case 9: // Procura do lado direito
-                //     lookingDown = false;
-                //     turningLeft = false;
-                //     turningRight = true;
-                //     goingForward = false;
-                //     break;
-                // case 10: // Procura do lado direito no pé
-                //     lookingDown = true;
-                //     turningLeft = false;
-                //     turningRight = false;
-                //     goingForward = false;
-                //     break;
-                // case 11: // Procura do lado direito na frente de novo
-                //     lookingDown = false;
-                //     turningLeft = false;
-                //     turningRight = false;
-                //     goingForward = false;
-                //     break;
-                // case 12: // Volta a olhar pra frente
-                //     lookingDown = false;
-                //     turningLeft = true;
-                //     turningRight = false;
-                //     goingForward = false;
-                //     break;
-                // case 13: // Procura no pé
-                //     lookingDown = true;
-                //     turningLeft = false;
-                //     turningRight = false;
-                //     goingForward = false;
-                //     break;
-                // case 14: // Anda muito pra frente
-                // case 15:
-                // case 16:
-                //     lookingDown = false;
-                //     turningLeft = false;
-                //     turningRight = false;
-                //     goingForward = true;
-                //     break;
-                // default: // Quando o ciclo terminar, começa de novo
-                //     lookingDown = false;
-                //     turningLeft = false;
-                //     turningRight = false;
-                //     goingForward = false;
-                //     searchState = 0;
-                //     break;
-                // }
 
                 if (turningLeft)
                     spellBook->motion.Vth = -Deg2Rad(20.0f);
@@ -248,5 +241,5 @@ void LocalizerRole::Tick(float ellapsedTime, const SensorValues &sensor)
                     spellBook->motion.HeadPitch = 0.0f;
             }
         }
-    //}
-//}
+    }
+}

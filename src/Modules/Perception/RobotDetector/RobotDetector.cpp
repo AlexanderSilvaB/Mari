@@ -44,12 +44,15 @@ void RobotDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &bott
         else
             equal = 0;
     }
-    if (equal > 20)
+    if (equal > 20)//Number of repetitive readings of sonar
     {
         spellBook->perception.vision.robotDetector.SonarStopped = true;
     }
     else
-        spellBook->perception.vision.robotDetector.SonarStopped = false;
+    {
+        spellBook->perception.vision.robotDetector.SonarStopped = false; 
+    }
+        
 
     if (IsObstacle())
     {
@@ -79,10 +82,7 @@ void RobotDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &bott
 
 bool RobotDetector::IsObstacle()
 {
-    int distance = 800; //mm
-
-    //vector<int> buffer(sonarFilter.sonarFiltered[LEFT].size());
-    //cout << sonarFilter.sonarFiltered[LEFT].size() << endl;
+    int distance = 1000; //mm
 
     for (int i = 0; i < sonarFilter.sonarFiltered.size(); i++)
         for (int j = 0; j < sonarFilter.sonarFiltered[i].size(); j++)
