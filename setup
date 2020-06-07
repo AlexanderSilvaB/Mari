@@ -11,10 +11,12 @@ sudo apt-get install cmake libnss-mdns avahi-discover avahi-utils sshpass unzip 
 sudo pip install qibuild
 
 toolchain="rinobot-robot"
-if [ "$#" -gt 0 ]; then
-    toolchain=$1
-fi
-
+local_toolchain="rinobot-local"
+for i in "$@"; do
+	if [ "$#" -gt 0 -a $i != "--local" ]; then
+    		toolchain=$1
+	fi
+done
 if [ ! -d ".qi" ]; then
     echo ""
     echo "Initializing qibuild"
@@ -51,3 +53,42 @@ else
         echo "./sync robot-hostname $toolchain"
     fi
 fi
+
+
+for arg in "$@"
+do
+    if [ "$arg" == "--local" ]
+    then
+	echo "Configuring a Local SDK"
+	echo "Installing a local SDK"
+
+	if [ ! -d "sdk" ]; then
+		echo "Creating SDK Folder"
+		echo "Place a SDK file (naoqi-sdk-2.1.4.13-linux64.tar.gz) inside the sdk folder and run this script again" 
+	else
+		counter=$(ls -l sdk/ | grep .tar.gz | egrep -c '^-')
+		if [ $counter = 0 ]; then
+			echo "No naoqi-sdk found"
+			echo "Place a SDK file (naoqi-sdk-2.1.4.13-linux64.tar.gz) inside the sdk folder and run this script again"
+			exit 1
+		elif [ $counter -gt 1 ]; then
+			echo "More than one SDK found"
+			exit 1
+		else
+			selected=$(ls -1 sdk/ | grep .tar.gz)
+			echo "naoqi-sdk Found: $selected"
+			echo "Extracting"
+			tar -xvzf sdk/$selected -C sdk/
+			echo "Creating local toolchain $local_toolchain"
+			filename="${selected%.*}"
+			sdk_filename="${filename%.*}"
+			qitoolchain create $local_toolchain sdk/$sdk_filename/toolchain.xml
+			echo "Adding config"
+			qibuild add-config $local_toolchain -t $local_toolchain
+			echo "Installed as $local_toolchain"
+		fi
+	fi
+       
+    fi
+done
+
