@@ -15,14 +15,14 @@
 RobotDetector::RobotDetector(SpellBook *spellBook)
     : InnerModule(spellBook)
 {
-    colorsTxt = new int[256 * 256 * 256];
-    for (int i = 0; i < 256 * 256 * 256; i++)
-    {
-        colorsTxt[i] = -1;
-    }
-    Load("/home/nao/data/vision/opponents.txt");
-    buffer = 0;
-    equal = 0;
+    // colorsTxt = new int[256 * 256 * 256];
+    // for (int i = 0; i < 256 * 256 * 256; i++)
+    // {
+    //     colorsTxt[i] = -1;
+    // }
+    // Load("/home/nao/data/vision/opponents.txt");
+    // buffer = 0;
+    // equal = 0;
 }
 
 void RobotDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &bottom, cv::Mat &combinedImage)
@@ -58,26 +58,10 @@ void RobotDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &bott
     {
         //cout << "Obstacle detected" << endl;
         //obstacle = bottom.BGR;
-        //cout << "Bottom: " <<Clustering(obstacle) << endl;
+        //cout << "Bottom: " << Clustering(obstacle) << endl;
         //obstacle = top.BGR;
         //cout << "Top: " <<Clustering(obstacle) << endl;
     }
-    // int menor = 2000;
-    // for (int i = 0; i < sonarFilter.sonarFiltered[1].size(); i++)
-    // {
-    //     if (sonarFilter.sonarFiltered[1][i] < menor)
-    //         menor = sonarFilter.sonarFiltered[1][i];
-    // }
-    // cout << menor << endl;
-    // if (menor < 450)
-    // {
-    //     spellBook->perception.vision.robotDetector.middleDetected = true;
-    // }
-
-    // else
-    // {
-    //     spellBook->perception.vision.robotDetector.middleDetected = false;
-    // }
 }
 
 bool RobotDetector::IsObstacle()
@@ -91,6 +75,7 @@ bool RobotDetector::IsObstacle()
             {
                 if (sonarFilter.sonarFiltered[LEFT][j] < distance)
                 {
+                    cout << "Left Sonar " << (float)sonarFilter.sonarFiltered[LEFT][j]/1000 << endl;
                     spellBook->perception.vision.robotDetector.leftDetected = true;
                     //cout << "LEFT DETECTED" << endl;
                     return true;
@@ -103,6 +88,7 @@ bool RobotDetector::IsObstacle()
                 //cout << sonarFilter.sonarFiltered[MIDDLE][j] << endl;
                 if (sonarFilter.sonarFiltered[MIDDLE][j] < distance)
                 {
+                    cout << "Middle Sonar " << (float)sonarFilter.sonarFiltered[MIDDLE][j]/1000 << endl;
                     spellBook->perception.vision.robotDetector.middleDetected = true;
                     //cout << "MIDDLE DETECTED" << endl;
                     return true;
@@ -114,6 +100,7 @@ bool RobotDetector::IsObstacle()
             {
                 if (sonarFilter.sonarFiltered[RIGHT][j] < distance)
                 {
+                    cout << "Right Sonar " << (float)sonarFilter.sonarFiltered[RIGHT][j]/1000 << endl;
                     spellBook->perception.vision.robotDetector.rightDetected = true;
                     //cout << "RIGHT DETECTED" << endl;
                     return true;

@@ -7,15 +7,15 @@ using namespace std;
 
 class KickerRole : public Role
 {
-    private:
-        bool onStart;
-        int wait;
-        int searchState;
-        bool lookingDown, turningLeft, turningRight, goingForward;
-    public:
-        KickerRole(SpellBook *spellBook);
-        void Tick(float ellapsedTime, const SensorValues &sensor);
-        virtual ~KickerRole();
+private:
+    bool onStart;
+    int wait;
+    int searchState;
+    bool lookingDown, turningLeft, turningRight, goingForward;
+public:
+    KickerRole(SpellBook *spellBook);
+    void Tick(float ellapsedTime, const SensorValues &sensor);
+    virtual ~KickerRole();
 };
 
 #endif

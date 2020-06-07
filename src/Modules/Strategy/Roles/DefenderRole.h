@@ -8,19 +8,14 @@ using namespace std;
 class DefenderRole: public Role {
 
 private:
-
-    bool onBall;
-    bool onPosition;
-    int contPerdido;
-    float scanPitch;
-    int conta, conta2, conta3;
-    float Deg, Vel;
-    bool reset;
+    bool onStart;
+    int wait;
+    int searchState;
+    bool lookingDown, turningLeft, turningRight, goingForward;
 public:
-
     DefenderRole(SpellBook *spellBook);
     ~DefenderRole();
     void Tick(float ellapsedTime, const SensorValues&);
-
 };
+
 #endif

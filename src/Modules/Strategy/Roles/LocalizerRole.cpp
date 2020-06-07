@@ -51,6 +51,7 @@ void LocalizerRole::Tick(float ellapsedTime, const SensorValues &sensor)
         }
         else
         {
+            cout << "Ball distance " << spellBook->perception.vision.ball.BallDistance << endl; 
             spellBook->motion.KickLeft = false;
             spellBook->motion.KickRight = false;
             if (spellBook->perception.vision.ball.BallLostCount < 5)
@@ -59,14 +60,14 @@ void LocalizerRole::Tick(float ellapsedTime, const SensorValues &sensor)
                 wait = 0;
                 if (abs(spellBook->perception.vision.ball.BallYaw) > Deg2Rad(10.0f))
                 {
-                    spellBook->motion.Vth = -spellBook->perception.vision.ball.BallYaw * 0.5f;
+                    spellBook->motion.Vth = 0;//-spellBook->perception.vision.ball.BallYaw * 0.5f;
                     spellBook->motion.Vx = 0;
                     CancelKick();
                 }
                 else
                 {
                     if (abs(spellBook->perception.vision.ball.BallYaw) > Deg2Rad(5.0f))
-                        spellBook->motion.Vth = -spellBook->perception.vision.ball.BallYaw * 0.4f;
+                        spellBook->motion.Vth = 0;//-spellBook->perception.vision.ball.BallYaw * 0.4f;
                     else
                         spellBook->motion.Vth = 0;
 
@@ -76,7 +77,7 @@ void LocalizerRole::Tick(float ellapsedTime, const SensorValues &sensor)
                         spellBook->motion.HeadPitch = Deg2Rad(0.0f);
                     if (spellBook->perception.vision.ball.BallDistance > 0.25f)
                     {
-                        spellBook->motion.Vx = min(spellBook->perception.vision.ball.BallDistance * 0.25f, 0.25f);
+                        //spellBook->motion.Vx = min(spellBook->perception.vision.ball.BallDistance * 0.25f, 0.25f);
                         CancelKick();
                     }
                     else
@@ -105,11 +106,11 @@ void LocalizerRole::Tick(float ellapsedTime, const SensorValues &sensor)
                     wait = 0;
                 }
 
-                if (spellBook->perception.vision.robotDetector.middleDetected || spellBook->perception.vision.robotDetector.leftDetected || spellBook->perception.vision.robotDetector.rightDetected)
-                {
-                    if(searchState != 3)
-                        searchState = 2;
-                }
+                // if (spellBook->perception.vision.robotDetector.middleDetected || spellBook->perception.vision.robotDetector.leftDetected || spellBook->perception.vision.robotDetector.rightDetected)
+                // {
+                //     if(searchState != 3)
+                //         searchState = 2;
+                // }
                 else
                 {
                 }
@@ -126,13 +127,15 @@ void LocalizerRole::Tick(float ellapsedTime, const SensorValues &sensor)
                     lookingDown = false;
                     turningLeft = false;
                     turningRight = false;
-                    goingForward = true;
+                    goingForward = false;
+                    searchState = 0;
                     break;
                 case 1: // Só espera
                     lookingDown = false;
                     turningLeft = false;
                     turningRight = false;
                     goingForward = false;
+                    searchState = 0;
                     break;
                 case 2: // Procura no pé
                     lookingDown = true;
@@ -224,14 +227,14 @@ void LocalizerRole::Tick(float ellapsedTime, const SensorValues &sensor)
                 }
 
                 if (turningLeft)
-                    spellBook->motion.Vth = -Deg2Rad(20.0f);
+                    spellBook->motion.Vth = 0;//-Deg2Rad(20.0f);
                 else if (turningRight)
-                    spellBook->motion.Vth = Deg2Rad(20.0f);
+                    spellBook->motion.Vth = 0;//Deg2Rad(20.0f);
                 else
                     spellBook->motion.Vth = 0.0f;
 
                 if (goingForward)
-                    spellBook->motion.Vx = 0.2f;
+                    spellBook->motion.Vx = 0;
                 else
                     spellBook->motion.Vx = 0;
 

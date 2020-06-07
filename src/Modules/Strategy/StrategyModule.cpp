@@ -302,16 +302,10 @@ void StrategyModule::Tick(float ellapsedTime)
             defender->Tick(ellapsedTime, sensor);
             break;
         case 4:
-            if (spellBook->strategy.Defensive)
-                rPlayer->Tick(ellapsedTime, sensor);
-            else
-                kicker->Tick(ellapsedTime, sensor);
+            rPlayer->Tick(ellapsedTime, sensor);
             break;
         case 5:
-            if (spellBook->strategy.Defensive)
-                ballHolder->Tick(ellapsedTime, sensor);
-            else
-                kicker->Tick(ellapsedTime, sensor);
+            ballHolder->Tick(ellapsedTime, sensor);
             break;
         case 6:
             kicker->Tick(ellapsedTime, sensor);

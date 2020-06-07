@@ -6,114 +6,223 @@
 
 BallHolder::BallHolder(SpellBook *spellBook) : Role(spellBook)
 {
-
-    onBall = false;
-    onPosition = false;
+    onStart = false;
+    searchState = 0;
 }
 BallHolder::~BallHolder()
 {
 }
 void BallHolder::Tick(float ellapsedTime, const SensorValues &sensor)
 {
-    CartesianCoord coord;
-    RelativeCoord rr;
     spellBook->strategy.MoveHead = false;
-    if ((spellBook->strategy.GameState == STATE_READY || spellBook->strategy.GameState == STATE_PLAYING) &&
-        !onPosition)
+    spellBook->motion.HeadYaw = 0;
+    spellBook->motion.HeadSpeedYaw = 0.2f;
+    spellBook->motion.HeadSpeedPitch = 0.2f;
+    
+    if((spellBook->strategy.GameState == STATE_READY || spellBook->strategy.GameState == STATE_PLAYING) && !onStart)
     {
-
-        if (spellBook->perception.vision.localization.Enabled)
+        if(spellBook->perception.vision.localization.Enabled)
         {
             spellBook->strategy.WalkForward = true;
-            spellBook->strategy.TargetX = 0.0f;
+            spellBook->strategy.TargetX = -1.0f;
             spellBook->strategy.TargetY = 0.0f;
             spellBook->strategy.TargetTheta = 0;
 
-            CartesianCoord current(spellBook->perception.vision.localization.X, spellBook->perception.vision.localization.Y);
-            CartesianCoord desired(spellBook->strategy.TargetX, spellBook->strategy.TargetY);
-            if (current.distance(desired) < 0.2f)
+            CartesianCoord current(spellBook->perception.vision.localization.X, spellBook->perception.vision.localization.Y); 
+            CartesianCoord desired(spellBook->strategy.TargetX, spellBook->strategy.TargetY); 
+            if(current.distance(desired)  < 0.2f)
             {
                 spellBook->strategy.WalkForward = false;
-                onPosition = true;
+                onStart = true;
             }
         }
         else
         {
-            onPosition = true;
+            onStart = true;
         }
     }
-    if (spellBook->strategy.GameState == STATE_PLAYING)
+    if(spellBook->strategy.GameState == STATE_PLAYING && onStart)
     {
-        spellBook->motion.KickRight = false;
-        spellBook->motion.KickLeft = false;
-        spellBook->motion.Vth = 0;
-        spellBook->motion.Vx = 0;
-        spellBook->motion.Vy = 0;
-
-        if (spellBook->perception.vision.ball.BallLostCount < 5)
+        if(Kicking())
         {
-            cout << "ballLost" << endl;
-            if(spellBook->perception.vision.ball.BallYaw > Deg2Rad(10))
-            {
-                spellBook->motion.Vth = - spellBook->perception.vision.ball.BallYaw * 0.5;
-
-            }
-            else if(spellBook->perception.vision.ball.BallYaw > Deg2Rad(5))
-            {
-                spellBook->motion.Vth = - spellBook->perception.vision.ball.BallYaw * 0.25;
-            }
-            else
-            {
-                spellBook->motion.Vth = 0;
-                spellBook->motion.Vx = 0.04; //0.02
-            }
-            if (spellBook->perception.vision.ball.BallDistance > 0.5f)
-            {
-                cout << "maior que meio" << endl;
-                spellBook->motion.Vth = -(spellBook->perception.vision.ball.BallYaw)*0.25;
-                spellBook->motion.Vx = (spellBook->perception.vision.ball.BallDistance) * 0.2f;
-                spellBook->motion.Vy = 0;
-                spellBook->motion.HeadPitch = Deg2Rad(15.0f);
-                spellBook->motion.HeadYaw = Deg2Rad(0);
-            }
-            else if (spellBook->perception.vision.ball.BallDistance < 0.3f)
-            {
-                cout << "menor que meio" << endl;
-                spellBook->motion.HeadPitch = Deg2Rad(25.0f);
-                spellBook->motion.HeadYaw = Deg2Rad(0);
-                spellBook->motion.Vx = (spellBook->perception.vision.ball.BallDistance) * 0.5f +0.01;//0.01
-                spellBook->motion.Vy = 0;
-                spellBook->motion.Vth = -(spellBook->perception.vision.ball.BallYaw);
-            }
+            searchState = 0;
         }
-        else 
-        {
-            if (spellBook->perception.vision.ball.BallLostCount < 30)
+        else
+        {            
+            spellBook->motion.KickLeft = false;
+            spellBook->motion.KickRight = false;
+            if(spellBook->perception.vision.ball.BallLostCount < 5)
             {
-                cout<<"distancia"<< spellBook->perception.vision.ball.BallDistance<< endl;
-                spellBook->motion.Vth = -(spellBook->perception.vision.ball.BallYaw) * 0.5f;
-                spellBook->motion.Vy = 0;
-                spellBook->motion.HeadPitch = Deg2Rad(15.0f);
-                spellBook->motion.HeadYaw = Deg2Rad(0);
-                if (spellBook->perception.vision.ball.BallDistance < 0.25)
+                searchState = 0;
+                wait = 0;
+                if(abs(spellBook->perception.vision.ball.BallYaw) > Deg2Rad(10.0f))
                 {
-                    spellBook->motion.Vx = -(spellBook->perception.vision.ball.BallDistance) * 0.25f;
+                    spellBook->motion.Vth = -spellBook->perception.vision.ball.BallYaw * 0.5f;
+                    spellBook->motion.Vx = 0;
+                    CancelKick();
                 }
                 else
                 {
-                    spellBook->motion.Vx = (spellBook->perception.vision.ball.BallDistance) * 0.25f;
+                    if(abs(spellBook->perception.vision.ball.BallYaw) > Deg2Rad(5.0f))
+                        spellBook->motion.Vth = -spellBook->perception.vision.ball.BallYaw * 0.4f;
+                    else
+                        spellBook->motion.Vth = 0;
+
+                    if(spellBook->perception.vision.ball.BallDistance < 0.45f)
+                        spellBook->motion.HeadPitch = Deg2Rad(24.0f);
+                    else if(spellBook->perception.vision.ball.BallDistance > 0.5f)
+                        spellBook->motion.HeadPitch = Deg2Rad(0.0f);
+                    if(spellBook->perception.vision.ball.BallDistance > 0.25f)
+                    {
+                        spellBook->motion.Vx = min(spellBook->perception.vision.ball.BallDistance * 0.25f, 0.25f);
+                        CancelKick();
+                    }
+                    else
+                    {
+                        spellBook->motion.Vx = 0;
+                        if(spellBook->motion.HeadPitch > 0)
+                        {
+                            PrepareKick(spellBook->perception.vision.ball.BallYaw);
+                        }
+                        else
+                        {
+                            CancelKick();
+                        }
+                    }
                 }
             }
             else
             {
-                cout << "to perdido" << endl;
-                spellBook->motion.Vth = 0.02;
-                spellBook->motion.Vx = 0.03;
-                spellBook->motion.Vy = 0;
-                spellBook->motion.HeadPitch = Deg2Rad(2.0);
-                spellBook->motion.HeadYaw = 0.0;
-                spellBook->motion.HeadSpeedYaw = 0.2f;
-                spellBook->motion.HeadSpeedPitch = 0.2f;
+                CancelKick();
+
+                // Avanço da máquina de estados
+                wait++;
+                if(wait > 40)
+                {
+                    searchState++;    
+                    wait = 0;
+                }
+                
+                // Controle da máquina de estados
+                switch(searchState)
+                {
+                    case 0: // ANda
+                        lookingDown = false;
+                        turningLeft = false;
+                        turningRight = false;
+                        goingForward = true;
+                        break;
+                    case 1: // Só espera
+                        lookingDown = false;
+                        turningLeft = false;
+                        turningRight = false;
+                        goingForward = false;
+                        break;
+                    case 2: // Procura no pé
+                        lookingDown = true;
+                        turningLeft = false;
+                        turningRight = false;
+                        goingForward = false;
+                        break;
+                    case 3: // Procura na frente de novo
+                        lookingDown = false;
+                        turningLeft = false;
+                        turningRight = false;
+                        goingForward = false;
+                        break;
+                    case 4: // Anda pouco
+                        lookingDown = false;
+                        turningLeft = false;
+                        turningRight = false;
+                        goingForward = true;
+                        break;
+                    case 5: // Procura no lado esquerdo na frente
+                        lookingDown = false;
+                        turningLeft = true;
+                        turningRight = false;
+                        goingForward = false;
+                        break;
+                    case 6: // Procura no lado esquerdo no pé
+                        lookingDown = true;
+                        turningLeft = false;
+                        turningRight = false;
+                        goingForward = false;
+                        break;
+                    case 7: // Procura no lado esquerdo na frente de novo
+                        lookingDown = false;
+                        turningLeft = false;
+                        turningRight = false;
+                        goingForward = false;
+                        break;
+                    case 8: // Volta a olhar pra frente
+                        lookingDown = false;
+                        turningLeft = false;
+                        turningRight = true;
+                        goingForward = false;
+                        break;
+                    case 9: // Procura do lado direito
+                        lookingDown = false;
+                        turningLeft = false;
+                        turningRight = true;
+                        goingForward = false;
+                        break;
+                    case 10: // Procura do lado direito no pé
+                        lookingDown = true;
+                        turningLeft = false;
+                        turningRight = false;
+                        goingForward = false;
+                        break;
+                    case 11: // Procura do lado direito na frente de novo
+                        lookingDown = false;
+                        turningLeft = false;
+                        turningRight = false;
+                        goingForward = false;
+                        break;
+                    case 12: // Volta a olhar pra frente
+                        lookingDown = false;
+                        turningLeft = true;
+                        turningRight = false;
+                        goingForward = false;
+                        break;
+                    case 13: // Procura no pé
+                        lookingDown = true;
+                        turningLeft = false;
+                        turningRight = false;
+                        goingForward = false;
+                        break;
+                    case 14: // Anda muito pra frente
+                    case 15:
+                    case 16:
+                        lookingDown = false;
+                        turningLeft = false;
+                        turningRight = false;
+                        goingForward = true;
+                        break;
+                    default: // Quando o ciclo terminar, começa de novo
+                        lookingDown = false;
+                        turningLeft = false;
+                        turningRight = false;
+                        goingForward = false;
+                        searchState = 0;
+                        break;
+                }
+
+                if(turningLeft)
+                    spellBook->motion.Vth = -Deg2Rad(20.0f);
+                else if(turningRight)
+                    spellBook->motion.Vth = Deg2Rad(20.0f);
+                else
+                    spellBook->motion.Vth = 0.0f;
+            
+                if(goingForward)
+                    spellBook->motion.Vx = 0.2f;
+                else 
+                    spellBook->motion.Vx = 0;
+
+                if(lookingDown)
+                    spellBook->motion.HeadPitch = Deg2Rad(24.0f);
+                else
+                    spellBook->motion.HeadPitch = 0.0f;
             }
         }
     }

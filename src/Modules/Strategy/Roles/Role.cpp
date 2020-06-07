@@ -73,7 +73,7 @@ bool Role::Kicking()
     if(kick > 50)
     {
         kick++;
-        spellBook->motion.Vx = spellBook->strategy.FakeKick ? 0.3f : 0.1f;
+        spellBook->motion.Vx = spellBook->strategy.FakeKick ? 0.2f : 0.1f;
         spellBook->motion.Vth = 0;
         spellBook->motion.Vy = 0;
         if(kick > 170)
