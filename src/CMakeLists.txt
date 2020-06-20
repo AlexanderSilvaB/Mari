@@ -40,6 +40,8 @@ find_package(qibuild)
 include_directories("Core/External/unsw")
 include_directories("Core/External/unsw/unsw")
 
+include_directories("Core/External/naoleague")
+
 include_directories(".")
 include_directories("Modules")
 set(src
@@ -79,10 +81,10 @@ file(GLOB_RECURSE MODULES_SRC
 add_subdirectory("Core/External")
 
 qi_create_bin(rinobot ${src} ${CORE_SRC} ${CORE_DRIVERS_SRC} ${CORE_UTILS_SRC} ${CORE_GC_SRC} ${MODULES_SRC})
-qi_use_lib(rinobot unsw     
+qi_use_lib(rinobot unsw naoleague    
         OPENCV2_CORE 
         OPENCV2_HIGHGUI 
         OPENCV2_IMGPROC 
         OPENCV2_VIDEO 
         OPENCV2_OBJDETECT )
-target_link_libraries(rinobot pthread ${OpenCV_LIBS_DIRS} TcpUdpSocket)
+target_link_libraries(rinobot pthread ${OpenCV_LIBS_DIRS} TcpUdpSocket naoleague)

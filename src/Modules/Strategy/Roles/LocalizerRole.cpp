@@ -1,18 +1,20 @@
-#include "DefenderRole.h"
+#include "LocalizerRole.h"
 #include "Core/Utils/Math.h"
 #include "Core/Utils/RelativeCoord.h"
-#include "Core/Utils/RobotDefs.h"
 #include "Core/Utils/CartesianCoord.h"
 
-DefenderRole::DefenderRole(SpellBook *spellBook) : Role(spellBook)
+LocalizerRole::LocalizerRole(SpellBook *spellBook)
+    : Role(spellBook)
 {
     onStart = false;
     searchState = 0;
 }
-DefenderRole::~DefenderRole()
+
+LocalizerRole::~LocalizerRole()
 {
 }
-void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
+
+void LocalizerRole::Tick(float ellapsedTime, const SensorValues &sensor)
 {
     spellBook->strategy.MoveHead = false;
     spellBook->motion.HeadYaw = 0;
@@ -49,6 +51,7 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
         }
         else
         {
+            cout << "Ball distance " << spellBook->perception.vision.ball.BallDistance << endl; 
             spellBook->motion.KickLeft = false;
             spellBook->motion.KickRight = false;
             if (spellBook->perception.vision.ball.BallLostCount < 5)
@@ -57,14 +60,14 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
                 wait = 0;
                 if (abs(spellBook->perception.vision.ball.BallYaw) > Deg2Rad(10.0f))
                 {
-                    spellBook->motion.Vth = -spellBook->perception.vision.ball.BallYaw * 0.5f;
+                    spellBook->motion.Vth = 0;//-spellBook->perception.vision.ball.BallYaw * 0.5f;
                     spellBook->motion.Vx = 0;
                     CancelKick();
                 }
                 else
                 {
                     if (abs(spellBook->perception.vision.ball.BallYaw) > Deg2Rad(5.0f))
-                        spellBook->motion.Vth = -spellBook->perception.vision.ball.BallYaw * 0.4f;
+                        spellBook->motion.Vth = 0;//-spellBook->perception.vision.ball.BallYaw * 0.4f;
                     else
                         spellBook->motion.Vth = 0;
 
@@ -72,21 +75,11 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
                         spellBook->motion.HeadPitch = Deg2Rad(24.0f);
                     else if (spellBook->perception.vision.ball.BallDistance > 0.5f)
                         spellBook->motion.HeadPitch = Deg2Rad(0.0f);
-                    //LARC ---- Chutão
-                    if (spellBook->perception.vision.ball.BallDistance > 0.25f && spellBook->perception.vision.ball.BallDistance < 0.35f)
+                    if (spellBook->perception.vision.ball.BallDistance > 0.25f)
                     {
-                        //Rinobot
                         //spellBook->motion.Vx = min(spellBook->perception.vision.ball.BallDistance * 0.25f, 0.25f);
-                        //Larc
-                        spellBook->motion.Vx = min(spellBook->perception.vision.ball.BallDistance * 0.45f, 0.45f);
                         CancelKick();
                     }
-                    else if (spellBook->perception.vision.ball.BallDistance > 0.35f)
-                    {
-                        spellBook->motion.Vx = min(spellBook->perception.vision.ball.BallDistance * 0.25f, 0.25f);
-                        CancelKick();
-                    }
-                    // -----
                     else
                     {
                         spellBook->motion.Vx = 0;
@@ -101,7 +94,7 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
                     }
                 }
             }
-            else
+            else //Quando perde a bola
             {
                 CancelKick();
 
@@ -113,20 +106,36 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
                     wait = 0;
                 }
 
-                // Controle da máquina de estados
+                // if (spellBook->perception.vision.robotDetector.middleDetected || spellBook->perception.vision.robotDetector.leftDetected || spellBook->perception.vision.robotDetector.rightDetected)
+                // {
+                //     if(searchState != 3)
+                //         searchState = 2;
+                // }
+                else
+                {
+                }
+                //     lookingDown = false;
+                //     turningLeft = false;
+                //     turningRight = false;
+                //     goingForward = true;
+                // }
+
+                //Controle da máquina de estados
                 switch (searchState)
                 {
                 case 0: // ANda
                     lookingDown = false;
                     turningLeft = false;
                     turningRight = false;
-                    goingForward = true;
+                    goingForward = false;
+                    searchState = 0;
                     break;
                 case 1: // Só espera
                     lookingDown = false;
                     turningLeft = false;
                     turningRight = false;
                     goingForward = false;
+                    searchState = 0;
                     break;
                 case 2: // Procura no pé
                     lookingDown = true;
@@ -218,14 +227,14 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
                 }
 
                 if (turningLeft)
-                    spellBook->motion.Vth = -Deg2Rad(20.0f);
+                    spellBook->motion.Vth = 0;//-Deg2Rad(20.0f);
                 else if (turningRight)
-                    spellBook->motion.Vth = Deg2Rad(20.0f);
+                    spellBook->motion.Vth = 0;//Deg2Rad(20.0f);
                 else
                     spellBook->motion.Vth = 0.0f;
 
                 if (goingForward)
-                    spellBook->motion.Vx = 0.5f;
+                    spellBook->motion.Vx = 0;
                 else
                     spellBook->motion.Vx = 0;
 
@@ -237,5 +246,3 @@ void DefenderRole::Tick(float ellapsedTime, const SensorValues &sensor)
         }
     }
 }
-
-//-- Lilith --- 4 --atualizado

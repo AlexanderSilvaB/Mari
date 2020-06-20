@@ -8,17 +8,13 @@ using namespace std;
 class BallHolder: public Role {
 
 private:
-
-    bool onBall;
-    bool onPosition;
-    float scanPitch;
-    int conta, conta2;
-
+        bool onStart;
+        int wait;
+        int searchState;
+        bool lookingDown, turningLeft, turningRight, goingForward;
 public:
-
     BallHolder(SpellBook *spellBook);
     ~BallHolder();
     void Tick(float ellapsedTime, const SensorValues&);
-
 };
 #endif

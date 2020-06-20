@@ -9,6 +9,9 @@ VisionModule::VisionModule(SpellBook *spellBook)
 {
     ballDetector = new BallDetector(spellBook);
     localizer = new Localizer(spellBook);
+    featureExtractor = new FeatureExtractor(spellBook);
+    robotDetector = new RobotDetector(spellBook);
+
     capture = new CombinedCamera();
     top.Update(CAM_W, CAM_H);
     bottom.Update(CAM_W, CAM_H);
@@ -20,6 +23,8 @@ VisionModule::~VisionModule()
     delete frameWriter;
     delete ballDetector;
     delete localizer;
+    delete featureExtractor;
+    delete robotDetector;
 }
 
 void VisionModule::setControl(Camera *camera, const uint32_t controlId, const int32_t controlValue)
@@ -129,4 +134,8 @@ void VisionModule::Tick(float ellapsedTime)
         ballDetector->Tick(ellapsedTime, top, bottom, combinedImage);
     if(spellBook->perception.vision.localization.Enabled)
         localizer->Tick(ellapsedTime, top, bottom, combinedImage);
+    if(spellBook->perception.vision.feature.Enabled)
+        featureExtractor->Tick(ellapsedTime, top, bottom, combinedImage);
+    if(spellBook->perception.vision.robotDetector.Enabled)
+        robotDetector->Tick(ellapsedTime, top, bottom, combinedImage);
 }

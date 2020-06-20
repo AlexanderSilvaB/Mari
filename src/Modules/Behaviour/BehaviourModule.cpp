@@ -78,6 +78,14 @@ void BehaviourModule::Tick(float ellapsedTime)
             spellBook->behaviour.LeftEye = BLUE;
         else
             spellBook->behaviour.LeftEye = GREEN;
-        spellBook->behaviour.RightEye = RED;
+        
+        if(spellBook->perception.vision.robotDetector.SonarStopped)
+            spellBook->behaviour.RightEye = CYAN;
+        else if(spellBook->perception.vision.robotDetector.leftDetected
+            || spellBook->perception.vision.robotDetector.rightDetected
+            || spellBook->perception.vision.robotDetector.middleDetected)
+            spellBook->behaviour.RightEye = BLACK;
+        else
+            spellBook->behaviour.RightEye = RED;
     }
 }

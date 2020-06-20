@@ -28,9 +28,13 @@ class BallDetector : public InnerModule
         bool CascadeMethod(CameraFrame &top, CameraFrame &bottom);
         bool GeometricMethod(CameraFrame &top, CameraFrame &bottom);
         bool NeuralMethod(CameraFrame &top, CameraFrame &bottom);
+
+        int *colorsTxt;
     public:
         BallDetector(SpellBook *spellBook);
         void Tick(float ellapsedTime, CameraFrame &top, CameraFrame &bottom, cv::Mat &combinedImage);
+        void Load(std::string file);
+        void Clustering(cv::Mat img);
 };
 
 #endif
