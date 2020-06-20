@@ -21,6 +21,8 @@
 #define X 2
 #define UNKNOWN 4
 
+#define GREEN ((0 << 16) | (255 << 8) | 0)
+
 using namespace std;
 
 class FeatureExtractor : public InnerModule
@@ -29,6 +31,7 @@ private:
     float targetYaw, targetPitch;
     float distance;
     float speed;
+    int *colorsTxt;
 
     cv::Mat img_rgb;
     std::vector<field_point> result_intersections, actual_features; //features
@@ -37,6 +40,8 @@ private:
 public:
     FeatureExtractor(SpellBook *spellBook);
     void Tick(float ellapsedTime, CameraFrame &top, CameraFrame &bottom, cv::Mat &combinedImage);
+    void Clustering(cv::Mat img);
+    void Load(std::string file);
 };
 
 #endif

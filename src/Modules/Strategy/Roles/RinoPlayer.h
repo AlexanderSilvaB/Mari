@@ -8,15 +8,10 @@ using namespace std;
 class RinoPlayer: public Role {
 
 private:
-
-    bool onBall;
-    bool onPosition;
-    int contPerdido;
-    float scanPitch;
-    float time;
-    int tique;
-    int ultimoY;
-    bool moonwalk;
+    bool onStart;
+    int wait;
+    int searchState;
+    bool lookingDown, turningLeft, turningRight, goingForward;
 public:
 
     RinoPlayer(SpellBook *spellBook);

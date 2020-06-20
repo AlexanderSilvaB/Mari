@@ -8,6 +8,9 @@
 #include "perception/vision/CameraToRR.hpp"
 #include "perception/vision/WhichCamera.hpp"
 
+#include <iostream>
+#include <fstream>
+
 #define R 2.0f
 #define PI_2 1.5707963267f
 #define TICK_TIME 30
@@ -19,6 +22,12 @@ FeatureExtractor::FeatureExtractor(SpellBook *spellBook)
 {
     targetYaw = 0;
     targetPitch = 0;
+    colorsTxt = new int[256 * 256 * 256];
+    for (int i = 0; i < 256 * 256 * 256; i++)
+    {
+        colorsTxt[i] = -1;
+    }
+    Load("/home/nao/data/vision/clustering.txt");
 }
 
 void FeatureExtractor::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &bottom, cv::Mat &combinedImage)
@@ -30,6 +39,9 @@ void FeatureExtractor::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &b
     SensorValues sensor = readFrom(motion, sensors);
 
     img_rgb = bottom.BGR;
+
+    Clustering(img_rgb);
+    
     extract_features(img_rgb, result_intersections, goalPosts);
 
     bool detected = false;
@@ -47,27 +59,27 @@ void FeatureExtractor::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &b
             break;
         }
     }
-    cout << "teste 1" << endl;
-    if(spellBook != NULL)
-        cout << "spellBook: OKK" << endl;
-    else
+    //cout << "teste 1" << endl;
+    //if(spellBook != NULL)
+        //cout << "spellBook: OKK" << endl;
+    //else
     {
-        cout << "spellBook: Invalid" << endl;
-        return;
+        //cout << "spellBook: Invalid" << endl;
+      //  return;
     }
-    if(result_intersections.size() > featureIndex)
-        cout << "featureIndex: OK" << endl;
-    else if(result_intersections.size() != 0)
-        cout << "result intersections" << endl;
-    else
+    //if(result_intersections.size() > featureIndex)
+        //cout << "featureIndex: OK" << endl;
+    //else if(result_intersections.size() != 0)
+        //cout << "result intersections" << endl;
+    //else
     {
-        cout << "featureIndex: Invalidd" << endl;
+        //cout << "featureIndex: Invalidd" << endl;
         //return;
     }
     //spellBook->perception.vision.feature.ImageX = result_intersections[featureIndex].position.x;
     //spellBook->perception.vision.feature.ImageY = result_intersections[featureIndex].position.y;
     //spellBook->perception.vision.feature.FeatureDetected = detected;
-    cout << "teste 2" << endl;
+    //cout << "teste 2" << endl;
 
     if (detected)
     {
@@ -96,15 +108,55 @@ void FeatureExtractor::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &b
     }
     else
     {
-        cout << "teste 8" << endl;
+       // cout << "teste 8" << endl;
 
         //spellBook->perception.vision.feature.FeatureLostCount++;
         //spellBook->perception.vision.feature.TimeSinceFeatureSeen += ellapsedTime;
-        cout << "teste 9" << endl;
+       // cout << "teste 9" << endl;
 
     }
-        cout << "teste 10" << endl;
+        //cout << "teste 10" << endl;
 
 }
 
-//cv::RNG rng(12345);
+void FeatureExtractor::Clustering(cv::Mat img)
+{
+    int red, green, blue;
+    int col;
+
+    for (int y = 0; y < img.rows; y++)
+    {
+        for (int x = 0; x < img.cols; x++)
+        {
+            Vec3b color = img.at<Vec3b>(y, x);
+            blue = (int)color.val[0];
+            green = (int)color.val[1];
+            red = (int)color.val[2];
+            col = (blue << 16) | (green << 8) | red;
+
+            if (colorsTxt[col] != -1)
+            {
+                color.val[0] = 0;
+                color.val[1] = 255;
+                color.val[2] = 0;
+            }
+            img.at<Vec3b>(y, x) = color;
+        }
+    }
+}
+
+void FeatureExtractor::Load(std::string file)
+{
+    int color;
+    ifstream inFile(file.c_str(), ios::in);
+    if (inFile)
+    { 
+        while (inFile >> color)
+        {
+            colorsTxt[color] = GREEN;
+        }
+        inFile.close();
+    }
+    else
+        cout << "could not open file" << endl;
+}

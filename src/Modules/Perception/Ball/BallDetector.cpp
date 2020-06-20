@@ -8,6 +8,8 @@
 #include "perception/vision/CameraToRR.hpp"
 #include "perception/vision/WhichCamera.hpp"
 
+#include <fstream>
+
 #define R 2.0f
 #define PI_2 1.5707963267f
 #define TICK_TIME 30
@@ -15,10 +17,10 @@
 using namespace cv;
 
 BallDetector::BallDetector(SpellBook *spellBook)
-    :   InnerModule(spellBook)
+    : InnerModule(spellBook)
 {
 
-    if(cascade.load("/home/nao/data/vision/cascade.xml"))
+    if (cascade.load("/home/nao/data/vision/cascade.xml"))
         cout << "Cascade file loaded" << endl;
     else
         cout << "Cascade file not found" << endl;
@@ -27,6 +29,13 @@ BallDetector::BallDetector(SpellBook *spellBook)
     targetPitch = 0;
 
     method = CASCADE;
+
+    colorsTxt = new int[256 * 256 * 256];
+    for (int i = 0; i < 256 * 256 * 256; i++)
+    {
+        colorsTxt[i] = -1;
+    }
+    Load("/home/nao/data/vision/clustering.txt");
 }
 
 void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &bottom, cv::Mat &combinedImage)
@@ -39,29 +48,29 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
     SensorValues sensor = readFrom(motion, sensors);
 
     bool detected = false;
-    switch(method)
+    switch (method)
     {
-        case CASCADE:
-            detected = CascadeMethod(top, bottom);
-            break;
-        case GEOMETRIC:
-            detected = GeometricMethod(top, bottom);
-            break;
-        case NEURAL:
-            detected = NeuralMethod(top, bottom);
-            break;
-        default:
-            break;
+    case CASCADE:
+        detected = CascadeMethod(top, bottom);
+        break;
+    case GEOMETRIC:
+        detected = GeometricMethod(top, bottom);
+        break;
+    case NEURAL:
+        detected = NeuralMethod(top, bottom);
+        break;
+    default:
+        break;
     }
 
     spellBook->perception.vision.ball.ImageX = ball.x;
     spellBook->perception.vision.ball.ImageY = ball.y;
     spellBook->perception.vision.ball.BallDetected = detected;
-    if(detected)
+    if (detected)
     {
         spellBook->perception.vision.ball.BallLostCount = 0;
         spellBook->perception.vision.ball.TimeSinceBallSeen = 0;
-        
+
         float currHeadYaw = sensor.joints.angles[Joints::HeadYaw];
         float currHeadPitch = sensor.joints.angles[Joints::HeadPitch];
 
@@ -80,7 +89,6 @@ void BallDetector::Tick(float ellapsedTime, CameraFrame &top, CameraFrame &botto
         spellBook->perception.vision.ball.HeadPitch = yDiff - currHeadPitch;
 
         //cout << rr.getDistance() << "m, " << Rad2Deg(rr.getYaw()) << "º" << endl;
-
     }
     else
     {
@@ -94,8 +102,27 @@ bool BallDetector::CascadeMethod(CameraFrame &top, CameraFrame &bottom)
     vector<Rect> balls;
     //cv::Mat hist;
     cv::Mat mask;
+    cv::Mat rgb, hsv;
+    rgb = bottom.BGR;
+    Clustering(rgb);
+    cvtColor(rgb, hsv, CV_BGR2HSV);
     //cv::equalizeHist(bottom.GRAY, hist);
-    inRange(bottom.HSV, Scalar(56, 102, 25), Scalar(116, 255, 255), mask);
+
+    //Rinobot
+    //inRange(bottom.HSV, Scalar(56, 102, 25), Scalar(116, 255, 255), mask);
+
+    //cv::Mat frame;
+    //frame = bottom.RGB;
+
+    //LARC
+    // #define GR_HUE_MIN  38
+    // #define GR_HUE_MAX  75
+    // #define GR_SAT_MIN  50
+    // #define GR_SAT_MAX  255
+    // #define GR_VAL_MIN  50
+    // #define GR_VAL_MAX  255
+    inRange(hsv, Scalar(38, 50, 50), Scalar(75, 255, 255), mask);
+
     cascade.detectMultiScale(bottom.GRAY, balls, 2, 1, 0, Size(16, 16));
     //cascade.detectMultiScale(hist, balls, 1.3, 5, 8, Size(16, 16));
     //cascade.detectMultiScale(gray, balls, 1.1, 5, 8, cv::Size(16, 16));
@@ -107,60 +134,69 @@ bool BallDetector::CascadeMethod(CameraFrame &top, CameraFrame &bottom)
     cv::Point pt(balls[0].x + raio, balls[0].y + raio);
     ball.radius = raio;
     ball.x = pt.x;
-    ball.y = pt.y;    
+    ball.y = pt.y;
+
     return true;
 
-    double melhorRaio;
-    double melhorConfidence = -1; // -1 ele continuar mostrando todos candidatos, =0
-    cv::Point melhorPt;
-    int step = 10;
-    double x;
-    double y;
-    double raio2;
-    for (int j = 0; j < balls.size(); j++)
-    {
+    // //COMENTAR TUDO DAQUI PRA BAIXO CASO DÊ PROBLEMA!!!!!!!!!!!!!!!!!
+    // // ctrl + kc - comenta
+    // // ctrl + ku - descomenta
+    // //
 
-        double raio = balls[j].width / 2.0;
-        cv::Point pt(balls[j].x + raio, balls[j].y + raio);
-        raio2 = raio * 1.2;
+    //     double melhorRaio;
+    //     double melhorConfidence = -1; // -1 ele continuar mostrando todos candidatos, =0
+    //     cv::Point melhorPt;
+    //     int step = 20;
+    //     double x;
+    //     double y;
+    //     double raio2;
+    //     for (int j = 0; j < balls.size(); j++)
+    //     {
 
-        double confidence = 0;
-        // quantos dos pontos analisados tem a cor verde (a cor branca da mask)
-        int contverde = 0;
+    //         double raio = balls[j].width / 2.0;
+    //         cv::Point pt(balls[j].x + raio, balls[j].y + raio);
+    //         raio2 = raio * 1.2;
 
-        //i++ e i+=10 tem diferenca, com ++ eu analizo 360 pontos e com 10, 10 ptos
-        for (int i = 0; i < 360; i += step)
-        {
-            //conversao para de grau p rad 0.0174532 = pi/180
-            x = raio2 * cos(i * 0.0174532) + pt.x;
-            y = raio2 * sin(i * 0.0174532) + pt.y;
+    //         double confidence = 0;
+    //         //quantos dos pontos analisados tem a cor verde (a cor branca da mask)
+    //         int contverde = 0;
 
-            if (mask.at<uchar>((int)y, (int)x) > 0)
-            {
-                contverde++;
-            }
-        }
-        //calculo de confianca no valor de acordo com o parametro (a quantidade de verde, só que é branco pela mask)
-        confidence = contverde / (360.0 / step);
-        if (confidence > melhorConfidence)
-        {
-            melhorConfidence = confidence;
-            melhorRaio = raio;
-            melhorPt = pt;
-        }
-    }
-    if (melhorConfidence <= 0)
-    {
-        //cout << "seria uma bola?" << "\t" << melhorConfidence << endl;
-        return false;
-    }
-    //cout << "Encontrado: " << melhorPt << " [ " << melhorRaio << " ] " << "\t" << (melhorConfidence * 100) << "%" << endl;
+    //         //i++ e i+=10 tem diferenca, com ++ eu analizo 360 pontos e com 10, 10 ptos
+    //         for (int i = 0; i < 360; i += step)
+    //         {
+    //             //conversao para de grau p rad 0.0174532 = pi/180
+    //             x = raio2 * cos(i * 0.0174532) + pt.x;
+    //             y = raio2 * sin(i * 0.0174532) + pt.y;
 
+    //             if (mask.at<uchar>((int)y, (int)x) > 0)
+    //             {
+    //                 contverde++;
+    //             }
+    //         }
+    //         cout << "Contverde: " << contverde << endl;
+    //         //calculo de confianca no valor de acordo com o parametro (a quantidade de verde, só que é branco pela mask)
+    //         if(contverde > 5)
+    //         {
+    //             confidence = contverde / (360.0 / step);
+    //             if (confidence > melhorConfidence)
+    //             {
+    //                 melhorConfidence = confidence;
+    //                 melhorRaio = raio;
+    //                 melhorPt = pt;
+    //             }
+    //        }
+    //     }
+    //     if (melhorConfidence <= 0)
+    //     {
+    //         //cout << "seria uma bola?" << "\t" << melhorConfidence << endl;
+    //         return false;
+    //     }
+    //     //cout << "Encontrado: " << melhorPt << " [ " << melhorRaio << " ] " << "\t" << (melhorConfidence * 100) << "%" << endl;
 
-    ball.radius = melhorRaio;
-    ball.x = melhorPt.x;
-    ball.y = melhorPt.y;
-    return true;
+    //     ball.radius = melhorRaio;
+    //     ball.x = melhorPt.x;
+    //     ball.y = melhorPt.y;
+    //     return true;
 }
 
 cv::RNG rng(12345);
@@ -179,4 +215,46 @@ bool BallDetector::GeometricMethod(CameraFrame &top, CameraFrame &bottom)
 bool BallDetector::NeuralMethod(CameraFrame &top, CameraFrame &bottom)
 {
     return false;
+}
+
+void BallDetector::Clustering(cv::Mat img)
+{
+    int red, green, blue;
+    int col;
+
+    for (int y = 0; y < img.rows; y++)
+    {
+        for (int x = 0; x < img.cols; x++)
+        {
+            cv::Vec3b color = img.at<cv::Vec3b>(y, x);
+            blue = (int)color.val[0];
+            green = (int)color.val[1];
+            red = (int)color.val[2];
+            col = (blue << 16) | (green << 8) | red;
+
+            if (colorsTxt[col] != -1)
+            {
+                color.val[0] = 0;
+                color.val[1] = 255;
+                color.val[2] = 0;
+            }
+            img.at<cv::Vec3b>(y, x) = color;
+        }
+    }
+}
+
+void BallDetector::Load(std::string file)
+{
+    int color;
+    ifstream inFile(file.c_str(), ios::in);
+    if (inFile)
+    {
+        while (inFile >> color)
+        {
+            colorsTxt[color] = RED;
+        }
+        inFile.close();
+    }
+    else
+        cout << "could not open file" << endl;
 }

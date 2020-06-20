@@ -6,14 +6,8 @@
 
 RinoPlayer::RinoPlayer(SpellBook *spellBook) : Role(spellBook)
 {
-    onBall = false;
-    onPosition = false;
-    contPerdido = 0;
-    scanPitch = 1;
-    time = 0;
-    tique = 0;
-    moonwalk = false;
-    spellBook->perception.vision.ball.BallYaw = 12;
+    onStart = false;
+    searchState = 0;
 }
 RinoPlayer::~RinoPlayer()
 {
@@ -21,18 +15,16 @@ RinoPlayer::~RinoPlayer()
 void RinoPlayer::Tick(float ellapsedTime, const SensorValues &sensor)
 {
     spellBook->strategy.MoveHead = false;
-    float YawHead;
-    CartesianCoord coord;
-    RelativeCoord rr;
-    if ((spellBook->strategy.GameState == STATE_READY || spellBook->strategy.GameState == STATE_PLAYING) &&
-        !onPosition)
-    {
+    spellBook->motion.HeadYaw = 0;
+    spellBook->motion.HeadSpeedYaw = 0.2f;
+    spellBook->motion.HeadSpeedPitch = 0.2f;
 
-        /*if (spellBook->perception.vision.localization.Enabled)
+    if ((spellBook->strategy.GameState == STATE_READY || spellBook->strategy.GameState == STATE_PLAYING) && !onStart)
+    {
+        if (spellBook->perception.vision.localization.Enabled)
         {
-            contPerdido = 0;
             spellBook->strategy.WalkForward = true;
-            spellBook->strategy.TargetX = 0.0f;
+            spellBook->strategy.TargetX = -1.0f;
             spellBook->strategy.TargetY = 0.0f;
             spellBook->strategy.TargetTheta = 0;
 
@@ -41,102 +33,206 @@ void RinoPlayer::Tick(float ellapsedTime, const SensorValues &sensor)
             if (current.distance(desired) < 0.2f)
             {
                 spellBook->strategy.WalkForward = false;
-                onPosition = true;
+                onStart = true;
             }
-        }*/
-        onPosition = true;
-    }
-
-    if (spellBook->strategy.GameState == STATE_PLAYING)
-    {
-        cout << "entrei em nada" << endl;
-        spellBook->motion.KickRight = false;
-        spellBook->motion.Vth = 0;
-        spellBook->motion.Vx = 0;
-        spellBook->motion.Vy = 0;
-
-        if (!spellBook->perception.vision.ball.BallDetected)
+        }
+        else
         {
-            cout << "Bola não detectada, situação do moonwalk: " << moonwalk << endl;
-            spellBook->motion.HeadYaw = Deg2Rad(0);
-            spellBook->motion.Vx = 0;
-            spellBook->motion.Vy = 0;
-            spellBook->motion.Vth = 0;
-            spellBook->strategy.HeadYawRange = Deg2Rad(55.0f);
-            spellBook->motion.HeadSpeedYaw = 0.02;
-            spellBook->strategy.HeadPitchRange = Deg2Rad(35.0f);
-            time += ellapsedTime;
-            cout << " Não Detectando " << endl;
-            // spellBook->perception.vision.ball.BallYaw
-            cout << "A bola foi perdida mas o X é igual a: " << spellBook->perception.vision.ball.BallDistance << endl;
-
-            spellBook->motion.HeadSpeedPitch = abs(0.0f);
-            spellBook->motion.HeadPitch = scanPitch;
-            scanPitch += Deg2Rad(0.4f);
-
-            if (scanPitch > spellBook->strategy.HeadPitchRange)
+            onStart = true;
+        }
+    }
+    if (spellBook->strategy.GameState == STATE_PLAYING && onStart)
+    {
+        if (Kicking())
+        {
+            searchState = 0;
+        }
+        else
+        {
+            spellBook->motion.KickLeft = false;
+            spellBook->motion.KickRight = false;
+            if (spellBook->perception.vision.ball.BallLostCount < 5)
             {
-                scanPitch = Deg2Rad(-5.0f);
-            }
-            if (spellBook->perception.vision.ball.BallDistance > 0.1f && spellBook->perception.vision.ball.BallDistance < 0.5f && moonwalk == false)
-            {
-                spellBook->motion.Vx = 0;
-                cout << "Era pra andar pra trás." << endl;
-                if (time > 30 * ellapsedTime && time < 90 * ellapsedTime)
+                searchState = 0;
+                wait = 0;
+                if (abs(spellBook->perception.vision.ball.BallYaw) > Deg2Rad(10.0f))
                 {
-                    spellBook->motion.Vx = -spellBook->perception.vision.ball.BallDistance / 2;
-                    if (time > 88 * ellapsedTime)
-                        moonwalk = true;
-                }
-                cout << "Andei para trás" << endl;
-            }
-            //if (time > 95 * ellapsedTime && time < 280 * ellapsedTime)
-            //{
-                if (spellBook->perception.vision.ball.BallYaw > 0)
-                {
-                    cout << "Time" << time << endl;
-                    spellBook->motion.Vth = Deg2Rad(-30);
+                    spellBook->motion.Vth = -spellBook->perception.vision.ball.BallYaw * 0.5f;
+                    spellBook->motion.Vx = 0;
+                    CancelKick();
                 }
                 else
                 {
-                    spellBook->motion.Vth = Deg2Rad(30);
+                    if (abs(spellBook->perception.vision.ball.BallYaw) > Deg2Rad(5.0f))
+                        spellBook->motion.Vth = -spellBook->perception.vision.ball.BallYaw * 0.4f;
+                    else
+                        spellBook->motion.Vth = 0;
+
+                    if (spellBook->perception.vision.ball.BallDistance < 0.45f)
+                        spellBook->motion.HeadPitch = Deg2Rad(24.0f);
+                    else if (spellBook->perception.vision.ball.BallDistance > 0.5f)
+                        spellBook->motion.HeadPitch = Deg2Rad(0.0f);
+                    //LARC ---- Chutão
+                    if (spellBook->perception.vision.ball.BallDistance > 0.25f && spellBook->perception.vision.ball.BallDistance < 0.35f)
+                    {
+                        //Rinobot
+                        //spellBook->motion.Vx = min(spellBook->perception.vision.ball.BallDistance * 0.25f, 0.25f);
+                        //Larc
+                        spellBook->motion.Vx = min(spellBook->perception.vision.ball.BallDistance * 0.45f, 0.45f);
+                        CancelKick();
+                    }
+                    else if (spellBook->perception.vision.ball.BallDistance > 0.35f)
+                    {
+                        spellBook->motion.Vx = min(spellBook->perception.vision.ball.BallDistance * 0.25f, 0.25f);
+                        CancelKick();
+                    }
+                    // -----
+                    else
+                    {
+                        spellBook->motion.Vx = 0;
+                        if (spellBook->motion.HeadPitch > 0)
+                        {
+                            PrepareKick(spellBook->perception.vision.ball.BallYaw);
+                        }
+                        else
+                        {
+                            CancelKick();
+                        }
+                    }
                 }
-            //}
-
-            if (time > 200 * ellapsedTime && time < 320 * ellapsedTime) //Se o robo estiver rodando muito, aumentar o intervalo. Ou remover o IF e aumentar velocidade em X. Ou falar com o Pedro.
-            {
-                spellBook->motion.Vth = 0;
-                spellBook->motion.Vx = 0.6f;
-            }
-        }
-        else if (spellBook->perception.vision.ball.BallDetected)
-        {
-            time = 0;
-            spellBook->motion.HeadSpeedPitch = abs(0.0f);
-            moonwalk = false;
-            spellBook->motion.Vth = 0;
-            spellBook->motion.Vx = 0;
-            spellBook->motion.Vy = 0;
-
-            cout << "Bola detectada, situação do moonwalk: " << moonwalk << endl;
-
-            if (spellBook->perception.vision.ball.BallYaw > Deg2Rad(5.0f))
-            {
-                cout << "ballY 5>" << endl;
-                spellBook->strategy.MoveHead = false;
-                spellBook->motion.Vth = -0.25 * (spellBook->perception.vision.ball.BallYaw);
-                spellBook->motion.Vx = 0;
-                spellBook->motion.Vy = 0;
             }
             else
             {
-                cout << "alinhado" << endl;
-                spellBook->strategy.MoveHead = false;
-                spellBook->motion.Vth = 0.0f;
-                spellBook->motion.Vx = 0.25 * (coord.getX() + 0.01);
-                spellBook->motion.Vy = 0;
-                //spellBook->motion.HeadYaw = 0;
-                //spellBook->motion.HeadPitch = Deg2Rad(20.0f);
+                CancelKick();
+
+                // Avanço da máquina de estados
+                wait++;
+                if (wait > 40)
+                {
+                    searchState++;
+                    wait = 0;
+                }
+
+                // Controle da máquina de estados
+                switch (searchState)
+                {
+                case 0: // ANda
+                    lookingDown = false;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = true;
+                    break;
+                case 1: // Só espera
+                    lookingDown = false;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = false;
+                    break;
+                case 2: // Procura no pé
+                    lookingDown = true;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = false;
+                    break;
+                case 3: // Procura na frente de novo
+                    lookingDown = false;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = false;
+                    break;
+                case 4: // Anda pouco
+                    lookingDown = false;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = true;
+                    break;
+                case 5: // Procura no lado esquerdo na frente
+                    lookingDown = false;
+                    turningLeft = true;
+                    turningRight = false;
+                    goingForward = false;
+                    break;
+                case 6: // Procura no lado esquerdo no pé
+                    lookingDown = true;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = false;
+                    break;
+                case 7: // Procura no lado esquerdo na frente de novo
+                    lookingDown = false;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = false;
+                    break;
+                case 8: // Volta a olhar pra frente
+                    lookingDown = false;
+                    turningLeft = false;
+                    turningRight = true;
+                    goingForward = false;
+                    break;
+                case 9: // Procura do lado direito
+                    lookingDown = false;
+                    turningLeft = false;
+                    turningRight = true;
+                    goingForward = false;
+                    break;
+                case 10: // Procura do lado direito no pé
+                    lookingDown = true;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = false;
+                    break;
+                case 11: // Procura do lado direito na frente de novo
+                    lookingDown = false;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = false;
+                    break;
+                case 12: // Volta a olhar pra frente
+                    lookingDown = false;
+                    turningLeft = true;
+                    turningRight = false;
+                    goingForward = false;
+                    break;
+                case 13: // Procura no pé
+                    lookingDown = true;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = false;
+                    break;
+                case 14: // Anda muito pra frente
+                case 15:
+                case 16:
+                    lookingDown = false;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = true;
+                    break;
+                default: // Quando o ciclo terminar, começa de novo
+                    lookingDown = false;
+                    turningLeft = false;
+                    turningRight = false;
+                    goingForward = false;
+                    searchState = 0;
+                    break;
+                }
+
+                if (turningLeft)
+                    spellBook->motion.Vth = -Deg2Rad(20.0f);
+                else if (turningRight)
+                    spellBook->motion.Vth = Deg2Rad(20.0f);
+                else
+                    spellBook->motion.Vth = 0.0f;
+
+                if (goingForward)
+                    spellBook->motion.Vx = 0.2f;
+                else
+                    spellBook->motion.Vx = 0;
+
+                if (lookingDown)
+                    spellBook->motion.HeadPitch = Deg2Rad(24.0f);
+                else
+                    spellBook->motion.HeadPitch = 0.0f;
             }
         }
     }

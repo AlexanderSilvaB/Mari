@@ -18,8 +18,6 @@ class ModulesManager
 
         void Run();
         void Cancel();
-        
-
 };
 
 #endif

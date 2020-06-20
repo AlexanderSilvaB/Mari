@@ -202,6 +202,73 @@ void BallSpell::Save(Storage &storage)
     storage["Modules"]["Perception"]["Vision"]["BallDetector"]["Ball"]["Size"][1] = ballHeight;
 }
 
+RobotDetectorSpell::RobotDetectorSpell()
+{
+    Enabled = true;
+    middleDetected = false;
+    leftDetected = false;
+    rightDetected = false;
+    SonarStopped = false;
+}
+
+void RobotDetectorSpell::CopyTo(Spell *spell)
+{
+    RobotDetectorSpell *s = (RobotDetectorSpell*)spell;
+    COPY(s, Enabled)
+    COPY(s, middleDetected)
+    COPY(s, leftDetected)
+    COPY(s, rightDetected)
+    COPY(s, SonarStopped)
+}
+
+void RobotDetectorSpell::Load(Storage &storage)
+{
+    Enabled = storage["Modules"]["Perception"]["Vision"]["RobotDetector"]["Enabled"].Default(true);
+}
+
+void RobotDetectorSpell::Save(Storage &storage)
+{
+    storage["Modules"]["Perception"]["Vision"]["RobotDetector"]["Enabled"] = Enabled;
+}
+
+FeatureSpell::FeatureSpell()
+{
+    Enabled = true;
+    FeatureYaw = 0;
+    FeatureDetected = false;
+    FeatureDistance = 0;
+    FeaturePitch = 0;
+    ImageX = ImageY = 0;
+    FeatureLostCount = 0;
+    HeadYaw = HeadPitch = 0;
+}
+
+void FeatureSpell::CopyTo(Spell *spell)
+{
+    FeatureSpell *s = (FeatureSpell*)spell;
+    COPY(s, Enabled)
+    COPY(s, FeatureYaw)
+    COPY(s, HeadSpeed)
+    COPY(s, FeatureDetected)
+    COPY(s, FeatureDistance)
+    COPY(s, FeaturePitch)
+    COPY(s, ImageX)
+    COPY(s, ImageY)
+    COPY(s, FeatureLostCount)
+    COPY(s, HeadYaw)
+    COPY(s, HeadPitch)
+}
+
+void FeatureSpell::Load(Storage &storage)
+{
+    Enabled = storage["Modules"]["Perception"]["Vision"]["FeatureExtractor"]["Enabled"].Default(true);
+}
+
+void FeatureSpell::Save(Storage &storage)
+{
+    storage["Modules"]["Perception"]["Vision"]["FeatureExtractor"]["Enabled"] = Enabled;
+}
+
 LocalizationSpell::LocalizationSpell()
 {
     Enabled = true;
@@ -249,6 +316,8 @@ void VisionSpell::CopyTo(Spell *spell)
     VisionSpell *s = (VisionSpell*)spell;
     ball.CopyTo(&(s->ball));
     localization.CopyTo(&(s->localization));
+    feature.CopyTo(&(s->feature));
+    robotDetector.CopyTo(&(s->robotDetector));
     COPY(s, Enabled)
     COPY(s, Record)
     COPY(s, VideoName)
@@ -264,12 +333,17 @@ void VisionSpell::Load(Storage &storage)
     VideoName = (string)storage["Modules"]["Perception"]["Vision"]["VideoName"].Default("video.avi");
     ball.Load(storage);
     localization.Load(storage);
+    feature.Load(storage);
+    robotDetector.Load(storage);
 }
 
 void VisionSpell::Save(Storage &storage)
 {
     ball.Save(storage);
     localization.Save(storage);
+    feature.Save(storage);
+    robotDetector.Save(storage);
+
     storage["Modules"]["Perception"]["Vision"]["Enabled"] = Enabled;
 }
 

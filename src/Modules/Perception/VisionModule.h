@@ -9,6 +9,8 @@
 #include "Core/Utils/CombinedCamera.hpp"
 #include "Ball/BallDetector.h"
 #include "Localization/Localizer.h"
+#include "Feature/FeatureExtractor.h"
+#include "RobotDetector/RobotDetector.h"
 
 #include "Core/Utils/FrameWriter.h"
 #include "Core/Utils/ImageMessage.h"
@@ -27,6 +29,8 @@ class VisionModule : public InnerModule
 
         BallDetector *ballDetector;
         Localizer *localizer;
+        FeatureExtractor *featureExtractor;
+        RobotDetector *robotDetector;
 
         ImageMessage message;
 

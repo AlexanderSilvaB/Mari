@@ -16,12 +16,14 @@
 
 #include "Trackers/BallTracker.h"
 #include "Trackers/RobotTracker.h"
+#include "Trackers/FeatureTracker.h"
 
 #include "Roles/GoalieRole.h"
 #include "Roles/DefenderRole.h"
 #include "Roles/KickerRole.h"
 #include "Roles/RinoPlayer.h"
 #include "Roles/BallHolder.h"
+#include "Roles/LocalizerRole.h"
 
 using namespace std;
 
@@ -38,6 +40,7 @@ class StrategyModule : public Module
 
         BallTracker *ballTracker;
         RobotTracker *robotTracker;
+        FeatureTracker *featureTracker;
 
         // Roles
         GoalieRole *goalie;
@@ -45,6 +48,8 @@ class StrategyModule : public Module
         KickerRole *kicker;
         RinoPlayer *rPlayer;
         BallHolder *ballHolder;
+        LocalizerRole *localizer;
+
 
         int squareStep;
         float squareX, squareY;

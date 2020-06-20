@@ -22,6 +22,12 @@
                         ]
                     }
                 },
+                "FeatureExtractor": {
+                    "Enabled": false
+                },
+                "RobotDetector": {
+                    "Enabled": false
+                },
                 "Localization":
                 {
                     "Enabled": false,
@@ -44,14 +50,14 @@
         },
         "Strategy": {
             "Enabled": true,
-            "Defensive" : true,
+            "Defensive" : false,
             "FakeKick" : false
         },
         "Behaviour": {
             "Enabled": true,
-            "Number" : 1,
+            "Number" : 2,
             "TeamNumber" : 47,
-            "Names" : ["Dino", "Luci", "Tiny Hand", "Lilith", "Morgana", "Unknown"]
+            "Names" : ["Dino", "Luci", "Tiny Hand", "Lilith", "Morgana", "Unknown", "Localizer"]
         }
     }
 }
